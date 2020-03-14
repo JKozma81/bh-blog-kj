@@ -2,6 +2,12 @@ const express = require('express');
 const path = require('path');
 const hbs = require('express-handlebars');
 
+const loginController = require('./controllers/LoginController');
+const adminController = require('./controllers/AdminController');
+
+const loginCtrl = new loginController();
+const adminCtrl = new adminController();
+
 const app = express();
 const port = 3000
 
@@ -39,11 +45,13 @@ const postList = [
     }
 ]
 
+
 app.engine('handlebars', hbs());
 app.set('view engine', 'handlebars');
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.get('/', (req, res) => {
     res.render('home', {
@@ -51,5 +59,11 @@ app.get('/', (req, res) => {
         postList
     })
 })
+
+app.get('/login', loginCtrl.get);
+app.post('/login', loginCtrl.post);
+
+app.get('/admin', adminCtrl.get);
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

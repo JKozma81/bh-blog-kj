@@ -4,45 +4,15 @@ body {
 	height: 100%;
 }
 
-div[data-js] {
-	min-height: 200px;
-	width: 100%;
-}
-
-legend.scheduler-border {
-    width:inherit;
-    padding:0 10px;
-    border-bottom:none;
-}
-
-img {
-	width: 100%;
-}
-
-th .active {
-	background-color: #6c757d !important;
-}
-
-.category-role {
-	display: none;
-}
-
-.main-container {
+div.login-container {
+	min-width: 1280px;
 	min-height: 720px;
 }
 
-.site-content {
-	min-height: 600px;
+.login-form {
+	width: 800px !important;
 }
 
-.table-responsive {
-	min-height: 500px;
-}
-
-.header {
-	min-height: 120px;
-}
-
-.footer {
-	min-height: 100px;
+.error-msg {
+	color: red;
 }
