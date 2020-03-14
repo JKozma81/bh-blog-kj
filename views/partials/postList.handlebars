@@ -1,0 +1,15 @@
+{{#each postList}}
+<div class="container pb-3">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <strong>Author: {{author}}</strong> <strong class="font-italic">{{date}}</strong>
+        </div>
+        <div class="card-body">
+            <div class="container-fluid d-flex justify-content-center">
+                <h5 class="card-title">{{title}}</h5>
+            </div>
+            <p class="card-text">{{text}}</p>
+        </div>
+    </div>
+</div>
+{{/each}}
