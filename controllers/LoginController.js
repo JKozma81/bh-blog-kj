@@ -35,9 +35,12 @@ class LoginController {
                 break;
         }
 
+        const logoutMsg = req.query.logout ? `Logout ${req.query.logout}` : '';
+
         res.render('login', {
             siteTitle: 'Bishops First Blog',
-            errorMsg
+            errorMsg,
+            logoutMsg
         })
     }
 
@@ -52,7 +55,7 @@ class LoginController {
         const SID = req.cookies[this.cookieController.getCookie()];
         this.sessionController.deleteSession(SID);
         this.cookieController.deleteCookie(res);
-        res.redirect('/login');
+        res.redirect('/login?logout=succes');
     }
 }
 
