@@ -1,8 +1,10 @@
 class AdminController {
 
     get(req, res) {
-        res.render('admin', {
-            siteTitle: 'Bishops First Blog'
+        const user = req.user;
+        res.render('dashboard', {
+            siteTitle: 'Bishops First Blog',
+            username: user.username
         })
     }
 }

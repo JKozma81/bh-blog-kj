@@ -1,16 +1,29 @@
 const express = require('express');
 const path = require('path');
 const hbs = require('express-handlebars');
+const cookieParser = require('cookie-parser');
 
-const loginController = require('./controllers/LoginController');
-const adminController = require('./controllers/AdminController');
+const users = [
+    {
+        username: 'admin',
+        password: 'admin'
+    }
+];
 
-const loginCtrl = new loginController();
-const adminCtrl = new adminController();
+const LoginController = require('./controllers/LoginController');
+const AdminController = require('./controllers/AdminController');
+const SessionController = require('./controllers/SessionController');
+const CookieController = require('./controllers/CookieController');
+const Authentication = require('./middlewares/Authentication');
+
+const adminContreller = new AdminController();
+const sessionCotroller = new SessionController();
+const cookieController = new CookieController();
+const loginCotroller = new LoginController(users, sessionCotroller, cookieController);
+const authMiddleware = new Authentication(users, sessionCotroller, cookieController)
 
 const app = express();
 const port = 3000
-
 
 const postList = [
     {
@@ -51,6 +64,8 @@ app.set('view engine', 'handlebars');
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
+
 
 
 app.get('/', (req, res) => {
@@ -60,10 +75,10 @@ app.get('/', (req, res) => {
     })
 })
 
-app.get('/login', loginCtrl.get);
-app.post('/login', loginCtrl.post);
-
-app.get('/admin', adminCtrl.get);
+app.get('/login', loginCotroller.get);
+app.post('/login', loginCotroller.post.bind(loginCotroller), loginCotroller.logUserIn.bind(loginCotroller));
+app.get('/logout', loginCotroller.logUserOut.bind(loginCotroller))
+app.get('/admin', authMiddleware.authenticate.bind(authMiddleware), adminContreller.get);
 
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

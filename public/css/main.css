@@ -10,9 +10,15 @@ div.login-container {
 }
 
 .login-form {
-	width: 800px !important;
+	width: 500px;
 }
 
-.error-msg {
-	color: red;
+.icon {
+	width: 100%;
 }
+
+.logout-btn {
+	width: 50px;
+}
+
+
