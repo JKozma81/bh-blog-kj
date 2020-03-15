@@ -83,7 +83,7 @@ class LoginController {
         const SID = req.cookies[this.cookieController.getCookie()];
         this.sessionController.deleteSession(SID);
         this.cookieController.deleteCookie(res);
-        res.redirect('/login?logout=succes');
+        res.redirect('/login?logout=success');
     }
 }
 
