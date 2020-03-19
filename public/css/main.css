@@ -1,24 +1,51 @@
 html,
 body {
-	width: 100%;
-	height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 div.login-container {
-	min-width: 1280px;
-	min-height: 720px;
+  min-width: 1280px;
+  min-height: 720px;
 }
 
 .login-form {
-	width: 500px;
+  width: 500px;
 }
 
 .icon {
-	width: 100%;
+  width: 100%;
 }
 
 .logout-btn {
-	width: 50px;
+  width: 50px;
 }
 
+.dashboard-menu {
+  min-height: 120px;
+}
 
+.dashboard-content {
+  min-height: 600px;
+}
+
+.new-post-site {
+  min-height: 720px;
+}
+
+.new-post-form {
+  width: 75%;
+}
+
+.title-alert,
+.content-alert {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+#post_content {
+  height: 400px;
+}

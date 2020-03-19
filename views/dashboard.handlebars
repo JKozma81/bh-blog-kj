@@ -1,4 +1,4 @@
-<div class="container-fluid d-flex flex-row justify-content-end align-items-center p-2">
+<div class="container-fluid d-flex flex-row justify-content-end align-items-center p-2 dashboard-menu">
     <p class="mr-3">Loged in as: <strong>{{username}}</strong></p>
     <a href=" /logout">
         <figure>
@@ -6,4 +6,16 @@
             <figcaption>Logout</figcaption>
         </figure>
     </a>
+</div>
+
+<div class="container-fluid d-flex flex-row justify-content-center align-items-center pt-3 pb-3 dashboard-content">
+    
+    <div class="card text-center" style="width: 18rem;">
+        <img class="card-img-top" src="/img/write.png" alt="Write new post image">
+
+        <div class="card-body">
+            <a href="/posts" class="card-link">New Post</a>
+        </div>
+    </div>
+
 </div>
