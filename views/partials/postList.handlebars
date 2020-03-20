@@ -2,13 +2,13 @@
 <div class="container pb-3">
     <div class="card">
         <div class="card-header d-flex justify-content-between">
-            <strong>Author: {{author}}</strong> <strong class="font-italic">{{date}}</strong>
+            <strong>Author: {{this.author}}</strong> <strong class="font-italic">{{this.created_at}}</strong>
         </div>
         <div class="card-body">
             <div class="container-fluid d-flex justify-content-center">
-                <h5 class="card-title">{{title}}</h5>
+                <h5 class="card-title">{{this.title}}</h5>
             </div>
-            <p class="card-text">{{text}}</p>
+            <p class="card-text">{{this.content}}</p>
         </div>
     </div>
 </div>

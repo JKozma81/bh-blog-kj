@@ -1,16 +1,18 @@
 <div class="container-fluid p-5 d-flex flex-column align-items-center new-post-site">
   <h1 class="pb-3">New Post</h1>
-  <form method="POST" action="/posts" class="new-post-form needs-validation" novalidate>
+  <form method="POST" action="/posts" class="new-post-form needs-validation">
     <div class="form-group row">
       <label for="post_title" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="post_title" name="title" required>
+        <input type="text" class="form-control" id="post_title" name="title" {{#if title}}value="{{title}}" {{/if}}
+          required>
       </div>
     </div>
     <div class="form-group row">
       <label for="post_content" class="col-sm-12 col-form-label">Content</label>
       <div class="col-sm-12">
-        <textarea class="form-control" id="post_content" rows="3" name="content" required></textarea>
+        <textarea class="form-control" id="post_content" rows="3" name="content" {{#if content}}value="{{content}}"
+          {{/if}} required></textarea>
       </div>
     </div>
     <div class="form-group row d-flex justify-content-between">
@@ -18,20 +20,18 @@
       <button type="submit" class="btn btn-primary mb-2">Publish</button>
     </div>
 
-    <div class="alert alert-danger mt-2 title-alert" role="alert">
-      Title is Mandatory!
+    <div class="alert alert-danger mt-2 missing-fields-alert" role="alert">
+
+    </div>
+
+    {{#if postError}}
+    <div class="alert alert-danger mt-2" role="alert">
+      {{postError}}
       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-
-    <div class="alert alert-danger mt-2 content-alert" role="alert">
-      Content is Mandatory!
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-
+    {{/if}}
 
   </form>
 </div>
@@ -44,12 +44,27 @@
       const form = document.querySelector('.new-post-form');
       form.addEventListener('submit', function (event) {
         event.preventDefault();
-        console.log(document.querySelector('#post_title').value)
+        if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value) {
+          const errorTextDisplay = document.createTextNode('Title and Content are Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
+        }
+
         if (!document.querySelector('#post_title').value) {
-          document.querySelector('.title-alert').style.display = 'block';
+          const errorTextDisplay = document.createTextNode('Title is Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
         }
         if (!document.querySelector('#post_content').value) {
-          document.querySelector('.content-alert').style.display = 'block';
+          const errorTextDisplay = document.createTextNode('Content is Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
         }
 
         if (document.querySelector('#post_title').value && document.querySelector('#post_content').value) form.submit();

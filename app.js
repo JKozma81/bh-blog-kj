@@ -55,7 +55,9 @@ const CookieController = require("./controllers/CookieController");
 const Authentication = require("./utils/Authentication");
 const PostController = require("./controllers/PostController");
 
-const adminContreller = new AdminController();
+const PostsDAO = require('./services/PostsDAO');
+
+const adminController = new AdminController();
 const sessionCotroller = new SessionController();
 const cookieController = new CookieController();
 const postController = new PostController(
@@ -80,10 +82,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   res.render("home", {
     siteTitle: "Bishops First Blog",
-    postList
+    postList: await PostsDAO.getAllPosts()
   });
 });
 
@@ -100,7 +102,7 @@ app.get("/logout", loginCotroller.logUserOut.bind(loginCotroller));
 app.get(
   "/admin",
   authMiddleware.authenticate.bind(authMiddleware),
-  adminContreller.get
+  adminController.get
 );
 
 app.get(

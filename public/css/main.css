@@ -37,13 +37,8 @@ div.login-container {
   width: 75%;
 }
 
-.title-alert,
-.content-alert {
+.missing-fields-alert {
   display: none;
-}
-
-.show {
-  display: block;
 }
 
 #post_content {

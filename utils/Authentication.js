@@ -12,6 +12,8 @@ class Authentication {
 
 		const SID = Number(req.cookies[this.cookieController.getCookie()]);
 		const userSession = this.sessionController.getSession(SID);
+
+		if (!userSession) res.redirect('/login?error=login')
 		req.user = userSession.user;
 		next();
 	}
