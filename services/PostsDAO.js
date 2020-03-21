@@ -14,9 +14,8 @@ class PostsDAO {
 
   static async addPost(postObject) {
     try {
-
       await db_run(
-        `INSERT INTO posts(title, author, content, created_at) VALUES("${postObject.title}", "${postObject.author}", "${postObject.content}", "${postObject.created_at}")`
+        `INSERT INTO posts(title, author, content, created_at) VALUES("${postObject.title}", "${postObject.author}", '${postObject.content}', "${postObject.created_at}")`
       );
 
       const postID = await db_get(
@@ -24,7 +23,6 @@ class PostsDAO {
       );
 
       return postID;
-
     } catch (err) {
       console.error(err);
     }

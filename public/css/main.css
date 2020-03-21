@@ -41,6 +41,11 @@ div.login-container {
   display: none;
 }
 
-#post_content {
+#editor {
+  width: 100%;
   height: 400px;
+}
+
+.ql-toolbar {
+  width: 100%;
 }
