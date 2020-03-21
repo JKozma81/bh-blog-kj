@@ -1,15 +1,16 @@
-{{#each postList}}
 <div class="container pb-3">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between">
-            <strong>Author: {{this.author}}</strong> <strong class="font-italic">{{this.created_at}}</strong>
-        </div>
-        <div class="card-body">
-            <div class="container-fluid d-flex justify-content-center">
-                <h5 class="card-title">{{this.title}}</h5>
+    <ul class="list-group w-100">
+        {{#each postList}}
+        <li class="list-group-item">
+            <div class="row d-flex justify-content-between p-2">
+                <div>
+                    <a href="/posts/{{this.id}}">{{this.title}} (by: {{this.author}})</a>
+                </div>
+                <div>
+                    {{this.created_at}}
+                </div>
             </div>
-            <p class="card-text">{{this.content}}</p>
-        </div>
-    </div>
+        </li>
+        {{/each}}
+    </ul>
 </div>
-{{/each}}

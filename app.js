@@ -10,44 +10,6 @@ const users = [
   }
 ];
 
-const postList = [
-  {
-    author: "John Doe",
-    date: "2020.03.14",
-    title: "First Post",
-    text:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque, ea! Animi, et. Magni dolorem esse recusandae architecto deserunt. Consectetur tempore soluta ex sunt suscipit deserunt reprehenderit minus nihil, commodi quae."
-  },
-  {
-    author: "John Davis",
-    date: "2020.03.12",
-    title: "Second Post",
-    text:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque, ea! Animi, et. Magni dolorem esse recusandae architecto deserunt. Consectetur tempore soluta ex sunt suscipit deserunt reprehenderit minus nihil, commodi quae."
-  },
-  {
-    author: "Jimmy Doe",
-    date: "2020.03.10",
-    title: "Lorem Post",
-    text:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque, ea! Animi, et. Magni dolorem esse recusandae architecto deserunt. Consectetur tempore soluta ex sunt suscipit deserunt reprehenderit minus nihil, commodi quae."
-  },
-  {
-    author: "John Doe",
-    date: "2020.03.14",
-    title: "First Post",
-    text:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque, ea! Animi, et. Magni dolorem esse recusandae architecto deserunt. Consectetur tempore soluta ex sunt suscipit deserunt reprehenderit minus nihil, commodi quae."
-  },
-  {
-    author: "John Doe",
-    date: "2020.03.14",
-    title: "First Post",
-    text:
-      "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eaque, ea! Animi, et. Magni dolorem esse recusandae architecto deserunt. Consectetur tempore soluta ex sunt suscipit deserunt reprehenderit minus nihil, commodi quae."
-  }
-];
-
 const LoginController = require("./controllers/LoginController");
 const AdminController = require("./controllers/AdminController");
 const SessionController = require("./controllers/SessionController");
@@ -55,16 +17,12 @@ const CookieController = require("./controllers/CookieController");
 const Authentication = require("./utils/Authentication");
 const PostController = require("./controllers/PostController");
 
-const PostsDAO = require('./services/PostsDAO');
+const PostsDAO = require("./services/PostsDAO");
 
 const adminController = new AdminController();
 const sessionCotroller = new SessionController();
 const cookieController = new CookieController();
-const postController = new PostController(
-  postList,
-  sessionCotroller,
-  cookieController
-);
+const postController = new PostController(sessionCotroller, cookieController);
 const loginCotroller = new LoginController(
   users,
   sessionCotroller,
@@ -110,6 +68,8 @@ app.get(
   authMiddleware.authenticate.bind(authMiddleware),
   postController.get.bind(postController)
 );
+
+app.get("/posts/:id", postController.getBlogPost);
 
 app.post(
   "/posts",

@@ -4,7 +4,8 @@ body {
   height: 100%;
 }
 
-div.login-container {
+div.login-container,
+.error404-content {
   min-width: 1280px;
   min-height: 720px;
 }
@@ -43,4 +44,20 @@ div.login-container {
 
 #post_content {
   height: 400px;
+}
+
+.read-post-header {
+  min-height: 150px;
+}
+
+.post-info {
+  min-height: 150px;
+}
+
+.post-content {
+  min-height: 370px;
+}
+
+.error404-img {
+  width: 50%;
 }

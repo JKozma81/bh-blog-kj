@@ -1,0 +1,21 @@
+<div class="container-fluid read-post-header d-flex flex-column justify-content-center align-items-center bg-light">
+  <h1>{{siteTitle}}</h1>
+</div>
+
+<div class="container-fluid post-info border pt-3 pb-3 d-flex flex-column justify-content-center">
+  <div class="container-fluid text-left">
+    <h3>{{post.title}}</h3>
+  </div>
+  <div class="container-fluid row">
+    <div class="col-6">
+      <h5>Author: {{post.author}}</h5>
+    </div>
+    <div class="col-6 text-right">
+      <h5>{{post.created_at}}</h5>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid post-content p-5">
+  {{{post.content}}}
+</div>
