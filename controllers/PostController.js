@@ -11,10 +11,22 @@ class PostController {
     let postError = "";
 
     if (req.query.error) {
+      if (req.query.error === "title-content-slug") {
+        postError = "Title, Content and Slug are Mandatory!";
+      }
+      if (req.query.error === "title-and-slug") {
+        postError = "Title and Slug are Mandatory!";
+      }
+      if (req.query.error === "content-and-slug") {
+        postError = "Content and Slug are Mandatory!";
+      }
+      if (req.query.error === "title-and-content") {
+        postError = "Title and Content are Mandatory!";
+      }
+
       if (req.query.error === "title") postError = "Title is Mandatory!";
       if (req.query.error === "content") postError = "Content is Mandatory!";
-      if (req.query.error === "title-and-content")
-        postError = "Title and Content are Mandatory!";
+      if (req.query.error === "slug") postError = "Slug is Mandatory!";
     }
 
     res.render("newPost", {
@@ -22,23 +34,36 @@ class PostController {
       username: user.username,
       postError,
       title: req.query.title ? req.query.title : "",
-      content: req.query.content ? req.query.content : ""
+      content: req.query.content ? req.query.content : "",
+      slug: req.query.slug ? req.query.slug : ""
     });
   }
 
   post(req, res) {
-    const { title, content } = req.body;
+    const { title, content, slug } = req.body;
 
-    if (!title && !content) {
-      res.redirect("/posts?error=title-and-content");
+    if (!title && !content && !slug) {
+      res.redirect("/posts?error=title-content-slug");
+      return;
+    }
+    if (!title && !slug) {
+      res.redirect(`/posts?error=title-and-slug&content=${content}`);
+      return;
+    }
+    if (!slug && !content) {
+      res.redirect(`/posts?error=content-and-slug&title=${title}`);
       return;
     }
     if (!title) {
-      res.redirect(`/posts?error=title&content=${content}`);
+      res.redirect(`/posts?error=title&content=${content}&slug=${slug}`);
       return;
     }
     if (!content) {
-      res.redirect(`/posts?error=content&title=${title}`);
+      res.redirect(`/posts?error=content&title=${title}&slug=${slug}`);
+      return;
+    }
+    if (!slug) {
+      res.redirect(`/posts?error=content&title=${title}&content=${content}`);
       return;
     }
 
@@ -50,17 +75,21 @@ class PostController {
       title,
       author: user.username,
       created_at: date,
-      content
+      content,
+      slug
     };
     PostsDAO.addPost(newPost);
     res.redirect("/admin");
   }
 
   async getBlogPost(req, res) {
-    const postID = Number(req.params.id);
-    const blogPost = await PostsDAO.getPost(postID);
+    const searchParameter = Number(req.params.idOrSlug);
 
-    if (!postID || !blogPost) {
+    const blogPost = await PostsDAO.getPost(
+      isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
+    );
+
+    if (!blogPost) {
       res.render("custom404", {
         siteTitle: "Bishops First Blog"
       });

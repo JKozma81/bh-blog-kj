@@ -4,7 +4,7 @@ class PostsDAO {
   static async getAllPosts() {
     try {
       const allPosts = await db_getAll(
-        "SELECT id, title, author, content, created_at FROM posts"
+        "SELECT id, title, author, content, created_at, slug FROM posts"
       );
       return allPosts;
     } catch (err) {
@@ -15,7 +15,10 @@ class PostsDAO {
   static async addPost(postObject) {
     try {
       await db_run(
-        `INSERT INTO posts(title, author, content, created_at) VALUES("${postObject.title}", "${postObject.author}", "${postObject.content}", "${postObject.created_at}")`
+        `INSERT
+         INTO
+          posts(title, author, content, created_at, slug)
+         VALUES("${postObject.title}", "${postObject.author}", "${postObject.content}", "${postObject.created_at}", "${postObject.slug}")`
       );
 
       const postID = await db_get(
@@ -28,22 +31,34 @@ class PostsDAO {
     }
   }
 
-  static async getPost(postID) {
+  static async getPost(searchParameter) {
     try {
-      const post = await db_get(
-        `SELECT 
+      let post;
+
+      const coreSqlQuery = `
+      SELECT 
           id,
           title,
           author,
           content,
-          created_at
+          created_at,
+          slug
         FROM
           posts
-        WHERE
-          id = ${postID}`
-      );
+      `;
 
-      return post;
+      if (typeof searchParameter === "number") {
+        const sqlQueryString = coreSqlQuery + `WHERE id = ${searchParameter}`;
+        post = await db_get(sqlQueryString);
+        return post;
+      }
+
+      if (typeof searchParameter === "string") {
+        const sqlQueryString =
+          coreSqlQuery + `WHERE slug = "${searchParameter}"`;
+        post = await db_get(sqlQueryString);
+        return post;
+      }
     } catch (err) {
       console.error(err);
     }

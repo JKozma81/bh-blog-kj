@@ -69,7 +69,7 @@ app.get(
   postController.get.bind(postController)
 );
 
-app.get("/posts/:id", postController.getBlogPost);
+app.get("/posts/:idOrSlug", postController.getBlogPost);
 
 app.post(
   "/posts",

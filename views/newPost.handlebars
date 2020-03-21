@@ -5,7 +5,14 @@
       <label for="post_title" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" id="post_title" name="title" {{#if title}}value="{{title}}" {{/if}}
-          required>
+          placeholder="Some blogpost title" required>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="post_slug" class="col-sm-2 col-form-label">Slug</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="post_slug" name="slug" {{#if slug}}value="{{slug}}" {{/if}}
+          placeholder="some-blogpost-title" required>
       </div>
     </div>
     <div class="form-group row">
@@ -42,8 +49,41 @@
     'use strict';
     window.addEventListener('load', function () {
       const form = document.querySelector('.new-post-form');
+
+      document.querySelector('#post_slug').addEventListener('keypress', (event) => {
+        const regex = new RegExp("^[a-z\-]+$");
+        const key = String.fromCharCode(event.charCode);
+        if (!regex.test(key)) {
+          event.preventDefault();
+        }
+      })
+
       form.addEventListener('submit', function (event) {
         event.preventDefault();
+        if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value && !document.querySelector('#post_slug')) {
+          const errorTextDisplay = document.createTextNode('Title, Content and Slug are Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
+        }
+
+        if (!document.querySelector('#post_title').value && !document.querySelector('#post_slug').value) {
+          const errorTextDisplay = document.createTextNode('Title and Slug are Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
+        }
+
+        if (!document.querySelector('#post_content').value && !document.querySelector('#post_slug').value) {
+          const errorTextDisplay = document.createTextNode('Content and Slug are Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
+        }
+
         if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value) {
           const errorTextDisplay = document.createTextNode('Title and Content are Mandatory!');
           document.querySelector('.missing-fields-alert').firstChild.textContent = '';
@@ -59,6 +99,7 @@
           document.querySelector('.missing-fields-alert').style.display = 'block';
           return;
         }
+
         if (!document.querySelector('#post_content').value) {
           const errorTextDisplay = document.createTextNode('Content is Mandatory!');
           document.querySelector('.missing-fields-alert').firstChild.textContent = '';
@@ -67,8 +108,20 @@
           return;
         }
 
-        if (document.querySelector('#post_title').value && document.querySelector('#post_content').value) form.submit();
+        if (!document.querySelector('#post_slug').value) {
+          const errorTextDisplay = document.createTextNode('Slug is Mandatory!');
+          document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+          document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+          document.querySelector('.missing-fields-alert').style.display = 'block';
+          return;
+        }
+
+        if (document.querySelector('#post_title').value && document.querySelector('#post_content').value && document.querySelector('#post_slug')) {
+          form.submit();
+        }
+
         form.classList.add('was-validated');
+
       }, false);
     }, false);
   })();

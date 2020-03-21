@@ -4,7 +4,7 @@ const db = new sqlite3.Database("./db/blog.db");
 
 db.serialize(() => {
   db.run(
-    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, author VARCHAR(100) NOT NULL, title VARCHAR(100) NOT NULL, content TEXT NOT NULL, created_at VARCHAR(100) NOT NULL)"
+    "CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, author VARCHAR(100) NOT NULL, title VARCHAR(100) NOT NULL, content TEXT NOT NULL, created_at VARCHAR(100) NOT NULL, slug VARCHAR(100) NOT NULL)"
   );
 });
 
@@ -41,5 +41,4 @@ module.exports = {
       });
     });
   }
-}
-
+};
