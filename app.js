@@ -64,12 +64,30 @@ app.get(
 );
 
 app.get(
+  "/admin/list",
+  authMiddleware.authenticate.bind(authMiddleware),
+  adminController.adminBlogPostList
+);
+
+app.get(
+  "/admin/list/:id",
+  authMiddleware.authenticate.bind(authMiddleware),
+  adminController.editBlogPost
+);
+
+app.post(
+  "/admin/list/:id",
+  authMiddleware.authenticate.bind(authMiddleware),
+  adminController.modifyBlogPost
+);
+
+app.get(
   "/posts",
   authMiddleware.authenticate.bind(authMiddleware),
   postController.get.bind(postController)
 );
 
-app.get("/posts/:idOrSlug", postController.getBlogPost);
+app.get("/posts/:idOrSlug", postController.showBlogPost);
 
 app.post(
   "/posts",

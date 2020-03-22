@@ -3,10 +3,10 @@ const { db_getAll, db_run, db_get } = require("./database_operations");
 class PostsDAO {
   static async getAllPosts() {
     try {
-      const allPosts = await db_getAll(
+      const blogPosts = await db_getAll(
         "SELECT id, title, author, content, created_at, slug FROM posts"
       );
-      return allPosts;
+      return blogPosts;
     } catch (err) {
       console.error(err);
     }
@@ -24,8 +24,6 @@ class PostsDAO {
       const postID = await db_get(
         `SELECT id FROM posts WHERE created_at = "${postObject.created_at}"`
       );
-
-      return postID;
     } catch (err) {
       console.error(err);
     }
@@ -59,6 +57,23 @@ class PostsDAO {
         post = await db_get(sqlQueryString);
         return post;
       }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  static async modifyPost(postID, postObject) {
+    try {
+      await db_run(
+        `UPDATE
+          posts
+         SET
+          title = "${postObject.title}",
+          slug = "${postObject.slug}",
+          content = "${postObject.content}"
+         WHERE
+          id = ${postID}`
+      );
     } catch (err) {
       console.error(err);
     }

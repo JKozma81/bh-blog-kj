@@ -1,0 +1,31 @@
+<div class="container-fluid admin-post-list">
+  <div class="container text-center p-4">
+    <h1>{{submenuTitle}}</h1>
+  </div>
+  <div class="container">
+    <a class="btn btn-primary mb-3 mt-3" href="/posts" role="button">New Post</a>
+
+    <table class="table table-bordered table-hover table-sm text-center">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Author</th>
+          <th scope="col">Publish date</th>
+          <th scope="col">Operations</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each blogPosts}}
+        <tr>
+          <td>{{this.title}}</td>
+          <td>{{this.author}}</td>
+          <td>{{this.created_at}}</td>
+          <td>
+            <a class="btn btn-primary w-100 btn-sm" href="/admin/list/{{this.id}}" role="button">Edit</a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>

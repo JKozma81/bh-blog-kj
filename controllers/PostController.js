@@ -31,6 +31,7 @@ class PostController {
 
     res.render("newPost", {
       siteTitle: "Bishops First Blog",
+      submenuTitle: "New Post",
       username: user.username,
       postError,
       title: req.query.title ? req.query.title : "",
@@ -82,7 +83,7 @@ class PostController {
     res.redirect("/admin");
   }
 
-  async getBlogPost(req, res) {
+  async showBlogPost(req, res) {
     const searchParameter = Number(req.params.idOrSlug);
 
     const blogPost = await PostsDAO.getPost(

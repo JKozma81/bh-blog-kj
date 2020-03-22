@@ -5,7 +5,8 @@ body {
 }
 
 div.login-container,
-.error404-content {
+.error404-content,
+.admin-post-list {
   min-width: 1280px;
   min-height: 720px;
 }
