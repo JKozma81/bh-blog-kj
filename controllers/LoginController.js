@@ -1,9 +1,9 @@
 const CookieService = require('../services/CookieService');
+const SessionServices = require('../services/SessionServices');
 
 class LoginController {
-	constructor(users, sessionsController) {
+	constructor(users) {
 		this.users = users;
-		this.sessionController = sessionsController;
 	}
 
 	post(req, res, next) {
@@ -76,14 +76,14 @@ class LoginController {
 
 	logUserIn(req, res) {
 		const user = req.user;
-		const SID = this.sessionController.createSession(user);
+		const SID = SessionServices.createSession(user);
 		CookieService.createCookie(res, SID);
 		res.redirect('/admin');
 	}
 
 	logUserOut(req, res) {
 		const SID = req.cookies[CookieService.getCookie()];
-		this.sessionController.deleteSession(SID);
+		SessionServices.deleteSession(SID);
 		CookieService.deleteCookie(res);
 		res.redirect('/login?logout=success');
 	}

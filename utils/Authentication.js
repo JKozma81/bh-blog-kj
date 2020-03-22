@@ -1,10 +1,7 @@
 const CookieService = require('../services/CookieService');
+const SessionServices = require('../services/SessionServices');
 
 class Authentication {
-	constructor(sessionController) {
-		this.sessionController = sessionController;
-	}
-
 	authenticate(req, res, next) {
 		if (!req.cookies[CookieService.getCookie()]) {
 			res.status(401).redirect('/login?error=login');
@@ -12,7 +9,7 @@ class Authentication {
 		}
 
 		const SID = Number(req.cookies[CookieService.getCookie()]);
-		const userSession = this.sessionController.getSession(SID);
+		const userSession = SessionServices.getSession(SID);
 
 		if (!userSession) {
 			res.redirect('/login?error=login');

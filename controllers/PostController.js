@@ -1,11 +1,8 @@
 const PostsDAO = require('../services/PostsDAO');
 const CookieService = require('../services/CookieService');
+const SessionServices = require('../services/SessionServices');
 
 class PostController {
-	constructor(sessionController) {
-		this.sessionController = sessionController;
-	}
-
 	get(req, res) {
 		const user = req.user;
 		let postError = '';
@@ -72,7 +69,7 @@ class PostController {
 		}
 
 		const SID = Number(req.cookies[CookieService.getCookie()]);
-		const user = this.sessionController.getSession(SID).user;
+		const user = SessionServices.getSession(SID).user;
 
 		const newPost = {
 			title,
