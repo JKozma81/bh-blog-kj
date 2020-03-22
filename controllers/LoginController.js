@@ -3,7 +3,7 @@ const SessionServices = require('../services/SessionServices');
 const users = require('../Mocks/Users');
 
 class LoginController {
-	post(req, res, next) {
+	static post(req, res, next) {
 		const { username, password } = req.body;
 
 		if (!username && !password) {
@@ -34,7 +34,7 @@ class LoginController {
 		next();
 	}
 
-	get(req, res) {
+	static get(req, res) {
 		let errorMsg;
 
 		switch (req.query.error) {
@@ -71,14 +71,14 @@ class LoginController {
 		});
 	}
 
-	logUserIn(req, res) {
+	static logUserIn(req, res) {
 		const user = req.user;
 		const SID = SessionServices.createSession(user);
 		CookieService.createCookie(res, SID);
 		res.redirect('/admin');
 	}
 
-	logUserOut(req, res) {
+	static logUserOut(req, res) {
 		const SID = req.cookies[CookieService.getCookie()];
 		SessionServices.deleteSession(SID);
 		CookieService.deleteCookie(res);

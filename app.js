@@ -9,8 +9,6 @@ const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
 const PostsDAO = require('./services/PostsDAO');
 
-const loginCotroller = new LoginController();
-
 const app = express();
 const port = 3000;
 
@@ -52,15 +50,11 @@ app.get('/', async (req, res) => {
 	});
 });
 
-app.get('/login', loginCotroller.get);
+app.get('/login', LoginController.get);
 
-app.post(
-	'/login',
-	loginCotroller.post.bind(loginCotroller),
-	loginCotroller.logUserIn.bind(loginCotroller)
-);
+app.post('/login', LoginController.post, LoginController.logUserIn);
 
-app.get('/logout', loginCotroller.logUserOut.bind(loginCotroller));
+app.get('/logout', LoginController.logUserOut);
 
 app.get(
 	'/admin',
