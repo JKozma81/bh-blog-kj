@@ -22,8 +22,10 @@
           {{/if}}</textarea>
       </div>
     </div>
+    <input type="text" name="draft" value="true" class="set-draft" disabled hidden>
     <div class="form-group row d-flex justify-content-between">
       <a class="btn btn-primary mb-2" href="/admin" role="button">Discard</a>
+      <button type="submit" class="btn btn-primary mb-2 save-draft">Save as draft</button>
       <button type="submit" class="btn btn-primary mb-2">Publish</button>
     </div>
 
@@ -49,6 +51,10 @@
     'use strict';
     window.addEventListener('load', function () {
       const form = document.querySelector('.new-post-form');
+
+      document.querySelector('.save-draft').addEventListener('click', () => {
+        document.querySelector('.set-draft').disabled = false;
+      })
 
       document.querySelector('#post_slug').addEventListener('keypress', (event) => {
         const regex = new RegExp("^[a-z\-]+$");

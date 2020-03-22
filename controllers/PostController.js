@@ -41,7 +41,7 @@ class PostController {
   }
 
   post(req, res) {
-    const { title, content, slug } = req.body;
+    const { title, content, slug, draft } = req.body;
 
     if (!title && !content && !slug) {
       res.redirect("/posts?error=title-content-slug");
@@ -77,7 +77,8 @@ class PostController {
       author: user.username,
       created_at: date,
       content,
-      slug
+      slug,
+      draft: draft ? Number(!!draft) : Number(false)
     };
     PostsDAO.addPost(newPost);
     res.redirect("/admin");
