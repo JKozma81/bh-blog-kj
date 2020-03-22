@@ -13,21 +13,15 @@ const users = [
 const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
 const SessionController = require('./controllers/SessionController');
-const CookieController = require('./controllers/CookieController');
 const Authentication = require('./utils/Authentication');
 const PostController = require('./controllers/PostController');
 
 const PostsDAO = require('./services/PostsDAO');
 
 const sessionCotroller = new SessionController();
-const cookieController = new CookieController();
-const postController = new PostController(sessionCotroller, cookieController);
-const loginCotroller = new LoginController(
-	users,
-	sessionCotroller,
-	cookieController
-);
-const authMiddleware = new Authentication(sessionCotroller, cookieController);
+const postController = new PostController(sessionCotroller);
+const loginCotroller = new LoginController(users, sessionCotroller);
+const authMiddleware = new Authentication(sessionCotroller);
 
 const app = express();
 const port = 3000;
