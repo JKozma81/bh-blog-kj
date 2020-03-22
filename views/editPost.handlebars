@@ -19,11 +19,13 @@
         <textarea class="form-control" id="post_content" rows="3" name="content" required>
           {{blogPost.content}}
         </textarea>
+        <input type="text" name="draft" value="false" class="set-draft" disabled hidden>
       </div>
     </div>
     <div class="form-group row d-flex justify-content-between">
       <a class="btn btn-primary mb-2" href="/admin/list" role="button">Discard</a>
-      <button type="submit" class="btn btn-primary mb-2">Modify</button>
+      <button type="submit" class="btn btn-primary mb-2 save-draft">Save as draft</button>
+      <button type="submit" class="btn btn-primary mb-2 modify">Modify</button>
     </div>
   </form>
 </div>
@@ -37,5 +39,15 @@
         event.preventDefault();
       }
     });
+
+    document.querySelector('.save-draft').addEventListener('click', () => {
+      document.querySelector('.set-draft').value = true;
+      document.querySelector('.set-draft').disabled = false;
+    })
+
+    document.querySelector('.modify').addEventListener('click', () => {
+      document.querySelector('.set-draft').value = false;
+      document.querySelector('.set-draft').disabled = false;
+    })
   });
 </script>

@@ -37,7 +37,8 @@ class AdminController {
     ({
       title: modifiedBlogPost.title,
       slug: modifiedBlogPost.slug,
-      content: modifiedBlogPost.content
+      content: modifiedBlogPost.content,
+      draft: modifiedBlogPost.draft
     } = req.body);
 
     await PostsDAO.modifyPost(blogPostID, modifiedBlogPost);

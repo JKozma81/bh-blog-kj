@@ -43,7 +43,7 @@ app.use(cookieParser());
 app.get("/", async (req, res) => {
   res.render("home", {
     siteTitle: "Bishops First Blog",
-    postList: await PostsDAO.getAllPosts()
+    postList: await PostsDAO.getAllPublishedPosts()
   });
 });
 

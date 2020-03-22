@@ -4,7 +4,18 @@ class PostsDAO {
   static async getAllPosts() {
     try {
       const blogPosts = await db_getAll(
-        "SELECT id, title, author, content, created_at, slug FROM posts"
+        "SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts"
+      );
+      return blogPosts;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  static async getAllPublishedPosts() {
+    try {
+      const blogPosts = await db_getAll(
+        "SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts WHERE published_at IS NOT NULL"
       );
       return blogPosts;
     } catch (err) {
@@ -17,12 +28,18 @@ class PostsDAO {
       await db_run(
         `INSERT
          INTO
-          posts(title, author, content, created_at, slug)
-         VALUES("${postObject.title}", "${postObject.author}", "${postObject.content}", "${postObject.created_at}", "${postObject.slug}")`
-      );
-
-      const postID = await db_get(
-        `SELECT id FROM posts WHERE created_at = "${postObject.created_at}"`
+          posts(title, author, content, created_at, slug, draft, published_at, modified_at)
+         VALUES("${postObject.title}",
+                "${postObject.author}",
+                "${postObject.content}",
+                 datetime("now"),
+                "${postObject.slug}"
+                 ${postObject.draft === "true" ? ", 1" : ", 0"}
+                 ${
+                   postObject.draft === "false" ? ", datetime('now')" : ", NULL"
+                 }
+                 ${', datetime("now")'}
+                )`
       );
     } catch (err) {
       console.error(err);
@@ -71,6 +88,11 @@ class PostsDAO {
           title = "${postObject.title}",
           slug = "${postObject.slug}",
           content = "${postObject.content}"
+          ${
+            postObject.draft === "true"
+              ? ', published_at = NULL, modified_at = datetime("now")'
+              : ', published_at = datetime("now"), modified_at = datetime("now")'
+          }
          WHERE
           id = ${postID}`
       );

@@ -22,11 +22,11 @@
           {{/if}}</textarea>
       </div>
     </div>
-    <input type="text" name="draft" value="true" class="set-draft" disabled hidden>
+    <input type="text" name="draft" value="false" class="set-draft" disabled hidden>
     <div class="form-group row d-flex justify-content-between">
       <a class="btn btn-primary mb-2" href="/admin" role="button">Discard</a>
       <button type="submit" class="btn btn-primary mb-2 save-draft">Save as draft</button>
-      <button type="submit" class="btn btn-primary mb-2">Publish</button>
+      <button type="submit" class="btn btn-primary mb-2 publish">Publish</button>
     </div>
 
     <div class="alert alert-danger mt-2 missing-fields-alert" role="alert">
@@ -53,6 +53,12 @@
       const form = document.querySelector('.new-post-form');
 
       document.querySelector('.save-draft').addEventListener('click', () => {
+        document.querySelector('.set-draft').value = true;
+        document.querySelector('.set-draft').disabled = false;
+      })
+
+      document.querySelector('.publish').addEventListener('click', () => {
+        document.querySelector('.set-draft').value = false;
         document.querySelector('.set-draft').disabled = false;
       })
 

@@ -68,17 +68,15 @@ class PostController {
       return;
     }
 
-    const date = new Date().toLocaleString();
     const SID = Number(req.cookies[this.cookieController.getCookie()]);
     const user = this.sessionController.getSession(SID).user;
 
     const newPost = {
       title,
       author: user.username,
-      created_at: date,
       content,
       slug,
-      draft: draft ? Number(!!draft) : Number(false)
+      draft
     };
     PostsDAO.addPost(newPost);
     res.redirect("/admin");
