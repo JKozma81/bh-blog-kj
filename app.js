@@ -9,7 +9,6 @@ const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
 const PostsDAO = require('./services/PostsDAO');
 
-const postController = new PostController();
 const loginCotroller = new LoginController();
 
 const app = express();
@@ -90,15 +89,15 @@ app.post(
 app.get(
 	'/posts',
 	UserAuthenticationMiddleware.authenticate,
-	postController.get.bind(postController)
+	PostController.get
 );
 
-app.get('/posts/:idOrSlug', postController.showBlogPost);
+app.get('/posts/:idOrSlug', PostController.showBlogPost);
 
 app.post(
 	'/posts',
 	UserAuthenticationMiddleware.authenticate,
-	postController.post.bind(postController)
+	PostController.post
 );
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

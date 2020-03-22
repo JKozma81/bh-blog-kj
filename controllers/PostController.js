@@ -3,7 +3,7 @@ const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
 
 class PostController {
-	get(req, res) {
+	static get(req, res) {
 		const user = req.user;
 		let postError = '';
 
@@ -38,7 +38,7 @@ class PostController {
 		});
 	}
 
-	post(req, res) {
+	static async post(req, res) {
 		const { title, content, slug, draft } = req.body;
 
 		if (!title && !content && !slug) {
@@ -78,11 +78,11 @@ class PostController {
 			slug,
 			draft
 		};
-		PostsDAO.addPost(newPost);
+		await PostsDAO.addPost(newPost);
 		res.redirect('/admin');
 	}
 
-	async showBlogPost(req, res) {
+	static async showBlogPost(req, res) {
 		const searchParameter = Number(req.params.idOrSlug);
 
 		const blogPost = await PostsDAO.getPost(
