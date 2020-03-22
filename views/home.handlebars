@@ -4,19 +4,41 @@
     </div>
 </div>
 
-<div class="container pb-3 w-75">
-    <ul class="list-group w-100">
-        {{#each postList}}
-        <li class="list-group-item">
-            <div class="row d-flex justify-content-between p-2">
-                <div>
-                    <a href="/posts/{{this.id}}">{{this.title}} (by: {{this.author}})</a>
+<div class="container-fluid row">
+    <div class="container col-3 archive-container">
+        <ul>
+            {{#each formatedBlogPostData}}
+            <li>{{@key}}
+                {{#each this}}
+                <ul>
+                    <li>{{@key}}
+                        <ul>
+                            {{#each this}}
+                            <li><a href="/posts/{{this.id}}">{{this.title}}</a></li>
+                            {{/each}}
+                        </ul>
+                    </li>
+                </ul>
+                {{/each}}
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <div class="container pb-3 col-9">
+        <ul class="list-group w-100">
+            {{#each postList}}
+            <li class="list-group-item">
+                <div class="row d-flex justify-content-between p-2">
+                    <div>
+                        <a href="/posts/{{this.id}}">{{this.title}} (by: {{this.author}})</a>
+                    </div>
+                    <div>
+                        {{this.created_at}}
+                    </div>
                 </div>
-                <div>
-                    {{this.created_at}}
-                </div>
-            </div>
-        </li>
-        {{/each}}
-    </ul>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
 </div>

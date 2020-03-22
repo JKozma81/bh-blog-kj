@@ -1,32 +1,71 @@
-const { db_getAll, db_run, db_get } = require("./database_operations");
+const { db_getAll, db_run, db_get } = require('./database_operations');
 
 class PostsDAO {
-  static async getAllPosts() {
-    try {
-      const blogPosts = await db_getAll(
-        "SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts"
-      );
-      return blogPosts;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+	static async getAllPosts() {
+		try {
+			const blogPosts = await db_getAll(
+				'SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts'
+			);
+			return blogPosts;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  static async getAllPublishedPosts() {
-    try {
-      const blogPosts = await db_getAll(
-        "SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts WHERE published_at IS NOT NULL"
-      );
-      return blogPosts;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+	static async getAllPublishedPosts() {
+		try {
+			const blogPosts = await db_getAll(
+				`SELECT
+          id,
+          title,
+          author,
+          content,
+          created_at,
+          slug,
+          draft,
+          published_at,
+          modified_at
+        FROM
+          posts
+        WHERE
+          published_at IS NOT NULL`
+			);
+			return blogPosts;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  static async addPost(postObject) {
-    try {
-      await db_run(
-        `INSERT
+	static async getPublishedPostSortedByDate() {
+		try {
+			const blogPosts = await db_getAll(
+				`SELECT
+          id,
+          title,
+          author,
+          content,
+          created_at,
+          slug,
+          draft,
+          published_at,
+          modified_at
+        FROM
+          posts
+        WHERE
+          published_at IS NOT NULL
+        ORDER BY published_at
+      `
+			);
+			return blogPosts;
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	static async addPost(postObject) {
+		try {
+			await db_run(
+				`INSERT
          INTO
           posts(title, author, content, created_at, slug, draft, published_at, modified_at)
          VALUES("${postObject.title}",
@@ -34,23 +73,25 @@ class PostsDAO {
                 "${postObject.content}",
                  datetime("now"),
                 "${postObject.slug}"
-                 ${postObject.draft === "true" ? ", 1" : ", 0"}
+                 ${postObject.draft === 'true' ? ', 1' : ', 0'}
                  ${
-                   postObject.draft === "false" ? ", datetime('now')" : ", NULL"
-                 }
+						postObject.draft === 'false'
+							? ", datetime('now')"
+							: ', NULL'
+					}
                  ${', datetime("now")'}
                 )`
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			);
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  static async getPost(searchParameter) {
-    try {
-      let post;
+	static async getPost(searchParameter) {
+		try {
+			let post;
 
-      const coreSqlQuery = `
+			const coreSqlQuery = `
       SELECT 
           id,
           title,
@@ -62,44 +103,45 @@ class PostsDAO {
           posts
       `;
 
-      if (typeof searchParameter === "number") {
-        const sqlQueryString = coreSqlQuery + `WHERE id = ${searchParameter}`;
-        post = await db_get(sqlQueryString);
-        return post;
-      }
+			if (typeof searchParameter === 'number') {
+				const sqlQueryString =
+					coreSqlQuery + `WHERE id = ${searchParameter}`;
+				post = await db_get(sqlQueryString);
+				return post;
+			}
 
-      if (typeof searchParameter === "string") {
-        const sqlQueryString =
-          coreSqlQuery + `WHERE slug = "${searchParameter}"`;
-        post = await db_get(sqlQueryString);
-        return post;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			if (typeof searchParameter === 'string') {
+				const sqlQueryString =
+					coreSqlQuery + `WHERE slug = "${searchParameter}"`;
+				post = await db_get(sqlQueryString);
+				return post;
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  static async modifyPost(postID, postObject) {
-    try {
-      await db_run(
-        `UPDATE
+	static async modifyPost(postID, postObject) {
+		try {
+			await db_run(
+				`UPDATE
           posts
          SET
           title = "${postObject.title}",
           slug = "${postObject.slug}",
           content = "${postObject.content}"
           ${
-            postObject.draft === "true"
-              ? ', published_at = NULL, modified_at = datetime("now")'
-              : ', published_at = datetime("now"), modified_at = datetime("now")'
-          }
+				postObject.draft === 'true'
+					? ', published_at = NULL, modified_at = datetime("now")'
+					: ', published_at = datetime("now"), modified_at = datetime("now")'
+			}
          WHERE
           id = ${postID}`
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			);
+		} catch (err) {
+			console.error(err);
+		}
+	}
 }
 
 module.exports = PostsDAO;
