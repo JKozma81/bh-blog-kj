@@ -1,11 +1,8 @@
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
+const users = require('../Mocks/Users');
 
 class LoginController {
-	constructor(users) {
-		this.users = users;
-	}
-
 	post(req, res, next) {
 		const { username, password } = req.body;
 
@@ -24,7 +21,7 @@ class LoginController {
 			return;
 		}
 
-		const user = this.users.find(
+		const user = users.find(
 			user => user.username === username && user.password === password
 		);
 

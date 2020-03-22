@@ -1,8 +1,8 @@
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
 
-class Authentication {
-	authenticate(req, res, next) {
+class UserAuthentication {
+	static authenticate(req, res, next) {
 		if (!req.cookies[CookieService.getCookie()]) {
 			res.status(401).redirect('/login?error=login');
 			return;
@@ -20,4 +20,4 @@ class Authentication {
 	}
 }
 
-module.exports = Authentication;
+module.exports = UserAuthentication;

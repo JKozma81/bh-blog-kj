@@ -1,4 +1,4 @@
-const { AUTH_COOKIE } = require('../Config/config.json');
+const { AUTH_COOKIE } = require('../config/config.json');
 
 class CookieService {
 	static createCookie(res, cookieValue) {

@@ -3,23 +3,14 @@ const path = require('path');
 const hbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 
-const users = [
-	{
-		username: 'admin',
-		password: 'admin'
-	}
-];
-
 const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
-const Authentication = require('./utils/Authentication');
+const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
-
 const PostsDAO = require('./services/PostsDAO');
 
 const postController = new PostController();
-const loginCotroller = new LoginController(users);
-const authMiddleware = new Authentication();
+const loginCotroller = new LoginController();
 
 const app = express();
 const port = 3000;
@@ -74,31 +65,31 @@ app.get('/logout', loginCotroller.logUserOut.bind(loginCotroller));
 
 app.get(
 	'/admin',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	AdminController.get
 );
 
 app.get(
 	'/admin/list',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	AdminController.adminBlogPostList
 );
 
 app.get(
 	'/admin/list/:id',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	AdminController.editBlogPost
 );
 
 app.post(
 	'/admin/list/:id',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	AdminController.modifyBlogPost
 );
 
 app.get(
 	'/posts',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	postController.get.bind(postController)
 );
 
@@ -106,7 +97,7 @@ app.get('/posts/:idOrSlug', postController.showBlogPost);
 
 app.post(
 	'/posts',
-	authMiddleware.authenticate.bind(authMiddleware),
+	UserAuthenticationMiddleware.authenticate,
 	postController.post.bind(postController)
 );
 
