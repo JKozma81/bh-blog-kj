@@ -19,7 +19,6 @@ const PostController = require('./controllers/PostController');
 
 const PostsDAO = require('./services/PostsDAO');
 
-const adminController = new AdminController();
 const sessionCotroller = new SessionController();
 const cookieController = new CookieController();
 const postController = new PostController(sessionCotroller, cookieController);
@@ -84,25 +83,25 @@ app.get('/logout', loginCotroller.logUserOut.bind(loginCotroller));
 app.get(
 	'/admin',
 	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.get
+	AdminController.get
 );
 
 app.get(
 	'/admin/list',
 	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.adminBlogPostList
+	AdminController.adminBlogPostList
 );
 
 app.get(
 	'/admin/list/:id',
 	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.editBlogPost
+	AdminController.editBlogPost
 );
 
 app.post(
 	'/admin/list/:id',
 	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.modifyBlogPost
+	AdminController.modifyBlogPost
 );
 
 app.get(
