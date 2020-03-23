@@ -16,9 +16,10 @@
     <div class="form-group row">
       <label for="post_content" class="col-sm-12 col-form-label">Content</label>
       <div class="col-sm-12">
-        <textarea class="form-control" id="post_content" rows="3" name="content" required>
-          {{blogPost.content}}
-        </textarea>
+        <div class="container-fluid" id="editor">
+
+        </div>
+        <input name="content" type="hidden" id="post_content" value="{{blogPost.content}}">
         <input type="text" name="draft" value="false" class="set-draft" disabled hidden>
       </div>
     </div>
@@ -48,6 +49,36 @@
     document.querySelector('.modify').addEventListener('click', () => {
       document.querySelector('.set-draft').value = false;
       document.querySelector('.set-draft').disabled = false;
+    })
+
+    const toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': 1 }, { 'header': 2 }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'direction': 'rtl' }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+      ['clean']
+    ];
+    const editor = new Quill('#editor', {
+      modules: {
+        toolbar: toolbarOptions
+      },
+      theme: 'snow'
+    });
+
+    const blogPostContent = JSON.parse(document.querySelector('#post_content').value)
+
+    editor.setContents(blogPostContent);
+
+    editor.on('editor-change', () => {
+      document.querySelector('#post_content').value = JSON.stringify(editor.getContents());
     })
   });
 </script>

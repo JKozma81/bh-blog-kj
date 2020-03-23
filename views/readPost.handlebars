@@ -17,5 +17,26 @@
 </div>
 
 <div class="container-fluid post-content p-5">
-  {{{post.content}}}
+  <div class="container-fluid h-100" id="editor">
+
+  </div>
+  <input name="content" type="hidden" id="post_content" value='{{post.content}}'>
 </div>
+
+
+<script>
+  window.addEventListener('load', () => {
+    const options = {
+      modules: {
+        toolbar: false
+      },
+      readOnly: true,
+      theme: 'snow'
+    };
+    const editor = new Quill('#editor', options);
+
+    const blogPostContent = JSON.parse(document.querySelector('#post_content').value)
+
+    editor.setContents(blogPostContent);
+  })
+</script>

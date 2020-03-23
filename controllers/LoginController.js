@@ -1,6 +1,6 @@
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
-const users = require('../Mocks/Users');
+const users = require('../mocks/Users');
 
 class LoginController {
 	static post(req, res, next) {
