@@ -8,6 +8,7 @@ const AdminController = require('./controllers/AdminController');
 const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
 const PostsDAO = require('./DAO/PostsDAO');
+const DataFormatingService = require('./services/DataFormatingService');
 
 const app = express();
 const port = 3000;
@@ -23,34 +24,12 @@ app.get('/', async (req, res) => {
 	try {
 		const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
 
-		const formatedBlogPostData = {};
-
-		sortedBlogPosts.forEach(blogPost => {
-			let fullDate = blogPost.published_at.split(' ')[0].split('-');
-			fullDate = fullDate.map(element => (element = Number(element)));
-			fullDate[1] -= 1;
-			let date = new Date(...fullDate);
-			let year = date.getFullYear();
-			let month = date.toLocaleString('en-US', { month: 'long' });
-
-			if (!formatedBlogPostData.hasOwnProperty(year)) {
-				formatedBlogPostData[year] = {};
-			}
-
-			if (!formatedBlogPostData[year].hasOwnProperty(month)) {
-				formatedBlogPostData[year][month] = [];
-			}
-
-			formatedBlogPostData[year][month].push({
-				id: blogPost.id,
-				title: blogPost.title
-			});
-		});
-
 		res.render('home', {
 			siteTitle: 'Bishops First Blog',
 			postList: await PostsDAO.getAllPublishedPosts(),
-			formatedBlogPostData
+			formatedBlogPostData: DataFormatingService.formatDataForArchive(
+				sortedBlogPosts
+			)
 		});
 	} catch (err) {
 		console.error(err);
