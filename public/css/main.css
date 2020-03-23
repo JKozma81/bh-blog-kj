@@ -37,6 +37,7 @@ div.login-container,
 
 .new-post-form {
 	width: 75%;
+	min-height: 700px;
 }
 
 .missing-fields-alert {
@@ -70,7 +71,7 @@ div.login-container,
 
 #editor {
 	width: 100%;
-	height: 400px;
+	min-height: 500px;
 }
 
 .ql-toolbar {
