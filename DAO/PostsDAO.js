@@ -17,19 +17,19 @@ class PostsDAO {
 		try {
 			const blogPosts = await DB.getAll(
 				`SELECT
-          id,
-          title,
-          author,
-          content,
-          created_at,
-          slug,
-          draft,
-          published_at,
-          modified_at
-        FROM
-          posts
-        WHERE
-          published_at IS NOT NULL`
+					id,
+					title,
+					author,
+					content,
+					created_at,
+					slug,
+					draft,
+					published_at,
+					modified_at
+					FROM
+					posts
+					WHERE
+					published_at IS NOT NULL`
 			);
 			return blogPosts;
 		} catch (err) {
@@ -41,21 +41,21 @@ class PostsDAO {
 		try {
 			const blogPosts = await DB.getAll(
 				`SELECT
-          id,
-          title,
-          author,
-          content,
-          created_at,
-          slug,
-          draft,
-          published_at,
-          modified_at
-        FROM
-          posts
-        WHERE
-          published_at IS NOT NULL
-        ORDER BY published_at
-      `
+					id,
+					title,
+					author,
+					content,
+					created_at,
+					slug,
+					draft,
+					published_at,
+					modified_at
+				 FROM
+					posts
+				 WHERE
+					published_at IS NOT NULL
+				 ORDER BY published_at
+				`
 			);
 			return blogPosts;
 		} catch (err) {
@@ -67,20 +67,16 @@ class PostsDAO {
 		try {
 			await DB.run(
 				`INSERT
-         INTO
-          posts(title, author, content, created_at, slug, draft, published_at, modified_at)
-         VALUES("${postObject.title}",
-                "${postObject.author}",
-                "${postObject.content}",
-                 datetime("now"),
-                "${postObject.slug}"
-                 ${postObject.draft === 'true' ? ', 1' : ', 0'}
-                 ${
-						postObject.draft === 'false'
-							? ", datetime('now')"
-							: ', NULL'
-					}
-                 ${', datetime("now")'}
+				 INTO
+					posts(title, author, content, created_at, slug, draft, published_at, modified_at)
+				 VALUES("${postObject.title}",
+						"${postObject.author}",
+						"${postObject.content}",
+						datetime("now"),
+						"${postObject.slug}"
+						 ${postObject.draft === 'true' ? ', 1' : ', 0'}
+						 ${postObject.draft === 'false' ? ", datetime('now')" : ', NULL'}
+						${', datetime("now")'}
                 )`
 			);
 		} catch (err) {

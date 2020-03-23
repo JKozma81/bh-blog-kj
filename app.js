@@ -20,34 +20,40 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 app.get('/', async (req, res) => {
-	const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
+	try {
+		const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
 
-	const formatedBlogPostData = {};
-	sortedBlogPosts.forEach(blogPost => {
-		let fullDate = blogPost.published_at.split(' ')[0].split('-');
-		fullDate = fullDate.map(element => (element = Number(element)));
+		const formatedBlogPostData = {};
 
-		let date = new Date(...fullDate);
-		let year = date.getFullYear();
-		let month = date.toLocaleString('en-US', { month: 'long' });
+		sortedBlogPosts.forEach(blogPost => {
+			let fullDate = blogPost.published_at.split(' ')[0].split('-');
+			fullDate = fullDate.map(element => (element = Number(element)));
+			let date = new Date(...fullDate);
+			let year = date.getFullYear();
+			let month = date.toLocaleString('en-US', { month: 'long' });
 
-		if (!formatedBlogPostData.hasOwnProperty(year)) {
-			formatedBlogPostData[year] = {};
+			if (!formatedBlogPostData.hasOwnProperty(year)) {
+				formatedBlogPostData[year] = {};
+			}
+
 			if (!formatedBlogPostData[year].hasOwnProperty(month)) {
 				formatedBlogPostData[year][month] = [];
 			}
-		}
-		formatedBlogPostData[year][month].push({
-			id: blogPost.id,
-			title: blogPost.title
-		});
-	});
 
-	res.render('home', {
-		siteTitle: 'Bishops First Blog',
-		postList: await PostsDAO.getAllPublishedPosts(),
-		formatedBlogPostData
-	});
+			formatedBlogPostData[year][month].push({
+				id: blogPost.id,
+				title: blogPost.title
+			});
+		});
+
+		res.render('home', {
+			siteTitle: 'Bishops First Blog',
+			postList: await PostsDAO.getAllPublishedPosts(),
+			formatedBlogPostData
+		});
+	} catch (err) {
+		console.error(err);
+	}
 });
 
 app.get('/login', LoginController.get);
