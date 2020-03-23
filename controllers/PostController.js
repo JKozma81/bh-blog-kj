@@ -6,11 +6,9 @@ const MessageProviderService = require('../services/MessageProviderService');
 class PostController {
 	static get(req, res) {
 		const user = req.user;
-		let postError = '';
-
-		if (req.query.error) {
-			postError = MessageProviderService.getMessage(req.query.error);
-		}
+		let postError = req.query.error
+			? MessageProviderService.getMessage(req.query.error)
+			: '';
 
 		res.render('newPost', {
 			siteTitle: 'Bishops First Blog',

@@ -1,4 +1,5 @@
 const PostsDAO = require('../DAO/PostsDAO');
+const DataFormatingService = require('../services/DataFormatingService');
 
 class AdminController {
 	static get(req, res) {
@@ -16,7 +17,7 @@ class AdminController {
 		res.render('postList', {
 			siteTitle: 'Bishops First Blog',
 			submenuTitle: 'Admin Post List',
-			blogPosts
+			blogPosts: DataFormatingService.formatDataForAdminList(blogPosts)
 		});
 	}
 
