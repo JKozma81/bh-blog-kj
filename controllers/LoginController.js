@@ -1,90 +1,89 @@
+const CookieService = require('../services/CookieService');
+const SessionServices = require('../services/SessionServices');
+const users = require('../Mocks/Users');
+
 class LoginController {
+	static post(req, res, next) {
+		const { username, password } = req.body;
 
-    constructor(users, sessionsController, cookieController) {
-        this.users = users;
-        this.sessionController = sessionsController;
-        this.cookieController = cookieController;
-    }
+		if (!username && !password) {
+			res.redirect('/login?error=missingcredentials');
+			return;
+		}
 
-    post(req, res, next) {
-        const { username, password } = req.body;
+		if (!username) {
+			res.redirect(`/login?error=missingusername&password=${password}`);
+			return;
+		}
 
-        if (!username && !password) {
-            res.redirect('/login?error=missingcredentials');
-            return;
-        }
+		if (!password) {
+			res.redirect(`/login?error=missingpassword&username=${username}`);
+			return;
+		}
 
-        if (!username) {
-            res.redirect(`/login?error=missingusername&password=${password}`);
-            return;
-        }
+		const user = users.find(
+			user => user.username === username && user.password === password
+		);
 
-        if (!password) {
-            res.redirect(`/login?error=missingpassword&username=${username}`);
-            return;
-        }
+		if (!user) {
+			res.redirect('/login?error=credentials');
+			return;
+		}
 
-        const user = this.users.find(user => user.username === username && user.password === password);
+		req.user = user;
+		next();
+	}
 
-        if (!user) {
-            res.redirect('/login?error=credentials');
-            return;
-        }
+	static get(req, res) {
+		let errorMsg;
 
-        req.user = user;
-        next();
-    }
+		switch (req.query.error) {
+			case 'credentials':
+				errorMsg = 'Wrong username or password!';
+				break;
+			case 'missingusername':
+				errorMsg = 'Username is missing!';
+				break;
+			case 'missingpassword':
+				errorMsg = 'Password is missing!';
+				break;
+			case 'missingcredentials':
+				errorMsg = 'Username and password is missing!';
+				break;
+			case 'login':
+				errorMsg = 'Login required!';
+				break;
+			default:
+				errorMsg = '';
+				break;
+		}
 
-    get(req, res) {
-        let errorMsg;
+		const logoutMsg = req.query.logout ? `Logout ${req.query.logout}` : '';
+		const username = req.query.username ? req.query.username : '';
+		const password = req.query.password ? req.query.password : '';
 
-        switch (req.query.error) {
-            case 'credentials':
-                errorMsg = 'Wrong username or password!';
-                break;
-            case 'missingusername':
-                errorMsg = 'Username is missing!';
-                break;
-            case 'missingpassword':
-                errorMsg = 'Password is missing!';
-                break;
-            case 'missingcredentials':
-                errorMsg = 'Username and password is missing!';
-                break;
-            case 'login':
-                errorMsg = 'Login required!';
-                break;
-            default:
-                errorMsg = '';
-                break;
-        }
+		res.render('login', {
+			siteTitle: 'Bishops First Blog',
+			errorMsg,
+			logoutMsg,
+			username,
+			password
+		});
+	}
 
-        const logoutMsg = req.query.logout ? `Logout ${req.query.logout}` : '';
-        const username = req.query.username ? req.query.username : '';
-        const password = req.query.password ? req.query.password : '';
+	static logUserIn(req, res) {
+		const user = req.user;
+		const SID = SessionServices.createSession(user);
+		CookieService.createCookie(res, SID);
+		res.redirect('/admin');
+	}
 
-        res.render('login', {
-            siteTitle: 'Bishops First Blog',
-            errorMsg,
-            logoutMsg,
-            username,
-            password
-        })
-    }
-
-    logUserIn(req, res) {
-        const user = req.user;
-        const SID = this.sessionController.createSession(user);
-        this.cookieController.createCookie(res, SID);
-        res.redirect('/admin');
-    }
-
-    logUserOut(req, res) {
-        const SID = req.cookies[this.cookieController.getCookie()];
-        this.sessionController.deleteSession(SID);
-        this.cookieController.deleteCookie(res);
-        res.redirect('/login?logout=success');
-    }
+	static logUserOut(req, res) {
+		const SID = req.cookies[CookieService.getCookie()];
+		SessionServices.deleteSession(SID);
+		CookieService.deleteCookie(res);
+		res.redirect('/login?logout=success');
+	}
 }
 
 module.exports = LoginController;

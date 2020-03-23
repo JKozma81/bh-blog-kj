@@ -3,32 +3,11 @@ const path = require('path');
 const hbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 
-const users = [
-	{
-		username: 'admin',
-		password: 'admin'
-	}
-];
-
 const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
-const SessionController = require('./controllers/SessionController');
-const CookieController = require('./controllers/CookieController');
-const Authentication = require('./utils/Authentication');
+const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
-
-const PostsDAO = require('./services/PostsDAO');
-
-const adminController = new AdminController();
-const sessionCotroller = new SessionController();
-const cookieController = new CookieController();
-const postController = new PostController(sessionCotroller, cookieController);
-const loginCotroller = new LoginController(
-	users,
-	sessionCotroller,
-	cookieController
-);
-const authMiddleware = new Authentication(sessionCotroller, cookieController);
+const PostsDAO = require('./DAO/PostsDAO');
 
 const app = express();
 const port = 3000;
@@ -41,82 +20,84 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 app.get('/', async (req, res) => {
-	const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
+	try {
+		const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
 
-	const formatedBlogPostData = {};
-	sortedBlogPosts.forEach(blogPost => {
-		let fullDate = blogPost.published_at.split(' ')[0].split('-');
-		fullDate = fullDate.map(element => (element = Number(element)));
+		const formatedBlogPostData = {};
 
-		let date = new Date(...fullDate);
-		let year = date.getFullYear();
-		let month = date.toLocaleString('en-US', { month: 'long' });
+		sortedBlogPosts.forEach(blogPost => {
+			let fullDate = blogPost.published_at.split(' ')[0].split('-');
+			fullDate = fullDate.map(element => (element = Number(element)));
+			let date = new Date(...fullDate);
+			let year = date.getFullYear();
+			let month = date.toLocaleString('en-US', { month: 'long' });
 
-		if (!formatedBlogPostData.hasOwnProperty(year)) {
-			formatedBlogPostData[year] = {};
+			if (!formatedBlogPostData.hasOwnProperty(year)) {
+				formatedBlogPostData[year] = {};
+			}
+
 			if (!formatedBlogPostData[year].hasOwnProperty(month)) {
 				formatedBlogPostData[year][month] = [];
 			}
-		}
-		formatedBlogPostData[year][month].push({
-			id: blogPost.id,
-			title: blogPost.title
-		});
-	});
 
-	res.render('home', {
-		siteTitle: 'Bishops First Blog',
-		postList: await PostsDAO.getAllPublishedPosts(),
-		formatedBlogPostData
-	});
+			formatedBlogPostData[year][month].push({
+				id: blogPost.id,
+				title: blogPost.title
+			});
+		});
+
+		res.render('home', {
+			siteTitle: 'Bishops First Blog',
+			postList: await PostsDAO.getAllPublishedPosts(),
+			formatedBlogPostData
+		});
+	} catch (err) {
+		console.error(err);
+	}
 });
 
-app.get('/login', loginCotroller.get);
+app.get('/login', LoginController.get);
 
-app.post(
-	'/login',
-	loginCotroller.post.bind(loginCotroller),
-	loginCotroller.logUserIn.bind(loginCotroller)
-);
+app.post('/login', LoginController.post, LoginController.logUserIn);
 
-app.get('/logout', loginCotroller.logUserOut.bind(loginCotroller));
+app.get('/logout', LoginController.logUserOut);
 
 app.get(
 	'/admin',
-	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.get
+	UserAuthenticationMiddleware.authenticate,
+	AdminController.get
 );
 
 app.get(
 	'/admin/list',
-	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.adminBlogPostList
+	UserAuthenticationMiddleware.authenticate,
+	AdminController.adminBlogPostList
 );
 
 app.get(
 	'/admin/list/:id',
-	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.editBlogPost
+	UserAuthenticationMiddleware.authenticate,
+	AdminController.editBlogPost
 );
 
 app.post(
 	'/admin/list/:id',
-	authMiddleware.authenticate.bind(authMiddleware),
-	adminController.modifyBlogPost
+	UserAuthenticationMiddleware.authenticate,
+	AdminController.modifyBlogPost
 );
 
 app.get(
 	'/posts',
-	authMiddleware.authenticate.bind(authMiddleware),
-	postController.get.bind(postController)
+	UserAuthenticationMiddleware.authenticate,
+	PostController.get
 );
 
-app.get('/posts/:idOrSlug', postController.showBlogPost);
+app.get('/posts/:idOrSlug', PostController.showBlogPost);
 
 app.post(
 	'/posts',
-	authMiddleware.authenticate.bind(authMiddleware),
-	postController.post.bind(postController)
+	UserAuthenticationMiddleware.authenticate,
+	PostController.post
 );
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
