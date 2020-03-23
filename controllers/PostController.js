@@ -1,6 +1,7 @@
 const PostsDAO = require('../DAO/PostsDAO');
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
+const MessageProviderService = require('../services/MessageProviderService');
 
 class PostController {
 	static get(req, res) {
@@ -8,23 +9,7 @@ class PostController {
 		let postError = '';
 
 		if (req.query.error) {
-			if (req.query.error === 'title-content-slug') {
-				postError = 'Title, Content and Slug are Mandatory!';
-			}
-			if (req.query.error === 'title-and-slug') {
-				postError = 'Title and Slug are Mandatory!';
-			}
-			if (req.query.error === 'content-and-slug') {
-				postError = 'Content and Slug are Mandatory!';
-			}
-			if (req.query.error === 'title-and-content') {
-				postError = 'Title and Content are Mandatory!';
-			}
-
-			if (req.query.error === 'title') postError = 'Title is Mandatory!';
-			if (req.query.error === 'content')
-				postError = 'Content is Mandatory!';
-			if (req.query.error === 'slug') postError = 'Slug is Mandatory!';
+			postError = MessageProviderService.getMessage(req.query.error);
 		}
 
 		res.render('newPost', {

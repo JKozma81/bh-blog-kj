@@ -1,5 +1,6 @@
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
+const MessageProviderService = require('../services/MessageProviderService');
 const users = require('../mocks/Users');
 
 class LoginController {
@@ -35,30 +36,13 @@ class LoginController {
 	}
 
 	static get(req, res) {
-		let errorMsg;
+		const errorMsg = req.query.error
+			? MessageProviderService.getMessage(req.query.error)
+			: '';
 
-		switch (req.query.error) {
-			case 'credentials':
-				errorMsg = 'Wrong username or password!';
-				break;
-			case 'missingusername':
-				errorMsg = 'Username is missing!';
-				break;
-			case 'missingpassword':
-				errorMsg = 'Password is missing!';
-				break;
-			case 'missingcredentials':
-				errorMsg = 'Username and password is missing!';
-				break;
-			case 'login':
-				errorMsg = 'Login required!';
-				break;
-			default:
-				errorMsg = '';
-				break;
-		}
-
-		const logoutMsg = req.query.logout ? `Logout ${req.query.logout}` : '';
+		const logoutMsg = req.query.logout
+			? MessageProviderService.getMessage(req.query.logout)
+			: '';
 		const username = req.query.username ? req.query.username : '';
 		const password = req.query.password ? req.query.password : '';
 
