@@ -1,4 +1,4 @@
-const PostsDAO = require('../services/PostsDAO');
+const PostsDAO = require('../DAO/PostsDAO');
 const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
 

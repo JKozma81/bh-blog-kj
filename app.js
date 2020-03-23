@@ -7,7 +7,7 @@ const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
 const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
-const PostsDAO = require('./services/PostsDAO');
+const PostsDAO = require('./DAO/PostsDAO');
 
 const app = express();
 const port = 3000;

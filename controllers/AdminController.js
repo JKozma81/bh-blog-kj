@@ -1,4 +1,4 @@
-const PostsDAO = require('../services/PostsDAO');
+const PostsDAO = require('../DAO/PostsDAO');
 
 class AdminController {
 	static get(req, res) {
