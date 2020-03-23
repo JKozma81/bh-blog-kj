@@ -75,9 +75,18 @@
       theme: 'snow'
     });
 
-    const blogPostContent = JSON.parse(document.querySelector('#post_content').value)
+    let blogPostContent;
 
-    editor.setContents(blogPostContent);
+    try {
+      blogPostContent = JSON.parse(document.querySelector('#post_content').value);
+      editor.setContents(blogPostContent);
+    } catch (err) {
+      if (err) {
+        blogPostContent = document.querySelector('#post_content').value;
+        editor.setText(blogPostContent)
+      }
+    }
+
 
     editor.on('editor-change', () => {
       document.querySelector('#post_content').value = JSON.stringify(editor.getContents());

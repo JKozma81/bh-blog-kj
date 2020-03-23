@@ -72,11 +72,11 @@ class PostsDAO {
 				 VALUES("${postObject.title}",
 						"${postObject.author}",
 						'${postObject.content}',
-						datetime("now"),
+						datetime("now", "localtime"),
 						"${postObject.slug}"
 						 ${postObject.draft === 'true' ? ', 1' : ', 0'}
-						 ${postObject.draft === 'false' ? ", datetime('now')" : ', NULL'}
-						${', datetime("now")'}
+						 ${postObject.draft === 'false' ? ", datetime('now', 'localtime')" : ', NULL'}
+						${', datetime("now", "localtime")'}
                 )`
 			);
 		} catch (err) {
@@ -129,8 +129,8 @@ class PostsDAO {
 					content = '${postObject.content}'
 					${
 						postObject.draft === 'true'
-							? ', published_at = NULL, modified_at = datetime("now")'
-							: ', published_at = datetime("now"), modified_at = datetime("now")'
+							? ', published_at = NULL, modified_at = datetime("now", "localtime")'
+							: ', published_at = datetime("now", "localtime"), modified_at = datetime("now", "localtime")'
 					}
 				WHERE
 					id = ${postID}`
