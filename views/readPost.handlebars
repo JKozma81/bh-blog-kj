@@ -2,7 +2,7 @@
   <h1>{{siteTitle}}</h1>
 </div>
 
-<div class="container-fluid post-info border pt-3 pb-3 d-flex flex-column justify-content-center">
+<div class="container-fluid post-info border pt-3 pb-3 d-flex flex-column justify-content-center mb-3">
   <div class="container-fluid text-left">
     <h3>{{post.title}}</h3>
   </div>
@@ -30,12 +30,22 @@
       modules: {
         toolbar: false
       },
-      readOnly: true,
+      //readOnly: true,
       theme: 'snow'
     };
     const editor = new Quill('#editor', options);
 
-    const blogPostContent = JSON.parse(document.querySelector('#post_content').value)
+    let blogPostContent;
+
+    try {
+      blogPostContent = JSON.parse(document.querySelector('#post_content').value);
+    } catch (err) {
+      if (err) {
+        blogPostContent = document.querySelector('#post_content').value;
+        editor.setText(blogPostContent)
+        return
+      }
+    }
 
     editor.setContents(blogPostContent);
   })

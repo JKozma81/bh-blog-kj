@@ -79,13 +79,14 @@
 
     try {
       blogPostContent = JSON.parse(document.querySelector('#post_content').value);
-      editor.setContents(blogPostContent);
     } catch (err) {
       if (err) {
         blogPostContent = document.querySelector('#post_content').value;
-        editor.setText(blogPostContent)
+        editor.setText(blogPostContent);
+        return
       }
     }
+    editor.setContents(blogPostContent);
 
 
     editor.on('editor-change', () => {

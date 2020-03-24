@@ -1,4 +1,3 @@
-// const { DBget, DBgetAll, DBrun } = require('../services/DatabaseService');
 const DB = require('../services/DatabaseService');
 
 class PostsDAO {
