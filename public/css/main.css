@@ -69,7 +69,8 @@ div.login-container,
   padding-left: 20px;
 }
 
-#editor {
+#editor,
+.ql-editor {
   width: 100%;
   min-height: 500px;
 }
