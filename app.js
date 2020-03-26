@@ -5,12 +5,14 @@ const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
 const { DBPath } = require('./config/config.json');
+const messages = require('./mocks/Messages');
 
 const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
 const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 const PostController = require('./controllers/PostController');
 
+const MessageProviderService = require('./services/MessageProviderService');
 const BlogPostServive = require('./services/BlogPostService');
 const PostRepository = require('./repositories/PostRepository');
 const DBService = require('./services/DatabaseService');
@@ -23,6 +25,7 @@ const dbService = new DBService(db);
 const dataFormatingService = new DataFormatingService();
 const postRepository = new PostRepository(dbService, dataFormatingService);
 const blogPostService = new BlogPostServive(BlogPost, postRepository);
+const messageProviderService = new MessageProviderService(messages);
 
 const app = express();
 const port = 3000;
@@ -41,7 +44,12 @@ app.get(
   })
 );
 
-// app.get("/login", LoginController.get);
+app.get(
+  '/login',
+  LoginController.showLogin({
+    messageProviderService
+  })
+);
 
 // app.post("/login", LoginController.post, LoginController.logUserIn);
 

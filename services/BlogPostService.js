@@ -48,8 +48,7 @@ class BlogPostService {
   }
 
   async getBlogPostsDataForArchive() {
-    const publishedPostsData = await this.PostRepository.getPublishedPostDataForArchive();
-    return publishedPostsData;
+    return await this.PostRepository.getPublishedPostDataForArchive();
   }
 }
 

@@ -18,22 +18,6 @@ class PostController {
     };
   }
 
-  // static async getMasterRoot(req, res) {
-  // 	try {
-  // 		const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
-
-  // 		res.render('home', {
-  // 			siteTitle: 'Bishops First Blog',
-  // 			postList: await PostsDAO.getAllPublishedPosts(),
-  // 			formatedBlogPostData: DataFormatingService.formatDataForArchive(
-  // 				sortedBlogPosts
-  // 			)
-  // 		});
-  // 	} catch (err) {
-  // 		console.error(err);
-  // 	}
-  // }
-
   // static get(req, res) {
   // 	const user = req.user;
   // 	let postError = req.query.error

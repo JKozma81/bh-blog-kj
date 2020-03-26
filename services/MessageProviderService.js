@@ -1,9 +1,11 @@
-const messages = require('../mocks/Messages');
-
 class MessageProviderService {
-	static getMessage(messageIdentifyer) {
-		return messages[messageIdentifyer];
-	}
+  constructor(messages) {
+    this.messages = messages;
+  }
+
+  static getMessage(messageIdentifyer) {
+    return this.messages[messageIdentifyer];
+  }
 }
 
 module.exports = MessageProviderService;
