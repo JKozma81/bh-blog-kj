@@ -36,17 +36,7 @@
     const editor = new Quill('#editor', options);
 
     let blogPostContent;
-
-    try {
-      blogPostContent = JSON.parse(document.querySelector('#post_content').value);
-    } catch (err) {
-      if (err) {
-        blogPostContent = document.querySelector('#post_content').value;
-        editor.setText(blogPostContent)
-        return
-      }
-    }
-
-    editor.setContents(blogPostContent);
+    blogPostContent = document.querySelector('#post_content').value;
+    editor.root.innerHTML = blogPostContent;
   })
 </script>

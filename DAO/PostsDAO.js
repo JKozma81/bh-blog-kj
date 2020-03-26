@@ -70,7 +70,7 @@ class PostsDAO {
 					posts(title, author, content, created_at, slug, draft, published_at, modified_at)
 				 VALUES("${postObject.title}",
 						"${postObject.author}",
-						'${postObject.content}',
+						"${postObject.content}",
 						datetime("now", "localtime"),
 						"${postObject.slug}"
 						 ${postObject.draft === 'true' ? ', 1' : ', 0'}
@@ -125,7 +125,7 @@ class PostsDAO {
 				 SET
 					title = "${postObject.title}",
 					slug = "${postObject.slug}",
-					content = '${postObject.content}'
+					content = "${postObject.content}"
 					${
 						postObject.draft === 'true'
 							? ', published_at = NULL, modified_at = datetime("now", "localtime")'

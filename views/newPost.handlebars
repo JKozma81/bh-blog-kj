@@ -141,8 +141,9 @@
         theme: 'snow'
       });
       editor.on('editor-change', () => {
-        document.querySelector('#post_content').value = JSON.stringify(editor.getContents());
+        document.querySelector('#post_content').value = editor.root.innerHTML;
       })
+
     }, false);
   })();
   function showModal() {

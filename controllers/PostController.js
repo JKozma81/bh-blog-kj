@@ -1,104 +1,108 @@
-const PostsDAO = require("../DAO/PostsDAO");
-const CookieService = require("../services/CookieService");
-const SessionServices = require("../services/SessionServices");
-const MessageProviderService = require("../services/MessageProviderService");
-const DataFormatingService = require("../services/DataFormatingService");
+const PostsDAO = require('../DAO/PostsDAO');
+const CookieService = require('../services/CookieService');
+const SessionServices = require('../services/SessionServices');
+const MessageProviderService = require('../services/MessageProviderService');
+const DataFormatingService = require('../services/DataFormatingService');
 
 class PostController {
-  static async getMasterRoot(req, res) {
-    try {
-      const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
+	static async getMasterRoot(req, res) {
+		try {
+			const sortedBlogPosts = await PostsDAO.getPublishedPostSortedByDate();
 
-      res.render("home", {
-        siteTitle: "Bishops First Blog",
-        postList: await PostsDAO.getAllPublishedPosts(),
-        formatedBlogPostData: DataFormatingService.formatDataForArchive(
-          sortedBlogPosts
-        )
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			res.render('home', {
+				siteTitle: 'Bishops First Blog',
+				postList: await PostsDAO.getAllPublishedPosts(),
+				formatedBlogPostData: DataFormatingService.formatDataForArchive(
+					sortedBlogPosts
+				)
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  static get(req, res) {
-    const user = req.user;
-    let postError = req.query.error
-      ? MessageProviderService.getMessage(req.query.error)
-      : "";
+	static get(req, res) {
+		const user = req.user;
+		let postError = req.query.error
+			? MessageProviderService.getMessage(req.query.error)
+			: '';
 
-    res.render("newPost", {
-      siteTitle: "Bishops First Blog",
-      submenuTitle: "New Post",
-      username: user.username,
-      postError,
-      title: req.query.title ? req.query.title : "",
-      content: req.query.content ? req.query.content : "",
-      slug: req.query.slug ? req.query.slug : ""
-    });
-  }
+		res.render('newPost', {
+			siteTitle: 'Bishops First Blog',
+			submenuTitle: 'New Post',
+			username: user.username,
+			postError,
+			title: req.query.title ? req.query.title : '',
+			content: req.query.content ? req.query.content : '',
+			slug: req.query.slug ? req.query.slug : ''
+		});
+	}
 
-  static async post(req, res) {
-    const { title, content, slug, draft } = req.body;
+	static async post(req, res) {
+		let { title, content, slug, draft } = req.body;
 
-    if (!title && !content && !slug) {
-      res.redirect("/posts?error=title-content-slug");
-      return;
-    }
-    if (!title && !slug) {
-      res.redirect(`/posts?error=title-and-slug&content=${content}`);
-      return;
-    }
-    if (!slug && !content) {
-      res.redirect(`/posts?error=content-and-slug&title=${title}`);
-      return;
-    }
-    if (!title) {
-      res.redirect(`/posts?error=title&content=${content}&slug=${slug}`);
-      return;
-    }
-    if (!content) {
-      res.redirect(`/posts?error=content&title=${title}&slug=${slug}`);
-      return;
-    }
-    if (!slug) {
-      res.redirect(`/posts?error=content&title=${title}&content=${content}`);
-      return;
-    }
+		content = content.split('"').join("'");
 
-    const SID = Number(req.cookies[CookieService.getCookie()]);
-    const user = SessionServices.getSession(SID).user;
+		if (!title && !content && !slug) {
+			res.redirect('/posts?error=title-content-slug');
+			return;
+		}
+		if (!title && !slug) {
+			res.redirect(`/posts?error=title-and-slug&content=${content}`);
+			return;
+		}
+		if (!slug && !content) {
+			res.redirect(`/posts?error=content-and-slug&title=${title}`);
+			return;
+		}
+		if (!title) {
+			res.redirect(`/posts?error=title&content=${content}&slug=${slug}`);
+			return;
+		}
+		if (!content) {
+			res.redirect(`/posts?error=content&title=${title}&slug=${slug}`);
+			return;
+		}
+		if (!slug) {
+			res.redirect(
+				`/posts?error=content&title=${title}&content=${content}`
+			);
+			return;
+		}
 
-    const newPost = {
-      title,
-      author: user.username,
-      content,
-      slug,
-      draft
-    };
-    await PostsDAO.addPost(newPost);
-    res.redirect("/admin");
-  }
+		const SID = Number(req.cookies[CookieService.getCookie()]);
+		const user = SessionServices.getSession(SID).user;
 
-  static async showBlogPost(req, res) {
-    const searchParameter = Number(req.params.idOrSlug);
+		const newPost = {
+			title,
+			author: user.username,
+			content,
+			slug,
+			draft
+		};
+		await PostsDAO.addPost(newPost);
+		res.redirect('/admin');
+	}
 
-    const blogPost = await PostsDAO.getPost(
-      isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
-    );
+	static async showBlogPost(req, res) {
+		const searchParameter = Number(req.params.idOrSlug);
 
-    if (!blogPost) {
-      res.render("custom404", {
-        siteTitle: "Bishops First Blog"
-      });
-      return;
-    }
+		const blogPost = await PostsDAO.getPost(
+			isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
+		);
 
-    res.render("readPost", {
-      siteTitle: "Bishops First Blog",
-      post: blogPost
-    });
-  }
+		if (!blogPost) {
+			res.render('custom404', {
+				siteTitle: 'Bishops First Blog'
+			});
+			return;
+		}
+
+		res.render('readPost', {
+			siteTitle: 'Bishops First Blog',
+			post: blogPost
+		});
+	}
 }
 
 module.exports = PostController;
