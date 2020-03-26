@@ -11,6 +11,12 @@ class AdminController {
 		});
 	}
 
+	static async adminBlogPostList(options) {
+		const postsDao = options.postsDao;
+
+		return (req, res) => {};
+	}
+
 	static async adminBlogPostList(req, res) {
 		const blogPosts = await PostsDAO.getAllPosts();
 

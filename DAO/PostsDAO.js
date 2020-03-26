@@ -1,7 +1,7 @@
 const DB = require('../services/DatabaseService');
 
 class PostsDAO {
-	static async getAllPosts() {
+	async getAllPosts() {
 		try {
 			const blogPosts = await DB.getAll(
 				'SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts'
@@ -12,7 +12,7 @@ class PostsDAO {
 		}
 	}
 
-	static async getAllPublishedPosts() {
+	async getAllPublishedPosts() {
 		try {
 			const blogPosts = await DB.getAll(
 				`SELECT
@@ -36,7 +36,7 @@ class PostsDAO {
 		}
 	}
 
-	static async getPublishedPostSortedByDate() {
+	async getPublishedPostSortedByDate() {
 		try {
 			const blogPosts = await DB.getAll(
 				`SELECT
@@ -62,7 +62,7 @@ class PostsDAO {
 		}
 	}
 
-	static async addPost(postObject) {
+	async addPost(postObject) {
 		try {
 			await DB.run(
 				`INSERT
@@ -83,7 +83,7 @@ class PostsDAO {
 		}
 	}
 
-	static async getPost(searchParameter) {
+	async getPost(searchParameter) {
 		try {
 			let post;
 
@@ -117,7 +117,7 @@ class PostsDAO {
 		}
 	}
 
-	static async modifyPost(postID, postObject) {
+	async modifyPost(postID, postObject) {
 		try {
 			await DB.run(
 				`UPDATE
