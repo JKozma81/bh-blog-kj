@@ -2,40 +2,11 @@ const CookieService = require('../services/CookieService');
 const SessionServices = require('../services/SessionServices');
 const users = require('../mocks/Users');
 
+const { AUTH_COOKIE } = require('../Config/config.json');
+
 class LoginController {
-  static post(req, res, next) {
-    const { username, password } = req.body;
-
-    if (!username && !password) {
-      res.redirect('/login?error=missingcredentials');
-      return;
-    }
-
-    if (!username) {
-      res.redirect(`/login?error=missingusername&password=${password}`);
-      return;
-    }
-
-    if (!password) {
-      res.redirect(`/login?error=missingpassword&username=${username}`);
-      return;
-    }
-
-    const user = users.find(
-      user => user.username === username && user.password === password
-    );
-
-    if (!user) {
-      res.redirect('/login?error=credentials');
-      return;
-    }
-
-    req.user = user;
-    next();
-  }
-
   static showLogin(options) {
-    const messageProvider = options.MessageProviderService;
+    const messageProvider = options.messageProviderService;
     return async (req, res) => {
       const errorMsg = req.query.error
         ? messageProvider.getMessage(req.query.error)
@@ -57,11 +28,14 @@ class LoginController {
     };
   }
 
-  static logUserIn(req, res) {
-    const user = req.user;
-    const SID = SessionServices.createSession(user);
-    CookieService.createCookie(res, SID);
-    res.redirect('/admin');
+  static login(options) {
+    const sessionService = options.sessionService;
+    return (req, res) => {
+      const user = req.user;
+      const SID = sessionService.createSession(user);
+      res.cookie(AUTH_COOKIE, SID);
+      res.redirect('/admin');
+    };
   }
 
   static logUserOut(req, res) {

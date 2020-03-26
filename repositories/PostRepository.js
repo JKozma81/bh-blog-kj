@@ -1,12 +1,13 @@
 class PostRepository {
-  constructor(DBService, DataFormatingService) {
-    this.DBService = DBService;
-    this.DataFormatingService = DataFormatingService;
+  constructor(DBAdapter, BlogPost, ArchiveMap) {
+    this.DBAdapter = DBAdapter;
+    this.BlogPost = BlogPost;
+    this.ArchiveMap = ArchiveMap;
   }
 
   async getAllPosts() {
     try {
-      const blogPosts = await this.DBService.getAll(
+      const blogPosts = await this.DBAdapter.getAll(
         'SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts'
       );
       return blogPosts;
@@ -17,7 +18,7 @@ class PostRepository {
 
   async getAllPublishedPosts() {
     try {
-      const blogPosts = await this.DBService.getAll(
+      const blogPostsData = await this.DBAdapter.getAll(
         `SELECT
 					id,
 					title,
@@ -33,15 +34,31 @@ class PostRepository {
 					WHERE
 					published_at IS NOT NULL`
       );
-      return blogPosts;
+
+      const results = blogPostsData.map(
+        postData =>
+          new this.BlogPost(
+            postData.id,
+            postData.title,
+            postData.author,
+            postData.content,
+            postData.created_at,
+            postData.slug,
+            postData.draft === 1 ? true : false,
+            postData.published_at,
+            postData.modified_at
+          )
+      );
+
+      return results;
     } catch (err) {
       console.error(err);
     }
   }
 
-  async getPublishedPostDataForArchive() {
+  async getArchiveMap() {
     try {
-      const blogPosts = await this.DBService.getAll(
+      const mapData = await this.DBAdapter.getAll(
         `SELECT
 					id,
 					title,
@@ -53,7 +70,32 @@ class PostRepository {
 				 ORDER BY published_at
 				`
       );
-      return this.DataFormatingService.formatDataForArchive(blogPosts);
+
+      const formatedBlogPostData = {};
+
+      mapData.forEach(blogPost => {
+        let fullDate = blogPost.published_at.split(' ')[0].split('-');
+        fullDate = fullDate.map(element => (element = Number(element)));
+        fullDate[1] -= 1;
+        let date = new Date(...fullDate);
+        let year = date.getFullYear();
+        let month = date.toLocaleString('en-US', { month: 'long' });
+
+        if (!formatedBlogPostData.hasOwnProperty(year)) {
+          formatedBlogPostData[year] = {};
+        }
+
+        if (!formatedBlogPostData[year].hasOwnProperty(month)) {
+          formatedBlogPostData[year][month] = [];
+        }
+
+        formatedBlogPostData[year][month].push({
+          id: blogPost.id,
+          title: blogPost.title
+        });
+      });
+
+      return new this.ArchiveMap(formatedBlogPostData);
     } catch (err) {
       console.error(err);
     }
@@ -61,7 +103,7 @@ class PostRepository {
 
   async addPost(postObject) {
     try {
-      await this.DBService.run(
+      await this.DBAdapter.run(
         `INSERT
 				 INTO
 					posts(title, author, content, created_at, slug, draft, published_at, modified_at)
@@ -98,14 +140,14 @@ class PostRepository {
 
       if (typeof searchParameter === 'number') {
         const sqlQueryString = coreSqlQuery + `WHERE id = ${searchParameter}`;
-        post = await this.DBService.get(sqlQueryString);
+        post = await this.DBAdapter.get(sqlQueryString);
         return post;
       }
 
       if (typeof searchParameter === 'string') {
         const sqlQueryString =
           coreSqlQuery + `WHERE slug = "${searchParameter}"`;
-        post = await this.DBService.get(sqlQueryString);
+        post = await this.DBAdapter.get(sqlQueryString);
         return post;
       }
     } catch (err) {
@@ -115,7 +157,7 @@ class PostRepository {
 
   async modifyPost(postID, postObject) {
     try {
-      await this.DBService.run(
+      await this.DBAdapter.run(
         `UPDATE
 					posts
 				 SET

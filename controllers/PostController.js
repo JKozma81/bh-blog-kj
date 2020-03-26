@@ -4,13 +4,15 @@ class PostController {
 
     return async (req, res) => {
       try {
-        const publishedPosts = await BlogPostService.getAllPublishedBlogPosts();
-        const formatedPostsData = await BlogPostService.getBlogPostsDataForArchive();
+        const {
+          publishedPosts,
+          archiveMap
+        } = await BlogPostService.getBlogPostsForHomePage();
 
         res.render('home', {
           siteTitle: 'Bishops First Blog',
           postList: publishedPosts,
-          formatedBlogPostData: formatedPostsData
+          formatedBlogPostData: archiveMap.mapObject
         });
       } catch (err) {
         console.error(err);

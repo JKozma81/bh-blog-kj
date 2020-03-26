@@ -4,27 +4,35 @@ const hbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
-const { DBPath } = require('./config/config.json');
+const { DBPath, AUTH_COOKIE } = require('./config/config.json');
 const messages = require('./mocks/Messages');
-
-const LoginController = require('./controllers/LoginController');
-const AdminController = require('./controllers/AdminController');
-const UserAuthenticationMiddleware = require('./middlewares/Authentication');
-const PostController = require('./controllers/PostController');
-
-const MessageProviderService = require('./services/MessageProviderService');
-const BlogPostServive = require('./services/BlogPostService');
-const PostRepository = require('./repositories/PostRepository');
-const DBService = require('./services/DatabaseService');
-const DataFormatingService = require('./services/DataFormatingService');
-const BlogPost = require('./domains/BlogPost');
+let sessions = [];
 
 const db = new sqlite3.Database(DBPath);
 
-const dbService = new DBService(db);
+const PostController = require('./controllers/PostController');
+const BlogPostServive = require('./services/BlogPostService');
+const PostRepository = require('./repositories/PostRepository');
+const DBAdapter = require('./repositories/DatabaseAdapter');
+const BlogPost = require('./domains/BlogPost');
+const ArchiveMap = require('./domains/ArchiveMap');
+
+const dbAdapter = new DBAdapter(db);
+const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
+const blogPostService = new BlogPostServive(postRepository);
+
+/////
+const LoginController = require('./controllers/LoginController');
+const AdminController = require('./controllers/AdminController');
+const UserAuthenticationMiddleware = require('./middlewares/Authentication');
+
+const SessionService = require('./services/SessionServices');
+const MessageProviderService = require('./services/MessageProviderService');
+const DataFormatingService = require('./services/DataFormatingService');
+
+const sessionService = new SessionService(sessions);
+const userAuthentication = new UserAuthenticationMiddleware(sessionService);
 const dataFormatingService = new DataFormatingService();
-const postRepository = new PostRepository(dbService, dataFormatingService);
-const blogPostService = new BlogPostServive(BlogPost, postRepository);
 const messageProviderService = new MessageProviderService(messages);
 
 const app = express();
@@ -44,21 +52,27 @@ app.get(
   })
 );
 
-app.get(
-  '/login',
-  LoginController.showLogin({
-    messageProviderService
-  })
-);
+// app.get(
+//   '/login',
+//   LoginController.showLogin({
+//     messageProviderService
+//   })
+// );
 
-// app.post("/login", LoginController.post, LoginController.logUserIn);
+// app.post(
+//   '/login',
+//   userAuthentication.login,
+//   LoginController.login({
+//     sessionService
+//   })
+// );
 
 // app.get("/logout", LoginController.logUserOut);
 
 // app.get(
-//   "/admin",
-//   UserAuthenticationMiddleware.authenticate,
-//   AdminController.get
+//   '/admin',
+//   userAuthentication.authenticate,
+//   AdminController.showDashboard
 // );
 
 // app.get(

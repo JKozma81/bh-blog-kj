@@ -3,7 +3,7 @@ class MessageProviderService {
     this.messages = messages;
   }
 
-  static getMessage(messageIdentifyer) {
+  getMessage(messageIdentifyer) {
     return this.messages[messageIdentifyer];
   }
 }
