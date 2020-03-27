@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
 const { DBPath, AUTH_COOKIE } = require('./config/config.json');
-const messages = require('./mocks/Messages');
 let sessions = [];
 
 const db = new sqlite3.Database(DBPath);
@@ -16,18 +15,21 @@ const PostRepository = require('./repositories/PostRepository');
 const DBAdapter = require('./repositories/DatabaseAdapter');
 const BlogPost = require('./domains/BlogPost');
 const ArchiveMap = require('./domains/ArchiveMap');
+const LoginController = require('./controllers/LoginController');
+const {
+  MessageProviderService,
+  messages
+} = require('./services/MessageProviderService');
 
 const dbAdapter = new DBAdapter(db);
 const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
 const blogPostService = new BlogPostServive(postRepository);
 
 /////
-const LoginController = require('./controllers/LoginController');
 const AdminController = require('./controllers/AdminController');
 const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 
 const SessionService = require('./services/SessionServices');
-const MessageProviderService = require('./services/MessageProviderService');
 const DataFormatingService = require('./services/DataFormatingService');
 
 const sessionService = new SessionService(sessions);
@@ -52,12 +54,12 @@ app.get(
   })
 );
 
-// app.get(
-//   '/login',
-//   LoginController.showLogin({
-//     messageProviderService
-//   })
-// );
+app.get(
+  '/login',
+  LoginController.showLogin({
+    messageProviderService
+  })
+);
 
 // app.post(
 //   '/login',
