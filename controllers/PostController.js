@@ -83,25 +83,28 @@ class PostController {
   // 	res.redirect('/admin');
   // }
 
-  // static async showBlogPost(req, res) {
-  // 	const searchParameter = Number(req.params.idOrSlug);
+  static showBlogPost(options) {
+    const blogPostService = options.blogPostService;
+    return async (req, res) => {
+      const searchParameter = Number(req.params.idOrSlug);
 
-  // 	const blogPost = await PostsDAO.getPost(
-  // 		isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
-  // 	);
+      const blogPost = await blogPostService.getDesiredBlogPost(
+        isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
+      );
 
-  // 	if (!blogPost) {
-  // 		res.render('custom404', {
-  // 			siteTitle: 'Bishops First Blog'
-  // 		});
-  // 		return;
-  // 	}
+      if (!blogPost) {
+        res.render('custom404', {
+          siteTitle: 'Bishops First Blog'
+        });
+        return;
+      }
 
-  // 	res.render('readPost', {
-  // 		siteTitle: 'Bishops First Blog',
-  // 		post: blogPost
-  // 	});
-  // }
+      res.render('readPost', {
+        siteTitle: 'Bishops First Blog',
+        post: blogPost
+      });
+    };
+  }
 }
 
 module.exports = PostController;

@@ -140,7 +140,7 @@ class PostRepository {
 
   async getPost(searchParameter) {
     try {
-      let post;
+      let postData;
 
       const coreSqlQuery = `
 				SELECT 
@@ -156,15 +156,45 @@ class PostRepository {
 
       if (typeof searchParameter === 'number') {
         const sqlQueryString = coreSqlQuery + `WHERE id = ${searchParameter}`;
-        post = await this.DBAdapter.get(sqlQueryString);
-        return post;
+        postData = await this.DBAdapter.get(sqlQueryString);
+
+        if (!postData) {
+          return undefined;
+        }
+
+        return new this.BlogPost(
+          postData.id,
+          postData.title,
+          postData.author,
+          postData.content,
+          postData.created_at,
+          postData.slug,
+          undefined,
+          undefined,
+          undefined
+        );
       }
 
       if (typeof searchParameter === 'string') {
         const sqlQueryString =
           coreSqlQuery + `WHERE slug = "${searchParameter}"`;
-        post = await this.DBAdapter.get(sqlQueryString);
-        return post;
+        postData = await this.DBAdapter.get(sqlQueryString);
+
+        if (!postData) {
+          return undefined;
+        }
+
+        return new this.BlogPost(
+          postData.id,
+          postData.title,
+          postData.author,
+          postData.content,
+          postData.created_at,
+          postData.slug,
+          undefined,
+          undefined,
+          undefined
+        );
       }
     } catch (err) {
       console.error(err);

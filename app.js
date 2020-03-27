@@ -114,7 +114,7 @@ app.get(
 //   PostController.get
 // );
 
-// app.get("/posts/:idOrSlug", PostController.showBlogPost);
+app.get('/posts/:idOrSlug', PostController.showBlogPost({ blogPostService }));
 
 // app.post(
 //   "/posts",

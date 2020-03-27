@@ -3,7 +3,9 @@ class BlogPostService {
     this.PostRepository = PostRepository;
   }
 
-  async getDesiredBlogPost() {}
+  async getDesiredBlogPost(blogPostIdentifier) {
+    return await this.PostRepository.getPost(blogPostIdentifier);
+  }
 
   async getAllBlogPosts() {}
 
