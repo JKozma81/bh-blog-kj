@@ -7,10 +7,26 @@ class PostRepository {
 
   async getAllPosts() {
     try {
-      const blogPosts = await this.DBAdapter.getAll(
+      const blogPostsData = await this.DBAdapter.getAll(
         'SELECT id, title, author, content, created_at, slug, draft, published_at, modified_at FROM posts'
       );
-      return blogPosts;
+
+      const results = blogPostsData.map(
+        postData =>
+          new this.BlogPost(
+            postData.id,
+            postData.title,
+            postData.author,
+            postData.content,
+            postData.created_at,
+            postData.slug,
+            postData.draft === 1 ? true : false,
+            postData.published_at,
+            postData.modified_at
+          )
+      );
+
+      return results;
     } catch (err) {
       console.error(err);
     }

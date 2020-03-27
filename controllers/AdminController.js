@@ -11,20 +11,18 @@ class AdminController {
     });
   }
 
-  static async showAdminBlogPostList(options) {
-    const PostRepository = options.postsDao;
+  static showAdminBlogPostList(options) {
+    const postRepository = options.postRepository;
 
-    return (req, res) => {};
-  }
+    return async (req, res) => {
+      const blogPosts = await postRepository.getAllPosts();
 
-  static async adminBlogPostList(req, res) {
-    const blogPosts = await PostsDAO.getAllPosts();
-
-    res.render('postList', {
-      siteTitle: 'Bishops First Blog',
-      submenuTitle: 'Admin Post List',
-      blogPosts: DataFormatingService.formatDataForAdminList(blogPosts)
-    });
+      res.render('postList', {
+        siteTitle: 'Bishops First Blog',
+        submenuTitle: 'Admin Post List',
+        blogPosts
+      });
+    };
   }
 
   static async editBlogPost(req, res) {

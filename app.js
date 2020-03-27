@@ -87,11 +87,14 @@ app.get(
   AdminController.showDashboard
 );
 
-// app.get(
-//   "/admin/list",
-//   UserAuthenticationMiddleware.authenticate,
-//   AdminController.adminBlogPostList
-// );
+app.get(
+  '/admin/list',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  AdminController.showAdminBlogPostList({ postRepository })
+);
 
 // app.get(
 //   "/admin/list/:id",
