@@ -1,6 +1,7 @@
 class BlogPostService {
-  constructor(PostRepository) {
+  constructor(PostRepository, BlogPost) {
     this.PostRepository = PostRepository;
+    this.BlogPost = BlogPost;
   }
 
   async getSelectedBlogPost(blogPostIdentifier) {
@@ -19,6 +20,24 @@ class BlogPostService {
       publishedPosts,
       archiveMap
     };
+  }
+
+  async saveBlogpost(blogpostData) {
+    const newPost = new this.BlogPost(
+      undefined,
+      blogpostData.title,
+      blogpostData.author,
+      blogpostData.content,
+      undefined,
+      blogpostData.slug,
+      blogpostData.draft,
+      undefined,
+      undefined
+    );
+
+    const savedPost = await this.PostRepository.savePost(newPost);
+
+    return savedPost || undefined;
   }
 }
 

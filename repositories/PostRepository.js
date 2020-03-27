@@ -117,7 +117,7 @@ class PostRepository {
     }
   }
 
-  async addPost(postObject) {
+  async savePost(postObject) {
     try {
       await this.DBAdapter.run(
         `INSERT
@@ -125,13 +125,39 @@ class PostRepository {
 					posts(title, author, content, created_at, slug, draft, published_at, modified_at)
 				 VALUES("${postObject.title}",
 						"${postObject.author}",
-						"${postObject.content}",
-						datetime("now", "localtime"),
-						"${postObject.slug}"
-						 ${postObject.draft}
+						"${postObject.content.split('"').join("'")}", 
+						datetime("now", "localtime"), 
+						"${postObject.slug}", 
+						 ${postObject.draft === 'true' ? 1 : 0}
 						 ${postObject.draft === 'false' ? ", datetime('now', 'localtime')" : ', NULL'}
 						${', datetime("now", "localtime")'}
                 )`
+      );
+
+      const savedPostData = await this.DBAdapter.get(`
+        SELECT 
+          id,
+          title,
+          author,
+          content,
+          created_at,
+          slug
+        FROM
+          posts
+        WHERE
+          title = "${postObject.title}" AND author = "${postObject.author}"
+      `);
+
+      return new this.BlogPost(
+        savedPostData.id,
+        savedPostData.title,
+        savedPostData.author,
+        savedPostData.content,
+        savedPostData.created_at,
+        savedPostData.slug,
+        undefined,
+        undefined,
+        undefined
       );
     } catch (err) {
       console.error(err);

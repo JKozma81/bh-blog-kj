@@ -1,13 +1,13 @@
 class PostController {
   static showHome(options) {
-    const BlogPostService = options.blogPostService;
+    const blogPostService = options.blogPostService;
 
     return async (req, res) => {
       try {
         const {
           publishedPosts,
           archiveMap
-        } = await BlogPostService.getBlogPostsForHomePage();
+        } = await blogPostService.getBlogPostsForHomePage();
 
         res.render('home', {
           siteTitle: 'Bishops First Blog',
@@ -40,51 +40,57 @@ class PostController {
     };
   }
 
-  // static async post(req, res) {
-  // 	let { title, content, slug, draft } = req.body;
+  static receiveBlogPostDataAndSave(options) {
+    const authCookie = options.authCookie;
+    const sessionService = options.sessionService;
+    const blogPostService = options.blogPostService;
+    return async (req, res) => {
+      let { title, content, slug, draft } = req.body;
 
-  // 	content = content.split('"').join("'");
+      if (!title && !content && !slug) {
+        res.redirect('/posts?error=title-content-slug');
+        return;
+      }
+      if (!title && !slug) {
+        res.redirect(`/posts?error=title-and-slug&content=${content}`);
+        return;
+      }
+      if (!slug && !content) {
+        res.redirect(`/posts?error=content-and-slug&title=${title}`);
+        return;
+      }
+      if (!title) {
+        res.redirect(`/posts?error=title&content=${content}&slug=${slug}`);
+        return;
+      }
+      if (!content) {
+        res.redirect(`/posts?error=content&title=${title}&slug=${slug}`);
+        return;
+      }
+      if (!slug) {
+        res.redirect(`/posts?error=content&title=${title}&content=${content}`);
+        return;
+      }
 
-  // 	if (!title && !content && !slug) {
-  // 		res.redirect('/posts?error=title-content-slug');
-  // 		return;
-  // 	}
-  // 	if (!title && !slug) {
-  // 		res.redirect(`/posts?error=title-and-slug&content=${content}`);
-  // 		return;
-  // 	}
-  // 	if (!slug && !content) {
-  // 		res.redirect(`/posts?error=content-and-slug&title=${title}`);
-  // 		return;
-  // 	}
-  // 	if (!title) {
-  // 		res.redirect(`/posts?error=title&content=${content}&slug=${slug}`);
-  // 		return;
-  // 	}
-  // 	if (!content) {
-  // 		res.redirect(`/posts?error=content&title=${title}&slug=${slug}`);
-  // 		return;
-  // 	}
-  // 	if (!slug) {
-  // 		res.redirect(
-  // 			`/posts?error=content&title=${title}&content=${content}`
-  // 		);
-  // 		return;
-  // 	}
+      const SID = Number(req.cookies[authCookie]);
+      const user = sessionService.getSession(SID).user;
 
-  // 	const SID = Number(req.cookies[CookieService.getCookie()]);
-  // 	const user = SessionServices.getSession(SID).user;
+      const newPostData = {
+        title,
+        author: user.username,
+        content,
+        slug,
+        draft
+      };
+      const newBlogPost = await blogPostService.saveBlogpost(newPostData);
 
-  // 	const newPost = {
-  // 		title,
-  // 		author: user.username,
-  // 		content,
-  // 		slug,
-  // 		draft
-  // 	};
-  // 	await PostsDAO.addPost(newPost);
-  // 	res.redirect('/admin');
-  // }
+      if (!newBlogPost) {
+        throw new Error("Can't save blogpost!");
+      }
+
+      res.redirect('/admin');
+    };
+  }
 
   static showBlogPost(options) {
     const blogPostService = options.blogPostService;

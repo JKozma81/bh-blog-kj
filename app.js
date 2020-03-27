@@ -26,7 +26,7 @@ const UserAuthentication = require('./middlewares/Authentication');
 
 const dbAdapter = new DBAdapter(db);
 const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
-const blogPostService = new BlogPostServive(postRepository);
+const blogPostService = new BlogPostServive(postRepository, BlogPost);
 const sessionService = new SessionServices(sessions);
 const userAuthentication = new UserAuthentication();
 const messageProviderService = new MessageProviderService(messages);
@@ -116,10 +116,17 @@ app.get(
 
 app.get('/posts/:idOrSlug', PostController.showBlogPost({ blogPostService }));
 
-// app.post(
-//   "/posts",
-//   UserAuthenticationMiddleware.authenticate,
-//   PostController.post
-// );
+app.post(
+  '/posts',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  PostController.receiveBlogPostDataAndSave({
+    authCookie: AUTH_COOKIE,
+    sessionService,
+    blogPostService
+  })
+);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
