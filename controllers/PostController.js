@@ -20,22 +20,25 @@ class PostController {
     };
   }
 
-  // static get(req, res) {
-  // 	const user = req.user;
-  // 	let postError = req.query.error
-  // 		? MessageProviderService.getMessage(req.query.error)
-  // 		: '';
+  static showNewPost(options) {
+    const messageProvider = options.messageProviderService;
+    return async (req, res) => {
+      const user = req.user;
+      let postError = req.query.error
+        ? messageProvider.getMessage(req.query.error)
+        : '';
 
-  // 	res.render('newPost', {
-  // 		siteTitle: 'Bishops First Blog',
-  // 		submenuTitle: 'New Post',
-  // 		username: user.username,
-  // 		postError,
-  // 		title: req.query.title ? req.query.title : '',
-  // 		content: req.query.content ? req.query.content : '',
-  // 		slug: req.query.slug ? req.query.slug : ''
-  // 	});
-  // }
+      res.render('newPost', {
+        siteTitle: 'Bishops First Blog',
+        submenuTitle: 'New Post',
+        username: user.username,
+        postError,
+        title: req.query.title ? req.query.title : '',
+        content: req.query.content ? req.query.content : '',
+        slug: req.query.slug ? req.query.slug : ''
+      });
+    };
+  }
 
   // static async post(req, res) {
   // 	let { title, content, slug, draft } = req.body;

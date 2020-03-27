@@ -105,11 +105,14 @@ app.get(
 //   AdminController.modifyBlogPost
 // );
 
-// app.get(
-//   "/posts",
-//   UserAuthenticationMiddleware.authenticate,
-//   PostController.get
-// );
+app.get(
+  '/posts',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  PostController.showNewPost({ messageProviderService })
+);
 
 app.get('/posts/:idOrSlug', PostController.showBlogPost({ blogPostService }));
 
