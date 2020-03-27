@@ -1,33 +1,36 @@
 class UserAuthentication {
-  login(req, res, next) {
-    const { username, password } = req.body;
+  login(options) {
+    const users = options.users;
+    return (req, res, next) => {
+      const { username, password } = req.body;
 
-    if (!username && !password) {
-      res.redirect('/login?error=missingcredentials');
-      return;
-    }
+      if (!username && !password) {
+        res.redirect('/login?error=missingcredentials');
+        return;
+      }
 
-    if (!username) {
-      res.redirect(`/login?error=missingusername&password=${password}`);
-      return;
-    }
+      if (!username) {
+        res.redirect(`/login?error=missingusername&password=${password}`);
+        return;
+      }
 
-    if (!password) {
-      res.redirect(`/login?error=missingpassword&username=${username}`);
-      return;
-    }
+      if (!password) {
+        res.redirect(`/login?error=missingpassword&username=${username}`);
+        return;
+      }
 
-    const user = users.find(
-      user => user.username === username && user.password === password
-    );
+      const user = users.find(
+        user => user.username === username && user.password === password
+      );
 
-    if (!user) {
-      res.redirect('/login?error=credentials');
-      return;
-    }
+      if (!user) {
+        res.redirect('/login?error=credentials');
+        return;
+      }
 
-    req.user = user;
-    next();
+      req.user = user;
+      next();
+    };
   }
 
   authenticate(options) {

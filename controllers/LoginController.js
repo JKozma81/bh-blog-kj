@@ -1,9 +1,3 @@
-const CookieService = require('../services/CookieService');
-const SessionServices = require('../services/SessionServices');
-const users = require('../mocks/Users');
-
-const { AUTH_COOKIE } = require('../Config/config.json');
-
 class LoginController {
   static showLogin(options) {
     const messageProvider = options.messageProviderService;
@@ -29,20 +23,25 @@ class LoginController {
   }
 
   static login(options) {
+    const authCookie = options.authCookie;
     const sessionService = options.sessionService;
     return (req, res) => {
       const user = req.user;
       const SID = sessionService.createSession(user);
-      res.cookie(AUTH_COOKIE, SID);
+      res.cookie(authCookie, SID);
       res.redirect('/admin');
     };
   }
 
-  static logUserOut(req, res) {
-    const SID = req.cookies[CookieService.getCookie()];
-    SessionServices.deleteSession(SID);
-    CookieService.deleteCookie(res);
-    res.redirect('/login?logout=success');
+  static logout(options) {
+    const authCookie = options.authCookie;
+    const sessionService = options.sessionService;
+    return (req, res) => {
+      const SID = req.cookies[authCookie];
+      sessionService.deleteSession(SID);
+      res.clearCookie(authCookie);
+      res.redirect('/login?logout=success');
+    };
   }
 }
 

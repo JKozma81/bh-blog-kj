@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
 const { DBPath, AUTH_COOKIE } = require('./config/config.json');
+const users = require('./mocks/Users');
 
 const db = new sqlite3.Database(DBPath);
 
@@ -62,13 +63,20 @@ app.get(
 
 app.post(
   '/login',
-  userAuthentication.login,
+  userAuthentication.login({ users }),
   LoginController.login({
+    authCookie: AUTH_COOKIE,
     sessionService
   })
 );
 
-// app.get("/logout", LoginController.logUserOut);
+app.get(
+  '/logout',
+  LoginController.logout({
+    authCookie: AUTH_COOKIE,
+    sessionService
+  })
+);
 
 app.get(
   '/admin',
