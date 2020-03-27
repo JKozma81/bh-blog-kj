@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
 const { DBPath, AUTH_COOKIE } = require('./config/config.json');
-let sessions = [];
 
 const db = new sqlite3.Database(DBPath);
 
@@ -20,20 +19,20 @@ const {
   MessageProviderService,
   messages
 } = require('./services/MessageProviderService');
+const { SessionServices, sessions } = require('./services/SessionServices');
+const AdminController = require('./controllers/AdminController');
+const UserAuthentication = require('./middlewares/Authentication');
 
 const dbAdapter = new DBAdapter(db);
 const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
 const blogPostService = new BlogPostServive(postRepository);
+const sessionService = new SessionServices(sessions);
+const userAuthentication = new UserAuthentication();
 
 /////
-const AdminController = require('./controllers/AdminController');
-const UserAuthenticationMiddleware = require('./middlewares/Authentication');
 
-const SessionService = require('./services/SessionServices');
 const DataFormatingService = require('./services/DataFormatingService');
 
-const sessionService = new SessionService(sessions);
-const userAuthentication = new UserAuthenticationMiddleware(sessionService);
 const dataFormatingService = new DataFormatingService();
 const messageProviderService = new MessageProviderService(messages);
 
@@ -61,21 +60,24 @@ app.get(
   })
 );
 
-// app.post(
-//   '/login',
-//   userAuthentication.login,
-//   LoginController.login({
-//     sessionService
-//   })
-// );
+app.post(
+  '/login',
+  userAuthentication.login,
+  LoginController.login({
+    sessionService
+  })
+);
 
 // app.get("/logout", LoginController.logUserOut);
 
-// app.get(
-//   '/admin',
-//   userAuthentication.authenticate,
-//   AdminController.showDashboard
-// );
+app.get(
+  '/admin',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  AdminController.showDashboard
+);
 
 // app.get(
 //   "/admin/list",

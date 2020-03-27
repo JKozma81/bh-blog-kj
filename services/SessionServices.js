@@ -1,3 +1,5 @@
+const sessions = [];
+
 class SessionServices {
   constructor(sessions) {
     this.sessions = sessions;
@@ -22,4 +24,4 @@ class SessionServices {
   }
 }
 
-module.exports = SessionServices;
+module.exports = { SessionServices, sessions };

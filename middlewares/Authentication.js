@@ -1,10 +1,4 @@
-const { AUTH_COOKIE } = require('../Config/config.json');
-
 class UserAuthentication {
-  constructor(sessionService) {
-    this.sessionService = sessionService;
-  }
-
   login(req, res, next) {
     const { username, password } = req.body;
 
@@ -36,21 +30,26 @@ class UserAuthentication {
     next();
   }
 
-  authenticate(req, res, next) {
-    if (!req.cookies[AUTH_COOKIE]) {
-      res.status(401).redirect('/login?error=login');
-      return;
-    }
+  authenticate(options) {
+    const sessionService = options.sessionService;
+    const authCookie = options.authCookie;
 
-    const SID = Number(req.cookies[AUTH_COOKIE]);
-    const userSession = this.sessionService.getSession(SID);
+    return (req, res, next) => {
+      if (!req.cookies[authCookie]) {
+        res.status(401).redirect('/login?error=login');
+        return;
+      }
 
-    if (!userSession) {
-      res.redirect('/login?error=login');
-      return;
-    }
-    req.user = userSession.user;
-    next();
+      const SID = Number(req.cookies[authCookie]);
+      const userSession = sessionService.getSession(SID);
+
+      if (!userSession) {
+        res.redirect('/login?error=login');
+        return;
+      }
+      req.user = userSession.user;
+      next();
+    };
   }
 }
 
