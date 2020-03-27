@@ -176,7 +176,7 @@ class PostRepository {
 					content,
 					created_at,
 					slug
-					FROM
+				FROM
 					posts
 				`;
 
@@ -227,22 +227,56 @@ class PostRepository {
     }
   }
 
-  async modifyPost(postID, postObject) {
+  async modifyPost(postObject) {
     try {
+      const postDataToUpdate = await this.getPost(postObject.id);
+
       await this.DBAdapter.run(
         `UPDATE
 					posts
-				 SET
-					title = "${postObject.title}",
-					slug = "${postObject.slug}",
-					content = "${postObject.content}"
+         SET
+         ${
+           postObject.title !== postDataToUpdate.title
+             ? 'title = "' + postObject.title + '",'
+             : ''
+         }
+         ${
+           postObject.content.split('"').join("'") !==
+           (await postDataToUpdate.content)
+             ? 'content = "' + postObject.content.split('"').join("'") + '",'
+             : ''
+         }
+         ${
+           postObject.slug !== postDataToUpdate.slug
+             ? 'slug = "' + postObject.slug + '",'
+             : ''
+         }
+         ${
+           postObject.draft !== (!!postDataToUpdate.draft).toString()
+             ? 'draft = ' + Number(!postObject.draft) + ','
+             : ''
+         }
 					${
             postObject.draft === 'true'
-              ? ', published_at = NULL, modified_at = datetime("now", "localtime")'
-              : ', published_at = datetime("now", "localtime"), modified_at = datetime("now", "localtime")'
+              ? ' published_at = NULL, modified_at = datetime("now", "localtime")'
+              : ' published_at = datetime("now", "localtime"), modified_at = datetime("now", "localtime")'
           }
 				WHERE
-					id = ${postID}`
+					id = ${postObject.id}`
+      );
+
+      const updatedPostData = await this.getPost(postObject.id);
+
+      return new this.BlogPost(
+        updatedPostData.id,
+        updatedPostData.title,
+        updatedPostData.author,
+        updatedPostData.content,
+        updatedPostData.created_at,
+        updatedPostData.slug,
+        undefined,
+        undefined,
+        undefined
       );
     } catch (err) {
       console.error(err);

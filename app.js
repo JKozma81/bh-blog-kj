@@ -4,17 +4,13 @@ const hbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
 const sqlite3 = require('sqlite3').verbose();
 
-const { DBPath, AUTH_COOKIE } = require('./config/config.json');
-const users = require('./mocks/Users');
-
-const db = new sqlite3.Database(DBPath);
-
 const PostController = require('./controllers/PostController');
 const BlogPostServive = require('./services/BlogPostService');
 const PostRepository = require('./repositories/PostRepository');
 const DBAdapter = require('./repositories/DatabaseAdapter');
 const BlogPost = require('./domains/BlogPost');
 const ArchiveMap = require('./domains/ArchiveMap');
+
 const LoginController = require('./controllers/LoginController');
 const {
   MessageProviderService,
@@ -23,6 +19,11 @@ const {
 const { SessionServices, sessions } = require('./services/SessionServices');
 const AdminController = require('./controllers/AdminController');
 const UserAuthentication = require('./middlewares/Authentication');
+
+const { DBPath, AUTH_COOKIE } = require('./config/config.json');
+const users = require('./mocks/Users');
+
+const db = new sqlite3.Database(DBPath);
 
 const dbAdapter = new DBAdapter(db);
 const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
@@ -99,11 +100,14 @@ app.get(
   AdminController.showEditBlogPost({ blogPostService })
 );
 
-// app.post(
-//   "/admin/list/:id",
-//   UserAuthenticationMiddleware.authenticate,
-//   AdminController.modifyBlogPost
-// );
+app.post(
+  '/admin/list/:id',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  AdminController.modifyBlogPost({ blogPostService })
+);
 
 app.get(
   '/posts',

@@ -39,6 +39,22 @@ class BlogPostService {
 
     return savedPost || undefined;
   }
+
+  async modifyPost(blogpostData) {
+    const newPostData = new this.BlogPost(
+      blogpostData.id,
+      blogpostData.title,
+      undefined,
+      blogpostData.content,
+      undefined,
+      blogpostData.slug,
+      blogpostData.draft,
+      undefined,
+      undefined
+    );
+
+    const savedPost = await this.PostRepository.modifyPost(newPostData);
+  }
 }
 
 module.exports = BlogPostService;

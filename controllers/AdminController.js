@@ -40,19 +40,23 @@ class AdminController {
     };
   }
 
-  static async modifyBlogPost(req, res) {
-    const blogPostID = Number(req.params.id);
-    const modifiedBlogPost = {};
-    ({
-      title: modifiedBlogPost.title,
-      slug: modifiedBlogPost.slug,
-      content: modifiedBlogPost.content,
-      draft: modifiedBlogPost.draft
-    } = req.body);
+  static modifyBlogPost(options) {
+    const blogPostService = options.blogPostService;
+    return async (req, res) => {
+      const blogPostID = Number(req.params.id);
+      const modifiedBlogPostData = {};
+      ({
+        title: modifiedBlogPostData.title,
+        content: modifiedBlogPostData.content,
+        slug: modifiedBlogPostData.slug,
+        draft: modifiedBlogPostData.draft
+      } = req.body);
+      modifiedBlogPostData.id = blogPostID;
 
-    await PostsDAO.modifyPost(blogPostID, modifiedBlogPost);
+      await blogPostService.modifyPost(modifiedBlogPostData);
 
-    res.redirect('/admin/list');
+      res.redirect('/admin/list');
+    };
   }
 }
 
