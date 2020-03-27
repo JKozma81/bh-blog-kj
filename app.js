@@ -29,12 +29,6 @@ const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
 const blogPostService = new BlogPostServive(postRepository);
 const sessionService = new SessionServices(sessions);
 const userAuthentication = new UserAuthentication();
-
-/////
-
-const DataFormatingService = require('./services/DataFormatingService');
-
-const dataFormatingService = new DataFormatingService();
 const messageProviderService = new MessageProviderService(messages);
 
 const app = express();
@@ -93,14 +87,17 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE
   }),
-  AdminController.showAdminBlogPostList({ postRepository })
+  AdminController.showAdminBlogPostList({ blogPostService })
 );
 
-// app.get(
-//   "/admin/list/:id",
-//   UserAuthenticationMiddleware.authenticate,
-//   AdminController.editBlogPost
-// );
+app.get(
+  '/admin/list/:id',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  AdminController.showEditBlogPost({ blogPostService })
+);
 
 // app.post(
 //   "/admin/list/:id",

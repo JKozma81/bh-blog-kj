@@ -88,7 +88,7 @@ class PostController {
     return async (req, res) => {
       const searchParameter = Number(req.params.idOrSlug);
 
-      const blogPost = await blogPostService.getDesiredBlogPost(
+      const blogPost = await blogPostService.getSelectedBlogPost(
         isNaN(searchParameter) ? req.params.idOrSlug : searchParameter
       );
 

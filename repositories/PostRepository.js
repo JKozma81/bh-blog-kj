@@ -21,7 +21,7 @@ class PostRepository {
             postData.created_at,
             postData.slug,
             postData.draft === 1 ? true : false,
-            postData.published_at,
+            postData.published_at ? postData.published_at : 'N/A',
             postData.modified_at
           )
       );

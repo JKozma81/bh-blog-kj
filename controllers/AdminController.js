@@ -12,10 +12,10 @@ class AdminController {
   }
 
   static showAdminBlogPostList(options) {
-    const postRepository = options.postRepository;
+    const blogPostService = options.blogPostService;
 
     return async (req, res) => {
-      const blogPosts = await postRepository.getAllPosts();
+      const blogPosts = await blogPostService.getAllBlogPosts();
 
       res.render('postList', {
         siteTitle: 'Bishops First Blog',
@@ -25,15 +25,19 @@ class AdminController {
     };
   }
 
-  static async editBlogPost(req, res) {
-    const blogPostID = Number(req.params.id);
-    const blogPost = await PostsDAO.getPost(blogPostID);
+  static showEditBlogPost(options) {
+    const blogPostService = options.blogPostService;
 
-    res.render('editPost', {
-      siteTitle: 'Bishops First Blog',
-      submenuTitle: 'Edit Post',
-      blogPost
-    });
+    return async (req, res) => {
+      const blogPostID = Number(req.params.id);
+      const blogPost = await blogPostService.getSelectedBlogPost(blogPostID);
+
+      res.render('editPost', {
+        siteTitle: 'Bishops First Blog',
+        submenuTitle: 'Edit Post',
+        blogPost
+      });
+    };
   }
 
   static async modifyBlogPost(req, res) {

@@ -3,11 +3,13 @@ class BlogPostService {
     this.PostRepository = PostRepository;
   }
 
-  async getDesiredBlogPost(blogPostIdentifier) {
+  async getSelectedBlogPost(blogPostIdentifier) {
     return await this.PostRepository.getPost(blogPostIdentifier);
   }
 
-  async getAllBlogPosts() {}
+  async getAllBlogPosts() {
+    return await this.PostRepository.getAllPosts();
+  }
 
   async getBlogPostsForHomePage() {
     const publishedPosts = await this.PostRepository.getAllPublishedPosts();
@@ -18,8 +20,6 @@ class BlogPostService {
       archiveMap
     };
   }
-
-  async getBlogPostsDataForArchive() {}
 }
 
 module.exports = BlogPostService;
