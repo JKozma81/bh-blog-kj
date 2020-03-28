@@ -1,8 +1,9 @@
+const BlogPost = require('../domains/BlogPost');
+const ArchiveMap = require('../domains/ArchiveMap');
+
 class PostRepository {
-  constructor(DBAdapter, BlogPost, ArchiveMap) {
+  constructor(DBAdapter) {
     this.DBAdapter = DBAdapter;
-    this.BlogPost = BlogPost;
-    this.ArchiveMap = ArchiveMap;
   }
 
   async getAllPosts() {
@@ -13,7 +14,7 @@ class PostRepository {
 
       const results = blogPostsData.map(
         postData =>
-          new this.BlogPost(
+          new BlogPost(
             postData.id,
             postData.title,
             postData.author,
@@ -36,30 +37,29 @@ class PostRepository {
     try {
       const blogPostsData = await this.DBAdapter.getAll(
         `SELECT
-					id,
-					title,
-					author,
-					content,
-					created_at,
-					slug,
-					draft,
-					published_at,
-					modified_at
-					FROM
-					posts
-					WHERE
+          posts.id,
+          posts.title,
+          posts.author,
+          posts.content,
+          posts.created_at,
+          posts.draft,
+          posts.published_at,
+          posts.modified_at
+				FROM
+          posts
+				WHERE
 					published_at IS NOT NULL`
       );
 
       const results = blogPostsData.map(
         postData =>
-          new this.BlogPost(
+          new BlogPost(
             postData.id,
             postData.title,
             postData.author,
             postData.content,
             postData.created_at,
-            postData.slug,
+            undefined,
             postData.draft === 1 ? true : false,
             postData.published_at,
             postData.modified_at
@@ -113,7 +113,7 @@ class PostRepository {
           title = "${postObject.title}" AND author = "${postObject.author}"
       `);
 
-      return new this.BlogPost(
+      return new BlogPost(
         savedPostData.id,
         savedPostData.title,
         savedPostData.author,
@@ -153,7 +153,7 @@ class PostRepository {
           return undefined;
         }
 
-        return new this.BlogPost(
+        return new BlogPost(
           postData.id,
           postData.title,
           postData.author,
@@ -175,7 +175,7 @@ class PostRepository {
           return undefined;
         }
 
-        return new this.BlogPost(
+        return new BlogPost(
           postData.id,
           postData.title,
           postData.author,
@@ -232,7 +232,7 @@ class PostRepository {
 
       const updatedPostData = await this.getPost(postObject.id);
 
-      return new this.BlogPost(
+      return new BlogPost(
         updatedPostData.id,
         updatedPostData.title,
         updatedPostData.author,

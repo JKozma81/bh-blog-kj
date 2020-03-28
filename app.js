@@ -8,8 +8,6 @@ const PostController = require('./controllers/PostController');
 const BlogPostServive = require('./services/BlogPostService');
 const PostRepository = require('./repositories/PostRepository');
 const DBAdapter = require('./repositories/DatabaseAdapter');
-const BlogPost = require('./domains/BlogPost');
-const ArchiveMap = require('./domains/ArchiveMap');
 
 const LoginController = require('./controllers/LoginController');
 const {
@@ -24,10 +22,11 @@ const { DBPath, AUTH_COOKIE } = require('./config/config.json');
 const users = require('./mocks/Users');
 
 const db = new sqlite3.Database(DBPath);
-
 const dbAdapter = new DBAdapter(db);
-const postRepository = new PostRepository(dbAdapter, BlogPost, ArchiveMap);
-const blogPostService = new BlogPostServive(postRepository, BlogPost);
+dbAdapter.init();
+
+const postRepository = new PostRepository(dbAdapter);
+const blogPostService = new BlogPostServive(postRepository);
 const sessionService = new SessionServices(sessions);
 const userAuthentication = new UserAuthentication();
 const messageProviderService = new MessageProviderService(messages);

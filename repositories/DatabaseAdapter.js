@@ -1,10 +1,36 @@
 module.exports = class DB {
   constructor(databaseEngine) {
     this.databaseEngine = databaseEngine;
+  }
 
+  init() {
     this.databaseEngine.serialize(() => {
       this.databaseEngine.run(
-        'CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, author VARCHAR(100) NOT NULL, title VARCHAR(100) NOT NULL, content TEXT NOT NULL, created_at TEXT NOT NULL, slug VARCHAR(100) NOT NULL, published_at VARCHAR(100), modified_at VARCHAR(100), draft INTEGER NOT NULL)'
+        `CREATE TABLE IF NOT EXISTS
+          posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 author VARCHAR(100) NOT NULL,
+                 title VARCHAR(100) NOT NULL,
+                 content TEXT NOT NULL,
+                 created_at TEXT NOT NULL,
+                 published_at VARCHAR(100),
+                 modified_at VARCHAR(100),
+                 draft INTEGER NOT NULL)`
+      );
+
+      this.databaseEngine.run(
+        `CREATE TABLE IF NOT EXISTS
+          slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 value VARCHAR(100) NOT NULL
+                )`
+      );
+
+      this.databaseEngine.run(
+        `CREATE TABLE IF NOT EXISTS
+          posts_with_slugs (id INTEGER PRIMARY KEY,
+                            post_id INTEGER NOT NULL,
+                            slug_id INTEGER NOT NULL,
+                            FOREIGN KEY (post_id) REFERENCES posts (id),
+                            FOREIGN KEY (slug_id) REFERENCES slugs (id))`
       );
     });
   }

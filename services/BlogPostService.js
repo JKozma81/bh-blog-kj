@@ -1,7 +1,8 @@
+const BlogPost = require('../domains/BlogPost');
+
 class BlogPostService {
-  constructor(PostRepository, BlogPost) {
+  constructor(PostRepository) {
     this.PostRepository = PostRepository;
-    this.BlogPost = BlogPost;
   }
 
   async getSelectedBlogPost(blogPostIdentifier) {
@@ -17,7 +18,7 @@ class BlogPostService {
   }
 
   async saveBlogpost(blogpostData) {
-    const newPost = new this.BlogPost(
+    const newPost = new BlogPost(
       undefined,
       blogpostData.title,
       blogpostData.author,
@@ -35,7 +36,7 @@ class BlogPostService {
   }
 
   async modifyPost(blogpostData) {
-    const newPostData = new this.BlogPost(
+    const newPostData = new BlogPost(
       blogpostData.id,
       blogpostData.title,
       undefined,
