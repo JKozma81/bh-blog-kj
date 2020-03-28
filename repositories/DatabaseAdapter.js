@@ -70,8 +70,4 @@ module.exports = class DB {
   formatDBBoolSpecifics(data) {
     return data === 'true' ? 1 : 0;
   }
-
-  // formatDBStringSpecifics(data) {
-  //   return data.split('"').join("'");
-  // }
 };

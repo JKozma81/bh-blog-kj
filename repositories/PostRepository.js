@@ -120,12 +120,7 @@ class PostRepository {
 
         const postID = await this.DBAdapter.get(
           `
-          SELECT
-            id
-          FROM
-            posts
-          WHERE
-            title = ? AND author = ?
+          SELECT id FROM posts WHERE title = ? AND author = ?
           `,
           [postObject.title, postObject.author]
         );
@@ -133,12 +128,7 @@ class PostRepository {
         if (!postObject.draft) {
           await this.DBAdapter.run(
             `
-            UPDATE
-              posts
-            SET
-              published_at = datetime("now", "localtime")
-            WHERE
-              id = ?
+            UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
           `,
             [postID.id]
           );
@@ -146,15 +136,7 @@ class PostRepository {
 
         const activeSlug = await this.DBAdapter.get(
           `
-          SELECT
-            id,
-            slug_value
-          FROM
-            slugs
-          WHERE
-            post_id = ?
-          AND 
-            is_active = 1
+          SELECT id, slug_value FROM slugs WHERE post_id = ? AND is_active = 1
           `,
           [postID.id]
         );
@@ -162,23 +144,14 @@ class PostRepository {
         if (activeSlug) {
           await this.DBAdapter.run(
             `
-            UPDATE
-              slugs
-            SET
-              is_active = 0
-            WHERE
-              post_id = ?
-            AND
-              id = ?
+            UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
           `,
             [postID.id, activeSlug.id]
           );
         } else {
           await this.DBAdapter.run(
             `
-            INSERT INTO
-              slugs(slug_value, post_id, is_active)
-            VALUES(?, ?, ?)
+            INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
             `,
             [postObject.slug, postID.id, 1]
           );
@@ -245,11 +218,9 @@ class PostRepository {
         ON
           slugs.post_id = posts.id
         WHERE
-          slugs.is_active = 1
-        AND
-          posts.published_at IS NOT NULL
-        AND 
           posts.id = ?
+        AND
+          slugs.is_active = 1
       `,
         [postId]
       );
@@ -295,10 +266,6 @@ class PostRepository {
         ON
           slugs.post_id = posts.id
         WHERE
-          slugs.is_active = 1
-        AND
-          posts.published_at IS NOT NULL
-        AND 
           slugs.slug_value = ?
       `,
         [slug]
@@ -328,14 +295,7 @@ class PostRepository {
     try {
       const postID = await this.DBAdapter.get(
         `
-        SELECT
-          post_id
-        FROM
-          slugs
-        WHERE
-          slug_value = ?
-        AND
-          is_active = 0
+        SELECT post_id FROM slugs WHERE slug_value = ? AND is_active = 0
       `,
         [slug]
       );
@@ -345,46 +305,73 @@ class PostRepository {
     }
   }
 
-  // must rewrite
   async modifyPost(postObject) {
     try {
-      const postDataToUpdate = await this.getPost(postObject.id);
-      const formatedPostObject = this.DBAdapter.format(postObject);
+      postObject.draft = this.DBAdapter.formatDBBoolSpecifics(postObject.draft);
+      try {
+        await this.DBAdapter.run(`
+          BEGIN TRANSACTION
+        `);
 
-      await this.DBAdapter.run(
-        `UPDATE
-					posts
-         SET
-         ${
-           formatedPostObject.title !== postDataToUpdate.title
-             ? 'title = "' + formatedPostObject.title + '",'
-             : ''
-         }
-         ${
-           formatedPostObject.content !== postDataToUpdate.content
-             ? 'content = "' + formatedPostObject.content + '",'
-             : ''
-         }
-         ${
-           formatedPostObject.slug !== postDataToUpdate.slug
-             ? 'slug = "' + formatedPostObject.slug + '",'
-             : ''
-         }
-         ${
-           formatedPostObject.draft !== postDataToUpdate.draft
-             ? 'draft = ' + formatedPostObject.draft + ','
-             : ''
-         }
-					${
-            formatedPostObject.draft === 1
-              ? ' published_at = NULL, modified_at = datetime("now", "localtime")'
-              : ' published_at = datetime("now", "localtime"), modified_at = datetime("now", "localtime")'
-          }
-				WHERE
-					id = ${postObject.id}`
-      );
+        await this.DBAdapter.run(
+          `
+          UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = datetime("now", "localtime") WHERE id = ?
+        `,
+          [
+            postObject.title,
+            postObject.content,
+            postObject.draft,
+            postObject.id
+          ]
+        );
 
-      const updatedPostData = await this.getPost(postObject.id);
+        if (!postObject.draft) {
+          await this.DBAdapter.run(
+            `
+            UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
+          `,
+            [postObject.id]
+          );
+        } else {
+          await this.DBAdapter.run(
+            `
+            UPDATE posts SET published_at = NULL WHERE id = ?
+          `,
+            [postObject.id]
+          );
+        }
+
+        const oldSlug = await this.DBAdapter.get(
+          `
+          SELECT id FROM slugs WHERE post_id = ? AND is_active = 1
+        `,
+          [postObject.id]
+        );
+
+        if (oldSlug) {
+          await this.DBAdapter.run(
+            `
+            UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
+          `,
+            [postObject.id, oldSlug.id]
+          );
+        }
+
+        await this.DBAdapter.run(
+          `
+          INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
+        `,
+          [postObject.slug, postObject.id, 1]
+        );
+      } catch (err) {
+        await this.DBAdapter.run(`
+          ROLLBACK TRANSACTION
+        `);
+        console.error(err);
+      }
+      await this.DBAdapter.run('COMMIT TRANSACTION');
+
+      const updatedPostData = await this.getPostById(postObject.id);
 
       return new BlogPost(
         updatedPostData.id,
@@ -392,7 +379,7 @@ class PostRepository {
         updatedPostData.author,
         updatedPostData.content,
         updatedPostData.created_at,
-        updatedPostData.slug,
+        undefined,
         undefined,
         undefined,
         undefined
