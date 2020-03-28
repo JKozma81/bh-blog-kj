@@ -12,14 +12,8 @@ class BlogPostService {
     return await this.PostRepository.getAllPosts();
   }
 
-  async getBlogPostsForHomePage() {
-    const publishedPosts = await this.PostRepository.getAllPublishedPosts();
-    const archiveMap = await this.PostRepository.getArchiveMap();
-
-    return {
-      publishedPosts,
-      archiveMap
-    };
+  async getPublishedBlogposts() {
+    return await this.PostRepository.getAllPublishedPosts();
   }
 
   async saveBlogpost(blogpostData) {

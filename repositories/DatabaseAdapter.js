@@ -42,20 +42,11 @@ module.exports = class DB {
     });
   }
 
-  format(data) {
-    const tempObject = {};
-    ({
-      id: tempObject.id,
-      title: tempObject.title,
-      author: tempObject.author,
-      created_at: tempObject.created_at,
-      slug: tempObject.slug,
-      published_at: tempObject.published_at,
-      modified_at: tempObject.modified_at
-    } = data);
-    tempObject.content = data.content.split('"').join("'");
-    tempObject.draft = data.draft === 'true' ? 1 : 0;
+  formatDBBoolSpecifics(data) {
+    return data === 'true' ? 1 : 0;
+  }
 
-    return tempObject;
+  formatDBStringSpecifics(data) {
+    return data.split('"').join("'");
   }
 };

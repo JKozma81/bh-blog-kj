@@ -72,70 +72,29 @@ class PostRepository {
     }
   }
 
-  async getArchiveMap() {
-    try {
-      const mapData = await this.DBAdapter.getAll(
-        `SELECT
-					id,
-					title,
-					published_at
-				 FROM
-					posts
-				 WHERE
-					published_at IS NOT NULL
-				 ORDER BY published_at
-				`
-      );
-
-      const formatedBlogPostData = {};
-
-      mapData.forEach(blogPost => {
-        let fullDate = blogPost.published_at.split(' ')[0].split('-');
-        fullDate = fullDate.map(element => (element = Number(element)));
-        fullDate[1] -= 1;
-        let date = new Date(...fullDate);
-        let year = date.getFullYear();
-        let month = date.toLocaleString('en-US', { month: 'long' });
-
-        if (!formatedBlogPostData.hasOwnProperty(year)) {
-          formatedBlogPostData[year] = {};
-        }
-
-        if (!formatedBlogPostData[year].hasOwnProperty(month)) {
-          formatedBlogPostData[year][month] = [];
-        }
-
-        formatedBlogPostData[year][month].push({
-          id: blogPost.id,
-          title: blogPost.title
-        });
-      });
-
-      return new this.ArchiveMap(formatedBlogPostData);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
   async savePost(postObject) {
     try {
-      const formatedBlogPost = this.DBAdapter.format(postObject);
+      postObject.draft = this.DBAdapter.formatDBBoolSpecifics(postObject.draft);
+      postObject.content = this.DBAdapter.formatDBStringSpecifics(
+        postObject.content
+      );
+
+      let publishDateSQLparam = ', NULL';
+      if (!postObject.draft) {
+        publishDateSQLparam = ", datetime('now', 'localtime')";
+      }
 
       await this.DBAdapter.run(
         `INSERT
       	 INTO
       		posts(title, author, content, created_at, slug, draft, published_at, modified_at)
-      	 VALUES("${formatedBlogPost.title}",
-      			"${formatedBlogPost.author}",
-      			"${formatedBlogPost.content}",
+      	 VALUES("${postObject.title}",
+      			"${postObject.author}",
+      			"${postObject.content}",
       			datetime("now", "localtime"),
-      			"${formatedBlogPost.slug}",
-      			 ${formatedBlogPost.draft}
-      			 ${
-               formatedBlogPost.draft === 0
-                 ? ", datetime('now', 'localtime')"
-                 : ', NULL'
-             }
+      			"${postObject.slug}",
+      			 ${postObject.draft}
+      			 ${publishDateSQLparam}
       			${', datetime("now", "localtime")'}
                 )`
       );
