@@ -20,25 +20,20 @@ module.exports = class DB {
       this.databaseEngine.run(
         `CREATE TABLE IF NOT EXISTS
           slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 value VARCHAR(100) NOT NULL
+                 slug_value VARCHAR(100) NOT NULL,
+                 post_id INTEGER NOT NULL,
+                 is_active INTEGER NOT NULL,
+                 FOREIGN KEY (post_id) REFERENCES posts (id)
                 )`
-      );
-
-      this.databaseEngine.run(
-        `CREATE TABLE IF NOT EXISTS
-          posts_with_slugs (id INTEGER PRIMARY KEY,
-                            post_id INTEGER NOT NULL,
-                            slug_id INTEGER NOT NULL,
-                            FOREIGN KEY (post_id) REFERENCES posts (id),
-                            FOREIGN KEY (slug_id) REFERENCES slugs (id))`
       );
     });
   }
 
-  getAll(sqlQuery) {
+  getAll(sqlQuery, params = []) {
     return new Promise((resolve, reject) => {
       this.databaseEngine.serialize(() => {
-        this.databaseEngine.all(sqlQuery, (err, results) => {
+        const statement = this.databaseEngine.prepare(sqlQuery);
+        statement.all(...params, (err, results) => {
           if (err !== null) reject(err);
           resolve(results);
         });
@@ -46,24 +41,28 @@ module.exports = class DB {
     });
   }
 
-  get(sqlQuery) {
+  get(sqlQuery, params = []) {
     return new Promise((resolve, reject) => {
       this.databaseEngine.serialize(() => {
-        this.databaseEngine.get(sqlQuery, (err, result) => {
+        const statement = this.databaseEngine.prepare(sqlQuery);
+        statement.get(...params, (err, result) => {
           if (err !== null) reject(err);
           resolve(result);
         });
+        statement.finalize();
       });
     });
   }
 
-  run(sqlQuery) {
+  run(sqlQuery, params = []) {
     return new Promise((resolve, reject) => {
       this.databaseEngine.serialize(() => {
-        this.databaseEngine.run(sqlQuery, err => {
+        const statement = this.databaseEngine.prepare(sqlQuery);
+        statement.run(...params, err => {
           if (err !== null) reject(err);
-          resolve();
         });
+        statement.finalize();
+        resolve();
       });
     });
   }
@@ -72,7 +71,7 @@ module.exports = class DB {
     return data === 'true' ? 1 : 0;
   }
 
-  formatDBStringSpecifics(data) {
-    return data.split('"').join("'");
-  }
+  // formatDBStringSpecifics(data) {
+  //   return data.split('"').join("'");
+  // }
 };

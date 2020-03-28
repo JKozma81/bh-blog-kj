@@ -30,7 +30,7 @@ class AdminController {
 
     return async (req, res) => {
       const blogPostID = Number(req.params.id);
-      const blogPost = await blogPostService.getSelectedBlogPost(blogPostID);
+      const blogPost = await blogPostService.getBlogPostById(blogPostID);
 
       res.render('editPost', {
         siteTitle: 'Bishops First Blog',

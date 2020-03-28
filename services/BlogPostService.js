@@ -5,8 +5,12 @@ class BlogPostService {
     this.PostRepository = PostRepository;
   }
 
-  async getSelectedBlogPost(blogPostIdentifier) {
-    return await this.PostRepository.getPost(blogPostIdentifier);
+  async getBlogPostById(blogPostId) {
+    return await this.PostRepository.getPostById(blogPostId);
+  }
+
+  async getBlogPostBySlug(slug) {
+    return await this.PostRepository.getPostBySlug(slug);
   }
 
   async getAllBlogPosts() {
@@ -15,6 +19,11 @@ class BlogPostService {
 
   async getPublishedBlogposts() {
     return await this.PostRepository.getAllPublishedPosts();
+  }
+
+  // Kell esetleg egy külön slugService vagy maradhat itt?
+  async getBlogPostByOldSlug(slug) {
+    return await this.PostRepository.getPostByOldSlug(slug);
   }
 
   async saveBlogpost(blogpostData) {
@@ -49,6 +58,7 @@ class BlogPostService {
     );
 
     const savedPost = await this.PostRepository.modifyPost(newPostData);
+    return savedPost;
   }
 }
 
