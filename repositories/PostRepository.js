@@ -119,23 +119,29 @@ class PostRepository {
 
   async savePost(postObject) {
     try {
+      const formatedBlogPost = this.DBAdapter.format(postObject);
+
       await this.DBAdapter.run(
         `INSERT
-				 INTO
-					posts(title, author, content, created_at, slug, draft, published_at, modified_at)
-				 VALUES("${postObject.title}",
-						"${postObject.author}",
-						"${postObject.content.split('"').join("'")}", 
-						datetime("now", "localtime"), 
-						"${postObject.slug}", 
-						 ${postObject.draft === 'true' ? 1 : 0}
-						 ${postObject.draft === 'false' ? ", datetime('now', 'localtime')" : ', NULL'}
-						${', datetime("now", "localtime")'}
+      	 INTO
+      		posts(title, author, content, created_at, slug, draft, published_at, modified_at)
+      	 VALUES("${formatedBlogPost.title}",
+      			"${formatedBlogPost.author}",
+      			"${formatedBlogPost.content}",
+      			datetime("now", "localtime"),
+      			"${formatedBlogPost.slug}",
+      			 ${formatedBlogPost.draft}
+      			 ${
+               formatedBlogPost.draft === 0
+                 ? ", datetime('now', 'localtime')"
+                 : ', NULL'
+             }
+      			${', datetime("now", "localtime")'}
                 )`
       );
 
       const savedPostData = await this.DBAdapter.get(`
-        SELECT 
+        SELECT
           id,
           title,
           author,
@@ -230,34 +236,34 @@ class PostRepository {
   async modifyPost(postObject) {
     try {
       const postDataToUpdate = await this.getPost(postObject.id);
+      const formatedPostObject = this.DBAdapter.format(postObject);
 
       await this.DBAdapter.run(
         `UPDATE
 					posts
          SET
          ${
-           postObject.title !== postDataToUpdate.title
-             ? 'title = "' + postObject.title + '",'
+           formatedPostObject.title !== postDataToUpdate.title
+             ? 'title = "' + formatedPostObject.title + '",'
              : ''
          }
          ${
-           postObject.content.split('"').join("'") !==
-           (await postDataToUpdate.content)
-             ? 'content = "' + postObject.content.split('"').join("'") + '",'
+           formatedPostObject.content !== postDataToUpdate.content
+             ? 'content = "' + formatedPostObject.content + '",'
              : ''
          }
          ${
-           postObject.slug !== postDataToUpdate.slug
-             ? 'slug = "' + postObject.slug + '",'
+           formatedPostObject.slug !== postDataToUpdate.slug
+             ? 'slug = "' + formatedPostObject.slug + '",'
              : ''
          }
          ${
-           postObject.draft !== (!!postDataToUpdate.draft).toString()
-             ? 'draft = ' + Number(!postObject.draft) + ','
+           formatedPostObject.draft !== postDataToUpdate.draft
+             ? 'draft = ' + formatedPostObject.draft + ','
              : ''
          }
 					${
-            postObject.draft === 'true'
+            formatedPostObject.draft === 1
               ? ' published_at = NULL, modified_at = datetime("now", "localtime")'
               : ' published_at = datetime("now", "localtime"), modified_at = datetime("now", "localtime")'
           }
