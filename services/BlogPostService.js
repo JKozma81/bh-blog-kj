@@ -21,11 +21,6 @@ class BlogPostService {
     return await this.PostRepository.getAllPublishedPosts();
   }
 
-  // Kell esetleg egy külön slugService vagy maradhat itt?
-  async getBlogPostByOldSlug(slug) {
-    return await this.PostRepository.getPostByOldSlug(slug);
-  }
-
   async saveBlogpost(blogpostData) {
     const newPost = new BlogPost(
       undefined,
@@ -60,6 +55,16 @@ class BlogPostService {
     const savedPost = await this.PostRepository.modifyPost(newPostData);
     return savedPost;
   }
+
+  // Kell esetleg egy külön slugService vagy maradhat itt?
+  async getOldSlug(slug) {
+    return await this.PostRepository.getOldSlug(slug);
+  }
+
+  async getActiveSlug(postId) {
+    return await this.PostRepository.getActiveSlug(postId);
+  }
+  ////////////////////////////////////////////////////////////
 }
 
 module.exports = BlogPostService;

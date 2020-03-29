@@ -267,6 +267,8 @@ class PostRepository {
           slugs.post_id = posts.id
         WHERE
           slugs.slug_value = ?
+        AND
+          slugs.is_active = 1
       `,
         [slug]
       );
@@ -291,15 +293,38 @@ class PostRepository {
     }
   }
 
-  async getPostByOldSlug(slug) {
+  async getOldSlug(slug) {
     try {
-      const postID = await this.DBAdapter.get(
+      const oldSlug = await this.DBAdapter.get(
         `
-        SELECT post_id FROM slugs WHERE slug_value = ? AND is_active = 0
+        SELECT post_id, slug_value FROM slugs WHERE slug_value = ? AND is_active = 0
       `,
         [slug]
       );
-      return postID.post_id;
+
+      const result = oldSlug
+        ? {
+            postId: oldSlug.post_id,
+            oldSlug: oldSlug.slug_value
+          }
+        : oldSlug;
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async getActiveSlug(postId) {
+    try {
+      const activeSlug = await this.DBAdapter.get(
+        `
+        SELECT slug_value FROM slugs WHERE post_id = ? AND is_active = 1
+      `,
+        [postId]
+      );
+      return {
+        value: activeSlug.slug_value
+      };
     } catch (err) {
       console.error(err);
     }

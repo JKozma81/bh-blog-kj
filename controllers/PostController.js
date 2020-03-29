@@ -121,10 +121,19 @@ class PostController {
   static showBlogPost(options) {
     const blogPostService = options.blogPostService;
     return async (req, res) => {
-      let blogPost, blogPostId;
+      let blogPost, oldSlug;
 
       if (isNaN(Number(req.params.idOrSlug))) {
         blogPost = await blogPostService.getBlogPostBySlug(req.params.idOrSlug);
+        if (!blogPost) {
+          oldSlug = await blogPostService.getOldSlug(req.params.idOrSlug);
+
+          if (oldSlug) {
+            const newSlug = await blogPostService.getActiveSlug(oldSlug.postId);
+            res.redirect(`/posts/${newSlug.value}`);
+            return;
+          }
+        }
       } else {
         blogPost = await blogPostService.getBlogPostById(
           Number(req.params.idOrSlug)
@@ -132,15 +141,6 @@ class PostController {
       }
 
       if (!blogPost) {
-        blogPostId = await blogPostService.getBlogPostByOldSlug(slug);
-      }
-
-      if (blogPostId) {
-        res.redirect(`/posts/${blogPostId}`);
-        return;
-      }
-
-      if (!blogPost && !blogPostId) {
         res.render('custom404', {
           siteTitle: 'Bishops First Blog'
         });
