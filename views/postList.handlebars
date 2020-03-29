@@ -11,6 +11,7 @@
           <th scope="col">Title</th>
           <th scope="col">Author</th>
           <th scope="col">Publish date</th>
+          <th scope="col">Last modified</th>
           <th scope="col">Operations</th>
         </tr>
       </thead>
@@ -20,6 +21,7 @@
           <td>{{this.title}}</td>
           <td>{{this.author}}</td>
           <td>{{this.published_at}}</td>
+          <td>{{this.modified_at}}</td>
           <td>
             <a class="btn btn-primary w-100 btn-sm" href="/admin/list/{{this.id}}" role="button">Edit</a>
           </td>

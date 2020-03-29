@@ -2,17 +2,15 @@
   <h1>{{siteTitle}}</h1>
 </div>
 
-<div class="container-fluid post-info border pt-3 pb-3 d-flex flex-column justify-content-center mb-3">
-  <div class="container-fluid text-left">
+<div class="container-fluid post-info border pt-5 pb-5 d-flex mb-3 row">
+
+  <div class="container-fluid col-6">
     <h3>{{post.title}}</h3>
+    <strong>Author: {{post.author}}</strong>
   </div>
-  <div class="container-fluid row">
-    <div class="col-6">
-      <h5>Author: {{post.author}}</h5>
-    </div>
-    <div class="col-6 text-right">
-      <h5>{{post.created_at}}</h5>
-    </div>
+  <div class="container-fluid col-6 text-right">
+    <h5>{{post.created_at}}</h5>
+    <em>Last modified at: {{post.modified_at}}</em>
   </div>
 </div>
 

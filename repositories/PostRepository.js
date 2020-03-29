@@ -238,7 +238,7 @@ class PostRepository {
         postData.slug_value,
         undefined,
         undefined,
-        undefined
+        postData.modified_at
       );
     } catch (err) {
       console.error(err);
