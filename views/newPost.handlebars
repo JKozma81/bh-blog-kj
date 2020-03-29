@@ -13,7 +13,7 @@
       <label for="post_slug" class="col-sm-2 col-form-label">Slug</label>
       <div class="col-sm-10">
         <input type="text" class="form-control" id="post_slug" name="slug" {{#if slug}}value="{{slug}}" {{/if}}
-          placeholder="some-blogpost-title" required>
+          placeholder="">
       </div>
     </div>
     <div class="form-group row">
@@ -52,8 +52,26 @@
 
   (function () {
     'use strict';
+
+    function generateSlug(event) {
+      const titleInputField = document.querySelector('#post_title');
+      const slugInputField = document.querySelector('#post_slug');
+
+      const key = String.fromCharCode(event.charCode);
+      const translateChars = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ö': 'o', 'ő': 'o', 'ú': 'u', 'ü': 'u', 'ű': 'u', ' ': '-' };
+      const charRegex = RegExp('^[áéíóöőúüű ]+$', 'g');
+
+      if (!slugInputField.value) {
+        let textForPlaceholder = titleInputField.value.toLowerCase().split('');
+        textForPlaceholder = textForPlaceholder.map(character => character.replace(charRegex, match => translateChars[match])).join('')
+        slugInputField.placeholder = textForPlaceholder;
+      }
+    }
+
     window.addEventListener('load', function () {
       const form = document.querySelector('.new-post-form');
+
+      document.querySelector('#post_title').addEventListener('keyup', generateSlug);
 
       document.querySelector('.save-draft').addEventListener('click', () => {
         document.querySelector('.set-draft').value = true;
@@ -83,17 +101,6 @@
 
       form.addEventListener('submit', function (event) {
         event.preventDefault();
-        if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value && !document.querySelector('#post_slug')) {
-          displayErrorMessage('Title, Content and Slug are Mandatory!')
-        }
-
-        if (!document.querySelector('#post_title').value && !document.querySelector('#post_slug').value) {
-          displayErrorMessage('Title and Slug are Mandatory!');
-        }
-
-        if (!document.querySelector('#post_content').value && !document.querySelector('#post_slug').value) {
-          displayErrorMessage('Content and Slug are Mandatory!');
-        }
 
         if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value) {
           displayErrorMessage('Title and Content are Mandatory!');
@@ -107,11 +114,8 @@
           displayErrorMessage('Content is Mandatory!');
         }
 
-        if (!document.querySelector('#post_slug').value) {
-          displayErrorMessage('Slug is Mandatory!');
-        }
-
-        if (document.querySelector('#post_title').value && document.querySelector('#post_content').value && document.querySelector('#post_slug')) {
+        if (document.querySelector('#post_title').value && document.querySelector('#post_content').value) {
+          document.querySelector('#post_slug').value = document.querySelector('#post_slug').placeholder;
           form.submit();
         }
 
