@@ -2,14 +2,14 @@ const BlogPost = require('../domains/BlogPost');
 const ArchiveMap = require('../domains/ArchiveMap');
 
 class PostRepository {
-	constructor(DBAdapter) {
-		this.DBAdapter = DBAdapter;
-	}
+  constructor(DBAdapter) {
+    this.DBAdapter = DBAdapter;
+  }
 
-	async getAllPosts() {
-		try {
-			const blogPostsData = await this.DBAdapter.getAll(
-				`SELECT
+  async getAllPosts() {
+    try {
+      const blogPostsData = await this.DBAdapter.getAll(
+        `SELECT
           posts.id,
           posts.title,
           posts.author,
@@ -25,35 +25,36 @@ class PostRepository {
         ON 
           slugs.post_id = posts.id
         WHERE
-          slugs.is_active = 1
+					slugs.is_active = 1
+				ORDER BY posts.id
         `
-			);
+      );
 
-			const results = blogPostsData.map(
-				postData =>
-					new BlogPost(
-						postData.id,
-						postData.title,
-						postData.author,
-						postData.content,
-						postData.created_at,
-						postData.slug_value,
-						postData.draft === 1 ? true : false,
-						postData.published_at ? postData.published_at : 'N/A',
-						postData.modified_at
-					)
-			);
+      const results = blogPostsData.map(
+        postData =>
+          new BlogPost(
+            postData.id,
+            postData.title,
+            postData.author,
+            postData.content,
+            postData.created_at,
+            postData.slug_value,
+            postData.draft === 1 ? true : false,
+            postData.published_at ? postData.published_at : 'N/A',
+            postData.modified_at
+          )
+      );
 
-			return results;
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return results;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getAllPublishedPosts() {
-		try {
-			const blogPostsData = await this.DBAdapter.getAll(
-				`SELECT
+  async getAllPublishedPosts() {
+    try {
+      const blogPostsData = await this.DBAdapter.getAll(
+        `SELECT
           posts.id,
           posts.title,
           posts.author,
@@ -72,103 +73,103 @@ class PostRepository {
         WHERE
           slugs.is_active = 1
         AND
-					posts.published_at IS NOT NULL`
-			);
+					posts.published_at IS NOT NULL
+				ORDER BY posts.id
+			`
+      );
 
-			const results = blogPostsData.map(
-				postData =>
-					new BlogPost(
-						postData.id,
-						postData.title,
-						postData.author,
-						postData.content,
-						postData.created_at,
-						postData.slug_value,
-						postData.draft === 1 ? true : false,
-						postData.published_at,
-						postData.modified_at
-					)
-			);
+      const results = blogPostsData.map(
+        postData =>
+          new BlogPost(
+            postData.id,
+            postData.title,
+            postData.author,
+            postData.content,
+            postData.created_at,
+            postData.slug_value,
+            postData.draft === 1 ? true : false,
+            postData.published_at,
+            postData.modified_at
+          )
+      );
 
-			return results;
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return results;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async savePost(postObject) {
-		try {
-			postObject.draft = this.DBAdapter.formatDBBoolSpecifics(
-				postObject.draft
-			);
+  async savePost(postObject) {
+    try {
+      postObject.draft = this.DBAdapter.formatDBBoolSpecifics(postObject.draft);
 
-			try {
-				await this.DBAdapter.run(`
+      try {
+        await this.DBAdapter.run(`
           BEGIN TRANSACTION
         `);
-				await this.DBAdapter.run(
-					`
+        await this.DBAdapter.run(
+          `
           INSERT INTO
             posts(title, author, content, created_at, draft, published_at, modified_at)
           VALUES(?, ?, ?, datetime("now", "localtime"), ?, null, datetime("now", "localtime"))
           `,
-					[
-						postObject.title,
-						postObject.author,
-						postObject.content,
-						postObject.draft
-					]
-				);
+          [
+            postObject.title,
+            postObject.author,
+            postObject.content,
+            postObject.draft
+          ]
+        );
 
-				const postID = await this.DBAdapter.get(
-					`
+        const postID = await this.DBAdapter.get(
+          `
           SELECT id FROM posts WHERE title = ? AND author = ?
           `,
-					[postObject.title, postObject.author]
-				);
+          [postObject.title, postObject.author]
+        );
 
-				if (!postObject.draft) {
-					await this.DBAdapter.run(
-						`
+        if (!postObject.draft) {
+          await this.DBAdapter.run(
+            `
             UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
           `,
-						[postID.id]
-					);
-				}
+            [postID.id]
+          );
+        }
 
-				const activeSlug = await this.DBAdapter.get(
-					`
+        const activeSlug = await this.DBAdapter.get(
+          `
           SELECT id, slug_value FROM slugs WHERE post_id = ? AND is_active = 1
           `,
-					[postID.id]
-				);
+          [postID.id]
+        );
 
-				if (activeSlug) {
-					await this.DBAdapter.run(
-						`
+        if (activeSlug) {
+          await this.DBAdapter.run(
+            `
             UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
           `,
-						[postID.id, activeSlug.id]
-					);
-				} else {
-					await this.DBAdapter.run(
-						`
+            [postID.id, activeSlug.id]
+          );
+        } else {
+          await this.DBAdapter.run(
+            `
             INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
             `,
-						[postObject.slug, postID.id, 1]
-					);
-				}
-			} catch (err) {
-				await this.DBAdapter.run(`
+            [postObject.slug, postID.id, 1]
+          );
+        }
+      } catch (err) {
+        await this.DBAdapter.run(`
           ROLLBACK TRANSACTION
         `);
-				console.error(err);
-			}
+        console.error(err);
+      }
 
-			await this.DBAdapter.run('COMMIT TRANSACTION');
+      await this.DBAdapter.run('COMMIT TRANSACTION');
 
-			const savedPostData = await this.DBAdapter.get(
-				`
+      const savedPostData = await this.DBAdapter.get(
+        `
         SELECT
           id,
           title,
@@ -180,29 +181,29 @@ class PostRepository {
         WHERE
           title = ? AND author = ?
       `,
-				[postObject.title, postObject.author]
-			);
+        [postObject.title, postObject.author]
+      );
 
-			return new BlogPost(
-				savedPostData.id,
-				savedPostData.title,
-				savedPostData.author,
-				savedPostData.content,
-				savedPostData.created_at,
-				undefined,
-				undefined,
-				undefined,
-				undefined
-			);
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return new BlogPost(
+        savedPostData.id,
+        savedPostData.title,
+        savedPostData.author,
+        savedPostData.content,
+        savedPostData.created_at,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getPostById(postId) {
-		try {
-			const postData = await this.DBAdapter.get(
-				`
+  async getPostById(postId) {
+    try {
+      const postData = await this.DBAdapter.get(
+        `
         SELECT
           posts.id,
           posts.title,
@@ -224,33 +225,33 @@ class PostRepository {
         AND
           slugs.is_active = 1
       `,
-				[postId]
-			);
+        [postId]
+      );
 
-			if (!postData) {
-				return undefined;
-			}
+      if (!postData) {
+        return undefined;
+      }
 
-			return new BlogPost(
-				postData.id,
-				postData.title,
-				postData.author,
-				postData.content,
-				postData.created_at,
-				postData.slug_value,
-				undefined,
-				undefined,
-				postData.modified_at
-			);
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return new BlogPost(
+        postData.id,
+        postData.title,
+        postData.author,
+        postData.content,
+        postData.created_at,
+        postData.slug_value,
+        undefined,
+        undefined,
+        postData.modified_at
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getPostBySlug(slug) {
-		try {
-			const postData = await this.DBAdapter.get(
-				`
+  async getPostBySlug(slug) {
+    try {
+      const postData = await this.DBAdapter.get(
+        `
         SELECT
           posts.id,
           posts.title,
@@ -272,157 +273,155 @@ class PostRepository {
         AND
           slugs.is_active = 1
       `,
-				[slug]
-			);
+        [slug]
+      );
 
-			if (!postData) {
-				return undefined;
-			}
+      if (!postData) {
+        return undefined;
+      }
 
-			return new BlogPost(
-				postData.id,
-				postData.title,
-				postData.author,
-				postData.content,
-				postData.created_at,
-				postData.slug_value,
-				undefined,
-				undefined,
-				undefined
-			);
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return new BlogPost(
+        postData.id,
+        postData.title,
+        postData.author,
+        postData.content,
+        postData.created_at,
+        postData.slug_value,
+        undefined,
+        undefined,
+        undefined
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getOldSlug(slug) {
-		try {
-			const oldSlug = await this.DBAdapter.get(
-				`
+  async getOldSlug(slug) {
+    try {
+      const oldSlug = await this.DBAdapter.get(
+        `
         SELECT post_id, slug_value FROM slugs WHERE slug_value = ? AND is_active = 0
       `,
-				[slug]
-			);
+        [slug]
+      );
 
-			const result = oldSlug
-				? {
-						postId: oldSlug.post_id,
-						oldSlug: oldSlug.slug_value
-				  }
-				: oldSlug;
-			return result;
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      const result = oldSlug
+        ? {
+            postId: oldSlug.post_id,
+            oldSlug: oldSlug.slug_value
+          }
+        : oldSlug;
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getActiveSlug(postId) {
-		try {
-			const activeSlug = await this.DBAdapter.get(
-				`
+  async getActiveSlug(postId) {
+    try {
+      const activeSlug = await this.DBAdapter.get(
+        `
         SELECT slug_value FROM slugs WHERE post_id = ? AND is_active = 1
       `,
-				[postId]
-			);
-			return {
-				value: activeSlug.slug_value
-			};
-		} catch (err) {
-			console.error(err);
-		}
-	}
+        [postId]
+      );
+      return {
+        value: activeSlug.slug_value
+      };
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async modifyPost(postObject) {
-		try {
-			postObject.draft = this.DBAdapter.formatDBBoolSpecifics(
-				postObject.draft
-			);
-			try {
-				await this.DBAdapter.run(`
+  async modifyPost(postObject) {
+    try {
+      postObject.draft = this.DBAdapter.formatDBBoolSpecifics(postObject.draft);
+      try {
+        await this.DBAdapter.run(`
           BEGIN TRANSACTION
         `);
 
-				await this.DBAdapter.run(
-					`
+        await this.DBAdapter.run(
+          `
           UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = datetime("now", "localtime") WHERE id = ?
         `,
-					[
-						postObject.title,
-						postObject.content,
-						postObject.draft,
-						postObject.id
-					]
-				);
+          [
+            postObject.title,
+            postObject.content,
+            postObject.draft,
+            postObject.id
+          ]
+        );
 
-				if (!postObject.draft) {
-					await this.DBAdapter.run(
-						`
+        if (!postObject.draft) {
+          await this.DBAdapter.run(
+            `
             UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
           `,
-						[postObject.id]
-					);
-				} else {
-					await this.DBAdapter.run(
-						`
+            [postObject.id]
+          );
+        } else {
+          await this.DBAdapter.run(
+            `
             UPDATE posts SET published_at = NULL WHERE id = ?
           `,
-						[postObject.id]
-					);
-				}
+            [postObject.id]
+          );
+        }
 
-				const oldSlug = await this.DBAdapter.get(
-					`
+        const oldSlug = await this.DBAdapter.get(
+          `
           SELECT id FROM slugs WHERE post_id = ? AND is_active = 1
         `,
-					[postObject.id]
-				);
+          [postObject.id]
+        );
 
-				if (oldSlug) {
-					await this.DBAdapter.run(
-						`
+        if (oldSlug) {
+          await this.DBAdapter.run(
+            `
             UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
           `,
-						[postObject.id, oldSlug.id]
-					);
-				}
+            [postObject.id, oldSlug.id]
+          );
+        }
 
-				await this.DBAdapter.run(
-					`
+        await this.DBAdapter.run(
+          `
           INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
         `,
-					[postObject.slug, postObject.id, 1]
-				);
-			} catch (err) {
-				await this.DBAdapter.run(`
+          [postObject.slug, postObject.id, 1]
+        );
+      } catch (err) {
+        await this.DBAdapter.run(`
           ROLLBACK TRANSACTION
         `);
-				console.error(err);
-			}
-			await this.DBAdapter.run('COMMIT TRANSACTION');
+        console.error(err);
+      }
+      await this.DBAdapter.run('COMMIT TRANSACTION');
 
-			const updatedPostData = await this.getPostById(postObject.id);
+      const updatedPostData = await this.getPostById(postObject.id);
 
-			return new BlogPost(
-				updatedPostData.id,
-				updatedPostData.title,
-				updatedPostData.author,
-				updatedPostData.content,
-				updatedPostData.created_at,
-				undefined,
-				undefined,
-				undefined,
-				undefined
-			);
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return new BlogPost(
+        updatedPostData.id,
+        updatedPostData.title,
+        updatedPostData.author,
+        updatedPostData.content,
+        updatedPostData.created_at,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
-	async getSearch(searchText) {
-		try {
-			const searchFor = searchText;
-			const searchResults = await this.DBAdapter.getAll(
-				`
+  async getSearch(searchText) {
+    try {
+      const searchFor = `%${searchText}%`;
+      const searchResults = await this.DBAdapter.getAll(
+        `
         SELECT
         DISTINCT
           id,
@@ -442,26 +441,26 @@ class PostRepository {
         OR
           content LIKE ?
       `,
-				[`%${searchFor}%`]
-			);
+        [searchFor, searchFor]
+      );
 
-			return searchResults.map(result => {
-				return new BlogPost(
-					result.id,
-					result.title,
-					result.author,
-					result.content,
-					result.created_at,
-					undefined,
-					undefined,
-					undefined,
-					result.modified_at
-				);
-			});
-		} catch (err) {
-			console.error(err);
-		}
-	}
+      return searchResults.map(result => {
+        return new BlogPost(
+          result.id,
+          result.title,
+          result.author,
+          result.content,
+          result.created_at,
+          undefined,
+          undefined,
+          undefined,
+          result.modified_at
+        );
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 module.exports = PostRepository;
