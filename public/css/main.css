@@ -31,7 +31,8 @@ div.login-container,
   min-height: 600px;
 }
 
-.new-post-site {
+.new-post-site,
+.configuration-site {
   min-height: 720px;
 }
 
@@ -77,4 +78,10 @@ div.login-container,
 
 .ql-toolbar {
   width: 100%;
+}
+
+legend.scheduler-border {
+  width: inherit;
+  padding: 0 10px;
+  border-bottom: none;
 }

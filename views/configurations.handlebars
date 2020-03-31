@@ -1,0 +1,45 @@
+{{> adminHeader }}
+
+<div class="container-fluid configuration-site">
+  <div class="container d-flex flex-column align-items-center">
+    <h1 class="pb-3">{{submenuTitle}}</h1>
+
+    <form action="/admin/config" method="POST" class="w-75">
+
+      <fieldset class="border p-3 mb-3">
+        <legend class="scheduler-border">Archive layout and Date format</legend>
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-6">
+            <label for="archive_layout" class="col-form-label">Archive layout</label>
+          </div>
+          <div class="form-group col-md-6">
+            <select class="custom-select my-1 mr-sm-2" id="archive_layout" name="archive_layout">
+
+              <option value="teszt">
+
+              </option>
+
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-4">
+            <label for="date_format" class="col-form-label">Date format:</label>
+          </div>
+          <div class="form-group col-md-8">
+            <input type="text" class="form-control" id="date_format" name="date_format" placeholder="Date format"
+              value="">
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="d-flex flex-row justify-content-between">
+
+        <a class="btn btn-secondary" href="/admin" role="button">Discard</a>
+        {{!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Discard</button> --}}
+        <button type="submit" class="btn btn-primary">Apply</button>
+      </div>
+    </form>
+  </div>
+</div>

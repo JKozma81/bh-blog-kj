@@ -1,5 +1,4 @@
 const BlogPost = require('../domains/BlogPost');
-const ArchiveMap = require('../domains/ArchiveMap');
 
 class PostRepository {
   constructor(DBAdapter) {
@@ -74,7 +73,7 @@ class PostRepository {
           slugs.is_active = 1
         AND
 					posts.published_at IS NOT NULL
-				ORDER BY posts.id
+				ORDER BY posts.published_at DESC
 			`
       );
 

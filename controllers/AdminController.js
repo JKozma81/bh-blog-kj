@@ -1,6 +1,3 @@
-const PostsDAO = require('../repositories/PostRepository');
-const DataFormatingService = require('../services/DataFormatingService');
-
 class AdminController {
   static showDashboard(req, res) {
     const user = req.user;
@@ -15,11 +12,13 @@ class AdminController {
     const blogPostService = options.blogPostService;
 
     return async (req, res) => {
+      const user = req.user;
       const blogPosts = await blogPostService.getAllBlogPosts();
 
       res.render('postList', {
         siteTitle: 'Bishops First Blog',
         submenuTitle: 'Admin Post List',
+        username: user.username,
         blogPosts
       });
     };
@@ -29,12 +28,14 @@ class AdminController {
     const blogPostService = options.blogPostService;
 
     return async (req, res) => {
+      const user = req.user;
       const blogPostID = Number(req.params.id);
       const blogPost = await blogPostService.getBlogPostById(blogPostID);
 
       res.render('editPost', {
         siteTitle: 'Bishops First Blog',
         submenuTitle: 'Edit Post',
+        username: user.username,
         blogPost
       });
     };
@@ -57,6 +58,15 @@ class AdminController {
 
       res.redirect('/admin/list');
     };
+  }
+
+  static showConfigurations(req, res) {
+    const user = req.user;
+    res.render('configurations', {
+      siteTitle: 'Bishops First Blog',
+      submenuTitle: 'Admin Configurations',
+      username: user.username
+    });
   }
 }
 
