@@ -295,6 +295,7 @@ class PostRepository {
     }
   }
 
+  //kiszedhető
   async getOldSlug(slug) {
     try {
       const oldSlug = await this.DBAdapter.get(
@@ -331,6 +332,7 @@ class PostRepository {
       console.error(err);
     }
   }
+  //////////////
 
   async modifyPost(postObject) {
     try {

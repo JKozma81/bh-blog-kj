@@ -1,8 +1,6 @@
-[
-  {
-    "lajouts": {
-      "flat": false,
-      "tree": true
-    }
+{
+  "lajouts": {
+    "flat": "false",
+    "tree": "true"
   }
-]
+}

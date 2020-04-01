@@ -60,13 +60,30 @@ class AdminController {
     };
   }
 
-  static showConfigurations(req, res) {
-    const user = req.user;
-    res.render('configurations', {
-      siteTitle: 'Bishops First Blog',
-      submenuTitle: 'Admin Configurations',
-      username: user.username
-    });
+  static showConfigurations(options) {
+    const archiveConfigService = options.archiveConfigService;
+    return async (req, res) => {
+      const layouts = await archiveConfigService.getAllLayouts();
+      const user = req.user;
+      res.render('configurations', {
+        siteTitle: 'Bishops First Blog',
+        submenuTitle: 'Admin Configurations',
+        username: user.username,
+        layouts
+      });
+    };
+  }
+
+  static saveConfigurations(options) {
+    // const dateFormat = options.dateFormat;
+    const archiveConfigService = options.archiveConfigService;
+    return async (req, res) => {
+      const { archive_layout, date_format } = req.body;
+      console.log(req.body);
+      await archiveConfigService.modifyLayout(archive_layout);
+
+      res.redirect('/admin/config');
+    };
   }
 }
 

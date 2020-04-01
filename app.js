@@ -17,6 +17,8 @@ const {
 const { SessionServices, sessions } = require('./services/SessionServices');
 const AdminController = require('./controllers/AdminController');
 const UserAuthentication = require('./middlewares/Authentication');
+const ArchiveConfigService = require('./services/ArchiveConfigService');
+const ArchiveConfigRepository = require('./repositories/ArchiveRepository');
 
 const { DBPath, AUTH_COOKIE } = require('./configs/config.json');
 const users = require('./mocks/Users');
@@ -25,6 +27,8 @@ const db = new sqlite3.Database(DBPath);
 const dbAdapter = new DBAdapter(db);
 dbAdapter.init();
 
+const archiveRepository = new ArchiveConfigRepository(dbAdapter);
+const archiveConfigService = new ArchiveConfigService(archiveRepository);
 const postRepository = new PostRepository(dbAdapter);
 const blogPostService = new BlogPostServive(postRepository);
 const sessionService = new SessionServices(sessions);
@@ -44,7 +48,8 @@ app.use(cookieParser());
 app.get(
   '/',
   PostController.showHome({
-    blogPostService
+    blogPostService,
+    archiveConfigService
   })
 );
 
@@ -121,7 +126,20 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE
   }),
-  AdminController.showConfigurations
+  AdminController.showConfigurations({
+    archiveConfigService
+  })
+);
+
+app.post(
+  '/admin/config',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE
+  }),
+  AdminController.saveConfigurations({
+    archiveConfigService
+  })
 );
 
 app.get(

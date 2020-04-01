@@ -3,32 +3,6 @@ module.exports = class DB {
     this.databaseEngine = databaseEngine;
   }
 
-  init() {
-    this.databaseEngine.serialize(() => {
-      this.databaseEngine.run(
-        `CREATE TABLE IF NOT EXISTS
-          posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 author VARCHAR(100) NOT NULL,
-                 title VARCHAR(100) NOT NULL,
-                 content TEXT NOT NULL,
-                 created_at TEXT NOT NULL,
-                 published_at VARCHAR(100),
-                 modified_at VARCHAR(100),
-                 draft INTEGER NOT NULL)`
-      );
-
-      this.databaseEngine.run(
-        `CREATE TABLE IF NOT EXISTS
-          slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 slug_value VARCHAR(100) NOT NULL,
-                 post_id INTEGER NOT NULL,
-                 is_active INTEGER NOT NULL,
-                 FOREIGN KEY (post_id) REFERENCES posts (id)
-                )`
-      );
-    });
-  }
-
   getAll(sqlQuery, params = []) {
     return new Promise((resolve, reject) => {
       this.databaseEngine.serialize(() => {
@@ -69,5 +43,61 @@ module.exports = class DB {
 
   formatDBBoolSpecifics(data) {
     return data === 'true' ? 1 : 0;
+  }
+
+  init() {
+    this.databaseEngine.serialize(async () => {
+      try {
+        await this.databaseEngine.run(
+          `CREATE TABLE IF NOT EXISTS
+            posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   author VARCHAR(100) NOT NULL,
+                   title VARCHAR(100) NOT NULL,
+                   content TEXT NOT NULL,
+                   created_at TEXT NOT NULL,
+                   published_at VARCHAR(100),
+                   modified_at VARCHAR(100),
+                   draft INTEGER NOT NULL)`
+        );
+
+        await this.databaseEngine.run(
+          `CREATE TABLE IF NOT EXISTS
+            slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   slug_value VARCHAR(100) NOT NULL,
+                   post_id INTEGER NOT NULL,
+                   is_active INTEGER NOT NULL,
+                   FOREIGN KEY (post_id) REFERENCES posts (id)
+                  )`
+        );
+
+        await this.databaseEngine.run(
+          `CREATE TABLE IF NOT EXISTS
+            archive_layouts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 layout VARCHAR(100) NOT NULL,
+                 is_active INTEGER NOT NULL
+                )`
+        );
+
+        await this.databaseEngine.all(
+          `SELECT layout FROM archive_layouts`,
+          async (err, results) => {
+            if (results.length === 0) {
+              await this.databaseEngine.run(`
+                INSERT INTO 
+                  archive_layouts(layout, is_active)
+                VALUES("flat", 0)
+              `);
+              await this.databaseEngine.run(`
+                INSERT INTO 
+                  archive_layouts(layout, is_active)
+                VALUES("tree", 1)
+              `);
+            }
+          }
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    });
   }
 };

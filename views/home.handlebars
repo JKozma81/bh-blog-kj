@@ -16,8 +16,10 @@
 </div>
 
 <div class="container-fluid row">
-    <div class="container col-3 archive-container">
+    <div class="container col-4 archive-container">
+        {{#if tree}}
         <ul>
+            Archive
             {{#each formatedBlogPostData}}
             <li>{{@key}}
                 {{#each this}}
@@ -34,9 +36,19 @@
             </li>
             {{/each}}
         </ul>
+        {{/if}}
+        {{#if flat}}
+        <ul class="list-group">
+            Archive
+            {{#each postList}}
+            <li class="list-group-item"><a href="/posts/{{this.id}}">{{this.published_at}} {{this.title}}</a></li>
+            {{/each}}
+        </ul>
+        {{/if}}
     </div>
 
-    <div class="container pb-3 col-9">
+
+    <div class="container pb-3 col-8">
         <ul class="list-group w-100">
             {{#each postList}}
             <li class="list-group-item">
