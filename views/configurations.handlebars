@@ -28,8 +28,8 @@
             <label for="date_format" class="col-form-label">Date format:</label>
           </div>
           <div class="form-group col-md-8">
-            <input type="text" class="form-control" id="date_format" name="date_format" placeholder="Date format"
-              value="">
+            <input type="text" class="form-control" id="date_format" name="date_format"
+              placeholder="Date format: YYYY MM DD" value="{{dateFormat.format}}">
           </div>
         </div>
       </fieldset>
@@ -43,3 +43,13 @@
     </form>
   </div>
 </div>
+
+<script>
+  document.querySelector('#date_format').addEventListener('keypress', (event) => {
+    const regex = new RegExp("^[dDhHmMsSTZY\:\.\-\/ ]+$");
+    const key = String.fromCharCode(event.charCode);
+    if (!regex.test(key)) {
+      event.preventDefault();
+    }
+  });
+</script>

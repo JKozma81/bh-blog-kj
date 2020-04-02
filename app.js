@@ -8,6 +8,7 @@ const PostController = require('./controllers/PostController');
 const BlogPostServive = require('./services/BlogPostService');
 const PostRepository = require('./repositories/PostRepository');
 const DBAdapter = require('./repositories/DatabaseAdapter');
+const { formatDate } = require('./utils/dateFormating');
 
 const LoginController = require('./controllers/LoginController');
 const {
@@ -22,6 +23,12 @@ const ArchiveConfigRepository = require('./repositories/ArchiveRepository');
 
 const { DBPath, AUTH_COOKIE } = require('./configs/config.json');
 const users = require('./mocks/Users');
+
+const defaultDate = {
+  format: 'YYYY-MM-DD HH:mm:ss'
+};
+
+// let dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 const db = new sqlite3.Database(DBPath);
 const dbAdapter = new DBAdapter(db);
@@ -49,14 +56,19 @@ app.get(
   '/',
   PostController.showHome({
     blogPostService,
-    archiveConfigService
+    archiveConfigService,
+    formatDate,
+    dateFormat: defaultDate
   })
 );
 
 app.post(
   '/search',
   PostController.getSearched({
-    blogPostService
+    blogPostService,
+    archiveConfigService,
+    formatDate,
+    dateFormat: defaultDate
   })
 );
 
@@ -99,7 +111,11 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE
   }),
-  AdminController.showAdminBlogPostList({ blogPostService })
+  AdminController.showAdminBlogPostList({
+    blogPostService,
+    formatDate,
+    dateFormat: defaultDate
+  })
 );
 
 app.get(
@@ -108,7 +124,11 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE
   }),
-  AdminController.showEditBlogPost({ blogPostService })
+  AdminController.showEditBlogPost({
+    blogPostService,
+    formatDate,
+    dateFormat: defaultDate
+  })
 );
 
 app.post(
@@ -117,7 +137,11 @@ app.post(
     sessionService,
     authCookie: AUTH_COOKIE
   }),
-  AdminController.modifyBlogPost({ blogPostService })
+  AdminController.modifyBlogPost({
+    blogPostService,
+    formatDate,
+    dateFormat: defaultDate
+  })
 );
 
 app.get(
@@ -127,7 +151,9 @@ app.get(
     authCookie: AUTH_COOKIE
   }),
   AdminController.showConfigurations({
-    archiveConfigService
+    archiveConfigService,
+    formatDate,
+    dateFormat: defaultDate
   })
 );
 
@@ -138,7 +164,9 @@ app.post(
     authCookie: AUTH_COOKIE
   }),
   AdminController.saveConfigurations({
-    archiveConfigService
+    archiveConfigService,
+    formatDate,
+    dateFormat: defaultDate
   })
 );
 
@@ -151,7 +179,14 @@ app.get(
   PostController.showNewPost({ messageProviderService })
 );
 
-app.get('/posts/:idOrSlug', PostController.showBlogPost({ blogPostService }));
+app.get(
+  '/posts/:idOrSlug',
+  PostController.showBlogPost({
+    blogPostService,
+    formatDate,
+    dateFormat: defaultDate
+  })
+);
 
 app.post(
   '/posts',

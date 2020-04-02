@@ -110,7 +110,7 @@ class PostRepository {
           `
           INSERT INTO
             posts(title, author, content, created_at, draft, published_at, modified_at)
-          VALUES(?, ?, ?, datetime("now", "localtime"), ?, null, datetime("now", "localtime"))
+          VALUES(?, ?, ?, strftime("%s","now",'localtime'), ?, null, strftime("%s","now", 'localtime'))
           `,
           [
             postObject.title,
@@ -130,7 +130,7 @@ class PostRepository {
         if (!postObject.draft) {
           await this.DBAdapter.run(
             `
-            UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
+            UPDATE posts SET published_at = strftime("%s","now",'localtime') WHERE id = ?
           `,
             [postID.id]
           );
@@ -295,7 +295,6 @@ class PostRepository {
     }
   }
 
-  //kiszedhető
   async getOldSlug(slug) {
     try {
       const oldSlug = await this.DBAdapter.get(
@@ -332,7 +331,6 @@ class PostRepository {
       console.error(err);
     }
   }
-  //////////////
 
   async modifyPost(postObject) {
     try {
@@ -344,7 +342,7 @@ class PostRepository {
 
         await this.DBAdapter.run(
           `
-          UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = datetime("now", "localtime") WHERE id = ?
+          UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = strftime("%s","now", "localtime") WHERE id = ?
         `,
           [
             postObject.title,
@@ -357,7 +355,7 @@ class PostRepository {
         if (!postObject.draft) {
           await this.DBAdapter.run(
             `
-            UPDATE posts SET published_at = datetime("now", "localtime") WHERE id = ?
+            UPDATE posts SET published_at = strftime("%s","now","localtime") WHERE id = ?
           `,
             [postObject.id]
           );
@@ -441,6 +439,7 @@ class PostRepository {
           title LIKE ?
         OR
           content LIKE ?
+        ORDER BY published_at DESC
       `,
         [searchFor, searchFor]
       );
@@ -454,7 +453,7 @@ class PostRepository {
           result.created_at,
           undefined,
           undefined,
-          undefined,
+          result.published_at,
           result.modified_at
         );
       });

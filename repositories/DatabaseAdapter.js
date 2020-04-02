@@ -54,9 +54,9 @@ module.exports = class DB {
                    author VARCHAR(100) NOT NULL,
                    title VARCHAR(100) NOT NULL,
                    content TEXT NOT NULL,
-                   created_at TEXT NOT NULL,
-                   published_at VARCHAR(100),
-                   modified_at VARCHAR(100),
+                   created_at INTEGER NOT NULL,
+                   published_at INTEGER,
+                   modified_at INTEGER,
                    draft INTEGER NOT NULL)`
         );
 
@@ -81,7 +81,8 @@ module.exports = class DB {
         await this.databaseEngine.all(
           `SELECT layout FROM archive_layouts`,
           async (err, results) => {
-            if (results.length === 0) {
+            const layouts = await results;
+            if (layouts.length === 0) {
               await this.databaseEngine.run(`
                 INSERT INTO 
                   archive_layouts(layout, is_active)
