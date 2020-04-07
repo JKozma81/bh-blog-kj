@@ -29,7 +29,21 @@
           </div>
           <div class="form-group col-md-8">
             <input type="text" class="form-control" id="date_format" name="date_format"
-              placeholder="Date format: YYYY MM DD" value="{{dateFormat.format}}">
+              placeholder="Date format: YYYY MM DD" value="{{dateFormat}}">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="border p-3 mb-3">
+        <legend class="scheduler-border">Database</legend>
+
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-4">
+            <label for="database_file" class="col-form-label">Database file:</label>
+          </div>
+          <div class="form-group col-md-8">
+            <input type="text" class="form-control" id="database_file" name="database_file"
+              placeholder="Database Filename" value="{{dbFile}}">
           </div>
         </div>
       </fieldset>

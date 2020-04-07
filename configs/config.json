@@ -1,4 +1,4 @@
 {
-	"AUTH_COOKIE": "auth-cookie",
-	"DBPath": "./model/blog.db"
+  "AUTH_COOKIE": "auth-cookie",
+  "DBPath": "./model/"
 }

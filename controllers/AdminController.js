@@ -1,43 +1,69 @@
+const fs = require('fs');
+const { DBPath } = require('../configs/config.json');
+const { initDBConnection } = require('../repositories/DatabaseAdapter');
+
 class AdminController {
   static showDashboard(req, res) {
     const user = req.user;
     res.render('dashboard', {
       siteTitle: 'Bishops First Blog',
       submenuTitle: 'Admin Dashboard',
-      username: user.username
+      username: user.username,
     });
   }
 
   static showAdminBlogPostList(options) {
     const blogPostService = options.blogPostService;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     const formatDate = options.formatDate;
 
     return async (req, res) => {
-      const user = req.user;
-      const blogPosts = await blogPostService.getAllBlogPosts();
+      try {
+        const user = req.user;
+        if (!configurations['db-file']) {
+          res.render('postList', {
+            siteTitle: 'Bishops First Blog',
+            submenuTitle: 'Admin Post List',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            username: user.username,
+            blogPosts: '',
+          });
+          return;
+        }
 
-      blogPosts.forEach(post => {
-        post.published_at =
-          post.published_at === 'N/A'
-            ? post.published_at
-            : formatDate(post.published_at, dateFormat.format);
-        post.modified_at = formatDate(post.modified_at, dateFormat.format);
-        post.created_at = formatDate(post.created_at, dateFormat.format);
-      });
+        const blogPosts = await blogPostService.getAllBlogPosts();
 
-      res.render('postList', {
-        siteTitle: 'Bishops First Blog',
-        submenuTitle: 'Admin Post List',
-        username: user.username,
-        blogPosts
-      });
+        blogPosts.forEach((post) => {
+          post.published_at =
+            post.published_at === 'N/A'
+              ? post.published_at
+              : formatDate(post.published_at, configurations.dateFormat);
+          post.modified_at = formatDate(
+            post.modified_at,
+            configurations.dateFormat
+          );
+          post.created_at = formatDate(
+            post.created_at,
+            configurations.dateFormat
+          );
+        });
+
+        res.render('postList', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'Admin Post List',
+          username: user.username,
+          blogPosts,
+        });
+      } catch (err) {
+        console.error(err);
+      }
     };
   }
 
   static showEditBlogPost(options) {
     const blogPostService = options.blogPostService;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     const formatDate = options.formatDate;
 
     return async (req, res) => {
@@ -47,19 +73,22 @@ class AdminController {
 
       blogPost.published_at = formatDate(
         blogPost.published_at,
-        dateFormat.format
+        configurations.dateFormat
       );
       blogPost.modified_at = formatDate(
         blogPost.modified_at,
-        dateFormat.format
+        configurations.dateFormat
       );
-      blogPost.created_at = formatDate(blogPost.created_at, dateFormat.format);
+      blogPost.created_at = formatDate(
+        blogPost.created_at,
+        configurations.dateFormat
+      );
 
       res.render('editPost', {
         siteTitle: 'Bishops First Blog',
         submenuTitle: 'Edit Post',
         username: user.username,
-        blogPost
+        blogPost,
       });
     };
   }
@@ -73,7 +102,7 @@ class AdminController {
         title: modifiedBlogPostData.title,
         content: modifiedBlogPostData.content,
         slug: modifiedBlogPostData.slug,
-        draft: modifiedBlogPostData.draft
+        draft: modifiedBlogPostData.draft,
       } = req.body);
       modifiedBlogPostData.id = blogPostID;
 
@@ -85,30 +114,43 @@ class AdminController {
 
   static showConfigurations(options) {
     const archiveConfigService = options.archiveConfigService;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     return async (req, res) => {
-      const layouts = await archiveConfigService.getAllLayouts();
+      let layouts;
+      if (configurations['db-file']) {
+        layouts = await archiveConfigService.getAllLayouts();
+      }
       const user = req.user;
       res.render('configurations', {
         siteTitle: 'Bishops First Blog',
         submenuTitle: 'Admin Configurations',
         username: user.username,
         layouts,
-        dateFormat
+        dateFormat: configurations.dateFormat,
+        dbFile: configurations['db-file'],
       });
     };
   }
 
   static saveConfigurations(options) {
-    let dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     const archiveConfigService = options.archiveConfigService;
     return async (req, res) => {
-      const { archive_layout, date_format } = req.body;
+      const { archive_layout, date_format, database_file } = req.body;
 
-      dateFormat.format = date_format ? date_format : dateFormat;
-      await archiveConfigService.modifyLayout(archive_layout);
+      configurations.dateFormat = date_format
+        ? date_format
+        : configurations.dateFormat;
 
-      res.redirect('/admin/config');
+      configurations['db-file'] = fs.existsSync(DBPath + database_file)
+        ? database_file
+        : '';
+
+      if (archive_layout) {
+        await archiveConfigService.modifyLayout(archive_layout);
+      }
+
+      res.redirect('/admin');
     };
   }
 }

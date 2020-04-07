@@ -6,18 +6,18 @@ class ArchiveConfigRepository {
   async getAllLayout() {
     let layouts;
     try {
-      layouts = await this.DBAdapter.getAll(
+      layouts = await this.DBAdapter().getAll(
         `SELECT id, layout, is_active FROM archive_layouts`
       );
     } catch (err) {
       console.error(err);
     }
 
-    layouts = layouts.map(layout => {
+    layouts = layouts.map((layout) => {
       return {
         id: layout.id,
         name: layout.layout,
-        default: layout.is_active === 1 ? true : false
+        default: layout.is_active === 1 ? true : false,
       };
     });
     return layouts;
@@ -25,7 +25,7 @@ class ArchiveConfigRepository {
 
   async modifyLayout(layout) {
     try {
-      await this.DBAdapter.run(`
+      await this.DBAdapter().run(`
         UPDATE 
           archive_layouts
         SET
@@ -35,7 +35,7 @@ class ArchiveConfigRepository {
   
       `);
 
-      await this.DBAdapter.run(
+      await this.DBAdapter().run(
         `
         UPDATE
           archive_layouts
@@ -54,7 +54,7 @@ class ArchiveConfigRepository {
   async getDefault() {
     let defaultLayout;
     try {
-      defaultLayout = await this.DBAdapter.get(`
+      defaultLayout = await this.DBAdapter().get(`
         SELECT
           id,
           layout,
@@ -71,7 +71,7 @@ class ArchiveConfigRepository {
     return {
       id: defaultLayout.id,
       name: defaultLayout.layout,
-      default: defaultLayout.is_active === 1 ? true : false
+      default: defaultLayout.is_active === 1 ? true : false,
     };
   }
 }

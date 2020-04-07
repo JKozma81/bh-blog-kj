@@ -1,9 +1,9 @@
 function createArchiveMap(data) {
   const formatedBlogPostData = {};
 
-  data.forEach(blogPost => {
+  data.forEach((blogPost) => {
     let fullDate = blogPost.published_at.split(' ')[0].split('-');
-    fullDate = fullDate.map(element => (element = Number(element)));
+    fullDate = fullDate.map((element) => (element = Number(element)));
     fullDate[1] -= 1;
     let date = new Date(...fullDate);
     let year = date.getFullYear();
@@ -19,7 +19,7 @@ function createArchiveMap(data) {
 
     formatedBlogPostData[year][month].push({
       id: blogPost.id,
-      title: blogPost.title
+      title: blogPost.title,
     });
   });
 
@@ -31,19 +31,32 @@ class PostController {
     const blogPostService = options.blogPostService;
     const archiveConfigService = options.archiveConfigService;
     const formatDate = options.formatDate;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
 
     return async (req, res) => {
       let archiveMap;
       try {
+        if (!configurations['db-file']) {
+          res.render('home', {
+            siteTitle: 'Bishops First Blog',
+            postList: '',
+            formatedBlogPostData: '',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            flat: false,
+            tree: true,
+          });
+          return;
+        }
+
         const publishedPosts = await blogPostService.getPublishedBlogposts();
         const defaultLayout = await archiveConfigService.getDefaultLayout();
 
         if (defaultLayout.name === 'tree') {
-          if (dateFormat.format !== 'YYYY-MM-DD HH:mm:ss') {
-            const archiveData = publishedPosts.map(post => {
+          if (configurations.dateFormat !== 'YYYY-MM-DD HH:mm:ss') {
+            const archiveData = publishedPosts.map((post) => {
               const tempObject = {
-                ...post
+                ...post,
               };
               tempObject.published_at = formatDate(
                 post.published_at,
@@ -61,16 +74,19 @@ class PostController {
             });
             archiveMap = createArchiveMap(archiveData);
 
-            publishedPosts.forEach(post => {
+            publishedPosts.forEach((post) => {
               post.published_at = formatDate(
                 post.published_at,
-                dateFormat.format
+                configurations.dateFormat
               );
               post.modified_at = formatDate(
                 post.modified_at,
-                dateFormat.format
+                configurations.dateFormat
               );
-              post.created_at = formatDate(post.created_at, dateFormat.format);
+              post.created_at = formatDate(
+                post.created_at,
+                configurations.dateFormat
+              );
             });
             res.render('home', {
               siteTitle: 'Bishops First Blog',
@@ -79,18 +95,24 @@ class PostController {
               flat:
                 defaultLayout.name === 'flat' ? defaultLayout.default : false,
               tree:
-                defaultLayout.name === 'tree' ? defaultLayout.default : false
+                defaultLayout.name === 'tree' ? defaultLayout.default : false,
             });
             return;
           }
 
-          publishedPosts.forEach(post => {
+          publishedPosts.forEach((post) => {
             post.published_at = formatDate(
               post.published_at,
-              dateFormat.format
+              configurations.dateFormat
             );
-            post.modified_at = formatDate(post.modified_at, dateFormat.format);
-            post.created_at = formatDate(post.created_at, dateFormat.format);
+            post.modified_at = formatDate(
+              post.modified_at,
+              configurations.dateFormat
+            );
+            post.created_at = formatDate(
+              post.created_at,
+              configurations.dateFormat
+            );
           });
           archiveMap = createArchiveMap(publishedPosts);
           res.render('home', {
@@ -98,15 +120,24 @@ class PostController {
             postList: publishedPosts,
             formatedBlogPostData: archiveMap,
             flat: defaultLayout.name === 'flat' ? defaultLayout.default : false,
-            tree: defaultLayout.name === 'tree' ? defaultLayout.default : false
+            tree: defaultLayout.name === 'tree' ? defaultLayout.default : false,
           });
           return;
         }
 
-        publishedPosts.forEach(post => {
-          post.published_at = formatDate(post.published_at, dateFormat.format);
-          post.modified_at = formatDate(post.modified_at, dateFormat.format);
-          post.created_at = formatDate(post.created_at, dateFormat.format);
+        publishedPosts.forEach((post) => {
+          post.published_at = formatDate(
+            post.published_at,
+            configurations.dateFormat
+          );
+          post.modified_at = formatDate(
+            post.modified_at,
+            configurations.dateFormat
+          );
+          post.created_at = formatDate(
+            post.created_at,
+            configurations.dateFormat
+          );
         });
 
         archiveMap = '';
@@ -116,7 +147,7 @@ class PostController {
           postList: publishedPosts,
           formatedBlogPostData: archiveMap,
           flat: defaultLayout.name === 'flat' ? defaultLayout.default : false,
-          tree: defaultLayout.name === 'tree' ? defaultLayout.default : false
+          tree: defaultLayout.name === 'tree' ? defaultLayout.default : false,
         });
       } catch (err) {
         console.error(err);
@@ -127,7 +158,7 @@ class PostController {
   static getSearched(options) {
     const blogPostService = options.blogPostService;
     const archiveConfigService = options.archiveConfigService;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     const formatDate = options.formatDate;
 
     return async (req, res) => {
@@ -139,10 +170,10 @@ class PostController {
         const publishedPosts = await blogPostService.getPublishedBlogposts();
 
         if (
-          dateFormat.format !== 'YYYY-MM-DD HH:mm:ss' &&
+          configurations.dateFormat !== 'YYYY-MM-DD HH:mm:ss' &&
           defaultLayout.name === 'tree'
         ) {
-          publishedPosts.forEach(post => {
+          publishedPosts.forEach((post) => {
             post.published_at = formatDate(
               post.published_at,
               'YYYY-MM-DD HH:mm:ss'
@@ -158,13 +189,19 @@ class PostController {
           });
           archiveMap = createArchiveMap(publishedPosts);
         } else {
-          publishedPosts.forEach(post => {
+          publishedPosts.forEach((post) => {
             post.published_at = formatDate(
               post.published_at,
-              dateFormat.format
+              configurations.dateFormat
             );
-            post.modified_at = formatDate(post.modified_at, dateFormat.format);
-            post.created_at = formatDate(post.created_at, dateFormat.format);
+            post.modified_at = formatDate(
+              post.modified_at,
+              configurations.dateFormat
+            );
+            post.created_at = formatDate(
+              post.created_at,
+              configurations.dateFormat
+            );
           });
           archiveMap = createArchiveMap(publishedPosts);
         }
@@ -175,16 +212,19 @@ class PostController {
           searchFor
         );
 
-        searchResults.forEach(result => {
+        searchResults.forEach((result) => {
           result.published_at = formatDate(
             result.published_at,
-            dateFormat.format
+            configurations.dateFormat
           );
           result.modified_at = formatDate(
             result.modified_at,
-            dateFormat.format
+            configurations.dateFormat
           );
-          result.created_at = formatDate(result.created_at, dateFormat.format);
+          result.created_at = formatDate(
+            result.created_at,
+            configurations.dateFormat
+          );
         });
 
         res.render('home', {
@@ -192,7 +232,7 @@ class PostController {
           postList: searchResults,
           formatedBlogPostData: archiveMap,
           flat: defaultLayout.name === 'flat' ? defaultLayout.default : false,
-          tree: defaultLayout.name === 'tree' ? defaultLayout.default : false
+          tree: defaultLayout.name === 'tree' ? defaultLayout.default : false,
         });
       } catch (err) {
         console.error(err);
@@ -215,7 +255,7 @@ class PostController {
         postError,
         title: req.query.title ? req.query.title : '',
         content: req.query.content ? req.query.content : '',
-        slug: req.query.slug ? req.query.slug : ''
+        slug: req.query.slug ? req.query.slug : '',
       });
     };
   }
@@ -260,7 +300,7 @@ class PostController {
         author: user.username,
         content,
         slug,
-        draft
+        draft,
       };
       const newBlogPost = await blogPostService.saveBlogpost(newPostData);
 
@@ -275,7 +315,7 @@ class PostController {
   static showBlogPost(options) {
     const blogPostService = options.blogPostService;
     const formatDate = options.formatDate;
-    const dateFormat = options.dateFormat;
+    const configurations = options.configurations;
     return async (req, res) => {
       let blogPost, oldSlug;
 
@@ -298,24 +338,27 @@ class PostController {
 
       if (!blogPost) {
         res.render('custom404', {
-          siteTitle: 'Bishops First Blog'
+          siteTitle: 'Bishops First Blog',
         });
         return;
       }
 
       blogPost.published_at = formatDate(
         blogPost.published_at,
-        dateFormat.format
+        configurations.dateFormat
       );
       blogPost.modified_at = formatDate(
         blogPost.modified_at,
-        dateFormat.format
+        configurations.dateFormat
       );
-      blogPost.created_at = formatDate(blogPost.created_at, dateFormat.format);
+      blogPost.created_at = formatDate(
+        blogPost.created_at,
+        configurations.dateFormat
+      );
 
       res.render('readPost', {
         siteTitle: 'Bishops First Blog',
-        post: blogPost
+        post: blogPost,
       });
     };
   }

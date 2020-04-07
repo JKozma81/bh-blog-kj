@@ -4,6 +4,11 @@
   <div class="container text-center p-4">
     <h1>{{submenuTitle}}</h1>
   </div>
+  {{#if error}}
+  <div class="alert alert-danger text-center" role="alert">
+    {{error}}
+  </div>
+  {{/if}}
   <div class="container">
     <a class="btn btn-primary mb-3 mt-3" href="/posts" role="button">New Post</a>
 
