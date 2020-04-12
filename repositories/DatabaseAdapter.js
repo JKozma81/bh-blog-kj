@@ -154,4 +154,4 @@ class DB {
   };
 }
 
-module.exports = { DB, initDBConnection };
+module.exports = { initDBConnection };

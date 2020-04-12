@@ -163,6 +163,19 @@ class PostController {
 
     return async (req, res) => {
       try {
+        if (!configurations['db-file']) {
+          res.render('home', {
+            siteTitle: 'Bishops First Blog',
+            postList: '',
+            formatedBlogPostData: '',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            flat: false,
+            tree: true,
+          });
+          return;
+        }
+
         const searchFor = req.body.search_text;
         const defaultLayout = await archiveConfigService.getDefaultLayout();
         let archiveMap;
@@ -242,11 +255,27 @@ class PostController {
 
   static showNewPost(options) {
     const messageProvider = options.messageProviderService;
+    const configurations = options.configurations;
     return async (req, res) => {
       const user = req.user;
       let postError = req.query.error
         ? messageProvider.getMessage(req.query.error)
         : '';
+
+      if (!configurations['db-file']) {
+        res.render('newPost', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'New Post',
+          username: user.username,
+          postError,
+          title: req.query.title ? req.query.title : '',
+          content: req.query.content ? req.query.content : '',
+          slug: req.query.slug ? req.query.slug : '',
+          error:
+            'No Database file provided. Please provide a valid file to continue...',
+        });
+        return;
+      }
 
       res.render('newPost', {
         siteTitle: 'Bishops First Blog',
@@ -318,6 +347,16 @@ class PostController {
     const configurations = options.configurations;
     return async (req, res) => {
       let blogPost, oldSlug;
+
+      if (!configurations['db-file']) {
+        res.render('readPost', {
+          siteTitle: 'Bishops First Blog',
+          post: blogPost,
+          error:
+            'No Database file provided. Please provide a valid file to continue...',
+        });
+        return;
+      }
 
       if (isNaN(Number(req.params.idOrSlug))) {
         blogPost = await blogPostService.getBlogPostBySlug(req.params.idOrSlug);

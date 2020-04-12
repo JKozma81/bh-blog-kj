@@ -69,6 +69,19 @@ class AdminController {
     return async (req, res) => {
       const user = req.user;
       const blogPostID = Number(req.params.id);
+
+      if (!configurations['db-file']) {
+        res.render('editPost', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'Edit Post',
+          error:
+            'No Database file provided. Please provide a valid file to continue...',
+          username: user.username,
+          blogPosts: '',
+        });
+        return;
+      }
+
       const blogPost = await blogPostService.getBlogPostById(blogPostID);
 
       blogPost.published_at = formatDate(

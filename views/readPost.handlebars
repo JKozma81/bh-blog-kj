@@ -2,6 +2,12 @@
   <h1>{{siteTitle}}</h1>
 </div>
 
+{{#if error}}
+<div class="alert alert-danger text-center" role="alert">
+  {{error}}
+</div>
+{{/if}}
+
 <div class="container-fluid post-info border pt-5 pb-5 d-flex mb-3 row">
 
   <div class="container-fluid col-6">

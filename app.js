@@ -178,7 +178,7 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE,
   }),
-  PostController.showNewPost({ messageProviderService })
+  PostController.showNewPost({ messageProviderService, configurations })
 );
 
 app.get(

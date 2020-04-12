@@ -1,6 +1,10 @@
 {{> adminHeader }}
 {{> confirmationModal }}
-
+{{#if error}}
+<div class="alert alert-danger text-center" role="alert">
+  {{error}}
+</div>
+{{/if}}
 <div class="container-fluid p-5 d-flex flex-column align-items-center new-post-site">
   <h1 class="pb-3">{{submenuTitle}}</h1>
   <form method="POST" action="/admin/list/{{blogPost.id}}" class="new-post-form">
