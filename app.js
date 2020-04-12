@@ -32,8 +32,6 @@ const configurations = {
   },
 };
 
-console.log(configurations);
-
 const archiveRepository = new ArchiveConfigRepository(
   configurations.dbAdapter.bind(configurations)
 );

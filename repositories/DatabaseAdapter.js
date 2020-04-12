@@ -123,6 +123,35 @@ class DB {
   formatDBBoolSpecifics(data) {
     return data === 'true' ? 1 : 0;
   }
+
+  runAsync = function (sql, ...params) {
+    return new Promise((resolve, reject) => {
+      this.databaseEngine.run(sql, params, function (err) {
+        if (err) return reject(err);
+        resolve(this);
+      });
+    });
+  };
+
+  runBatchAsync = function (statements) {
+    var results = [];
+    var batch = ['BEGIN', ...statements, 'COMMIT'];
+    return batch
+      .reduce(
+        (chain, statement) =>
+          chain.then((result) => {
+            results.push(result);
+            return this.runAsync(...[].concat(statement));
+          }),
+        Promise.resolve()
+      )
+      .catch((err) =>
+        this.runAsync('ROLLBACK').then(() =>
+          Promise.reject(err + ' in statement #' + results.length)
+        )
+      )
+      .then(() => results.slice(2));
+  };
 }
 
 module.exports = { DB, initDBConnection };

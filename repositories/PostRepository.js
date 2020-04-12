@@ -29,7 +29,6 @@ class PostRepository {
         `
       );
 
-      console.log(blogPostsData);
       const results = blogPostsData.map(
         (postData) =>
           new BlogPost(
@@ -105,20 +104,19 @@ class PostRepository {
         postObject.draft
       );
 
-      // console.log('from save', postObject);
-
-      await this.DBAdapter().run(
+      await this.DBAdapter().runAsync(
         `
           INSERT INTO
             posts(title, author, content, created_at, draft, published_at, modified_at)
-          VALUES(?, ?, ?, strftime("%s", "now"), ?, null, strftime("%s", "now"))
+          VALUES(?, ?, ?, strftime("%s", "now"), ?, ${
+            postObject.draft ? 'null' : 'strftime("%s", "now")'
+          }, strftime("%s", "now"))
           `,
-        [
-          postObject.title,
-          postObject.author,
-          postObject.content,
-          postObject.draft,
-        ]
+
+        postObject.title,
+        postObject.author,
+        postObject.content,
+        postObject.draft
       );
 
       const postID = await this.DBAdapter().get(
@@ -128,60 +126,13 @@ class PostRepository {
         [postObject.title, postObject.author]
       );
 
-      // console.log('pid', await postID);
-
-      if (!postObject.draft) {
-        await this.DBAdapter().run(
-          `
-            UPDATE posts SET published_at = strftime("%s","now") WHERE id = ?
-          `,
-          [postID.id]
-        );
-      }
-
-      const activeSlug = await this.DBAdapter().get(
+      await this.DBAdapter().run(
         `
-          SELECT id, slug_value FROM slugs WHERE post_id = ? AND is_active = 1
-          `,
-        [postID.id]
+        INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
+        `,
+        [postObject.slug, postID.id, 1]
       );
 
-      // console.log('active', activeSlug);
-
-      if (activeSlug) {
-        try {
-          await this.DBAdapter().run(
-            `
-                UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
-              `,
-            [postID.id, activeSlug.id]
-          );
-          await this.DBAdapter().run(
-            `
-                INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
-                `,
-            [postObject.slug, postID.id, 1]
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      if (!activeSlug) {
-        await this.DBAdapter().run(
-          `
-            INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
-            `,
-          [postObject.slug, postID.id, 1]
-        );
-      }
-    } catch (err) {
-      if (err) {
-        console.error(err);
-      }
-    }
-
-    try {
       const savedPostData = await this.DBAdapter().get(
         `
         SELECT
@@ -197,9 +148,6 @@ class PostRepository {
       `,
         [postObject.title, postObject.author]
       );
-
-      console.log('obj before', postObject);
-      console.log('after save', savedPostData);
 
       return new BlogPost(
         savedPostData.id,
@@ -350,73 +298,98 @@ class PostRepository {
     }
   }
 
+  // async modifyPost(postObject) {
+  //   try {
+  //     postObject.draft = this.DBAdapter().formatDBBoolSpecifics(
+  //       postObject.draft
+  //     );
+  //     try {
+  //       await this.DBAdapter().run(`
+  //         BEGIN TRANSACTION
+  //       `);
+
+  //       await this.DBAdapter().run(
+  //         `
+  //         UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = strftime("%s","now") published_at = ${
+  //           postObject.draft ? 'NULL' : 'strftime("%s","now")'
+  //         } WHERE id = ?
+  //       `,
+  //         [
+  //           postObject.title,
+  //           postObject.content,
+  //           postObject.draft,
+  //           postObject.id,
+  //         ]
+  //       );
+
+  //       await this.DBAdapter().run(
+  //         `
+  //       UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
+  //     `,
+  //         [postObject.id, oldSlug.id]
+  //       );
+
+  //       await this.DBAdapter().run(
+  //         `
+  //         INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
+  //       `,
+  //         [postObject.slug, postObject.id, 1]
+  //       );
+  //     } catch (err) {
+  //       await this.DBAdapter().run(`
+  //         ROLLBACK TRANSACTION
+  //       `);
+  //       console.error(err);
+  //     }
+  //     await this.DBAdapter().run('COMMIT TRANSACTION');
+
+  //     const updatedPostData = await this.getPostById(postObject.id);
+
+  //     return new BlogPost(
+  //       updatedPostData.id,
+  //       updatedPostData.title,
+  //       updatedPostData.author,
+  //       updatedPostData.content,
+  //       updatedPostData.created_at,
+  //       undefined,
+  //       undefined,
+  //       undefined,
+  //       undefined
+  //     );
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // }
+
   async modifyPost(postObject) {
     try {
-      postObject.draft = this.DBAdapter().formatDBBoolSpecifics(
+      postObject.draft = await this.DBAdapter().formatDBBoolSpecifics(
         postObject.draft
       );
       try {
-        await this.DBAdapter().run(`
-          BEGIN TRANSACTION
-        `);
-
-        await this.DBAdapter().run(
-          `
-          UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = strftime("%s","now", "localtime") WHERE id = ?
-        `,
+        await this.DBAdapter().runBatchAsync([
           [
+            `UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = strftime("%s","now"), published_at = ${
+              postObject.draft ? 'NULL' : 'strftime("%s","now")'
+            } WHERE id = ?`,
             postObject.title,
             postObject.content,
             postObject.draft,
             postObject.id,
-          ]
-        );
+          ],
 
-        if (!postObject.draft) {
-          await this.DBAdapter().run(
-            `
-            UPDATE posts SET published_at = strftime("%s","now","localtime") WHERE id = ?
-          `,
-            [postObject.id]
-          );
-        } else {
-          await this.DBAdapter().run(
-            `
-            UPDATE posts SET published_at = NULL WHERE id = ?
-          `,
-            [postObject.id]
-          );
-        }
+          [`UPDATE slugs SET is_active = 0 WHERE post_id = ?`, postObject.id],
 
-        const oldSlug = await this.DBAdapter().get(
-          `
-          SELECT id FROM slugs WHERE post_id = ? AND is_active = 1
-        `,
-          [postObject.id]
-        );
-
-        if (oldSlug) {
-          await this.DBAdapter().run(
-            `
-            UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
-          `,
-            [postObject.id, oldSlug.id]
-          );
-        }
-
-        await this.DBAdapter().run(
-          `
-          INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
-        `,
-          [postObject.slug, postObject.id, 1]
-        );
+          [
+            `INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)`,
+            postObject.slug,
+            postObject.id,
+            1,
+          ],
+        ]);
       } catch (err) {
-        await this.DBAdapter().run(`
-          ROLLBACK TRANSACTION
-        `);
         console.error(err);
       }
-      await this.DBAdapter().run('COMMIT TRANSACTION');
 
       const updatedPostData = await this.getPostById(postObject.id);
 
