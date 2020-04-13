@@ -167,7 +167,7 @@ class AdminController {
   }
 
   static showAccountList(options) {
-    // const accountService = options.accountService;
+    const accountService = options.accountService;
     const configurations = options.configurations;
 
     return async (req, res) => {
@@ -185,8 +185,7 @@ class AdminController {
           return;
         }
 
-        // const accounts = await accountService.getAllAccounts();
-        const accounts = [];
+        const accounts = await accountService.getAllAccounts();
 
         res.render('accountList', {
           siteTitle: 'Bishops First Blog',
@@ -201,7 +200,6 @@ class AdminController {
   }
 
   static showNewAccount(options) {
-    // const accountService = options.accountService;
     const configurations = options.configurations;
 
     return async (req, res) => {
@@ -223,6 +221,43 @@ class AdminController {
           submenuTitle: 'New Account',
           username: user.username,
         });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  static addNewAccount(options) {
+    const accountService = options.accountService;
+    const configurations = options.configurations;
+
+    return async (req, res) => {
+      try {
+        const user = req.user;
+        if (!configurations['db-file']) {
+          res.render('newAccount', {
+            siteTitle: 'Bishops First Blog',
+            submenuTitle: 'New Account',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            username: user.username,
+          });
+          return;
+        }
+
+        const { user_name, user_password, user_email } = req.body;
+
+        const newAccount = await accountService.addNewAccount({
+          user_name,
+          user_password,
+          user_email,
+        });
+
+        if (!newAccount) {
+          throw new Error("Can't create new Account!");
+        }
+
+        res.redirect('/admin/accounts');
       } catch (err) {
         console.error(err);
       }

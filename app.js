@@ -19,6 +19,8 @@ const AdminController = require('./controllers/AdminController');
 const UserAuthentication = require('./middlewares/Authentication');
 const ArchiveConfigService = require('./services/ArchiveConfigService');
 const ArchiveConfigRepository = require('./repositories/ArchiveRepository');
+const AccountService = require('./services/AccountService');
+const AccountRepository = require('./repositories/AccountRepository');
 
 const { AUTH_COOKIE } = require('./configs/config.json');
 const users = require('./mocks/Users');
@@ -39,6 +41,11 @@ const archiveConfigService = new ArchiveConfigService(archiveRepository);
 const postRepository = new PostRepository(
   configurations.dbAdapter.bind(configurations)
 );
+const accountRepository = new AccountRepository(
+  configurations.dbAdapter.bind(configurations)
+);
+const accountService = new AccountService(accountRepository);
+
 let blogPostService = new BlogPostServive(postRepository);
 const sessionService = new SessionServices(sessions);
 const userAuthentication = new UserAuthentication();
@@ -178,7 +185,16 @@ app.get(
     sessionService,
     authCookie: AUTH_COOKIE,
   }),
-  AdminController.showAccountList({ configurations })
+  AdminController.showAccountList({ accountService, configurations })
+);
+
+app.post(
+  '/admin/accounts',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE,
+  }),
+  AdminController.addNewAccount({ accountService, configurations })
 );
 
 app.get(

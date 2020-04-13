@@ -7,11 +7,11 @@
 {{/if}}
 <div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-50">
   <h1 class="pb-3">{{submenuTitle}}</h1>
-  <form method="POST" action="/accounts" class="new-account-form w-50 needs-validation">
+  <form method="POST" action="/admin/accounts" class="new-account-form w-50 needs-validation">
     <div class="form-group row">
       <label for="user_name" class="col-sm-2 col-form-label">Username</label>
       <div class="col-sm-10">
-        <input type="text" class="form-control" id="username" name="user_name" {{#if user_name}}value="{{user_name}}"
+        <input type="text" class="form-control" id="user_name" name="user_name" {{#if user_name}}value="{{user_name}}"
           {{/if}} placeholder="Enter username" required>
       </div>
     </div>

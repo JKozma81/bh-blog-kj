@@ -53,6 +53,24 @@ function initDBConnection(dbFile) {
               `);
           }
         });
+
+        dataBase.run(
+          `CREATE TABLE IF NOT EXISTS
+            accounts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   user_name VARCHAR(100) NOT NULL,
+                   user_email VARCHAR(100) NOT NULL,
+                   user_password VARCHAR(100) NOT NULL
+                  )`
+        );
+        dataBase.get('SELECT user_name FROM accounts', (err, result) => {
+          if (!result) {
+            dataBase.run(`
+              INSERT INTO
+                accounts(user_name, user_email, user_password)
+              VALUES("admin", "admin@example.com", "admin")
+            `);
+          }
+        });
       });
     } catch (err) {
       console.error(err);

@@ -24,12 +24,12 @@
       <tbody>
         {{#each accounts}}
         <tr>
-          <td>{{this.user_name}}</td>
+          <td>{{this.username}}</td>
           <td>{{this.email}}</td>
           <td>{{this.role}}</td>
           <td>
             <a class="btn btn-primary w-100 btn-sm" href="/admin/accounts/{{this.id}}" role="button">Edit</a>
-            <a class="btn btn-danger w-100 btn-sm" href="/admin/accounts/delete/{{this.id}}" role="button">Delete</a>
+            {{!-- <a class="btn btn-danger w-100 btn-sm" href="/admin/accounts/delete/{{this.id}}" role="button">Delete</a> --}}
           </td>
         </tr>
         {{/each}}
