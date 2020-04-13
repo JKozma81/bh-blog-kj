@@ -1,0 +1,39 @@
+{{> adminHeader }}
+
+<div class="container-fluid admin-post-list">
+  <div class="container text-center p-4">
+    <h1>{{submenuTitle}}</h1>
+  </div>
+  {{#if error}}
+  <div class="alert alert-danger text-center" role="alert">
+    {{error}}
+  </div>
+  {{/if}}
+  <div class="container">
+    <a class="btn btn-primary mb-3 mt-3" href="/admin/accounts/new" role="button">New Account</a>
+
+    <table class="table table-bordered table-hover table-sm text-center">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+          <th scope="col">Operations</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each accounts}}
+        <tr>
+          <td>{{this.user_name}}</td>
+          <td>{{this.email}}</td>
+          <td>{{this.role}}</td>
+          <td>
+            <a class="btn btn-primary w-100 btn-sm" href="/admin/accounts/{{this.id}}" role="button">Edit</a>
+            <a class="btn btn-danger w-100 btn-sm" href="/admin/accounts/delete/{{this.id}}" role="button">Delete</a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</div>

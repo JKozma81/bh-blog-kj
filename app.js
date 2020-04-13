@@ -173,6 +173,24 @@ app.post(
 );
 
 app.get(
+  '/admin/accounts',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE,
+  }),
+  AdminController.showAccountList({ configurations })
+);
+
+app.get(
+  '/admin/accounts/new',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE,
+  }),
+  AdminController.showNewAccount({ configurations })
+);
+
+app.get(
   '/posts',
   userAuthentication.authenticate({
     sessionService,

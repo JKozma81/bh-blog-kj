@@ -1,6 +1,5 @@
 const fs = require('fs');
 const { DBPath } = require('../configs/config.json');
-const { initDBConnection } = require('../repositories/DatabaseAdapter');
 
 class AdminController {
   static showDashboard(req, res) {
@@ -164,6 +163,69 @@ class AdminController {
       }
 
       res.redirect('/admin');
+    };
+  }
+
+  static showAccountList(options) {
+    // const accountService = options.accountService;
+    const configurations = options.configurations;
+
+    return async (req, res) => {
+      try {
+        const user = req.user;
+        if (!configurations['db-file']) {
+          res.render('accountList', {
+            siteTitle: 'Bishops First Blog',
+            submenuTitle: 'Admin Account List',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            username: user.username,
+            accounts: '',
+          });
+          return;
+        }
+
+        // const accounts = await accountService.getAllAccounts();
+        const accounts = [];
+
+        res.render('accountList', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'Admin Account List',
+          username: user.username,
+          accounts,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  static showNewAccount(options) {
+    // const accountService = options.accountService;
+    const configurations = options.configurations;
+
+    return async (req, res) => {
+      try {
+        const user = req.user;
+        if (!configurations['db-file']) {
+          res.render('newAccount', {
+            siteTitle: 'Bishops First Blog',
+            submenuTitle: 'New Account',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            username: user.username,
+          });
+          return;
+        }
+
+        res.render('newAccount', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'New Account',
+          username: user.username,
+        });
+      } catch (err) {
+        console.error(err);
+      }
     };
   }
 }

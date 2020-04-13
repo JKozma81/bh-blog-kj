@@ -298,69 +298,6 @@ class PostRepository {
     }
   }
 
-  // async modifyPost(postObject) {
-  //   try {
-  //     postObject.draft = this.DBAdapter().formatDBBoolSpecifics(
-  //       postObject.draft
-  //     );
-  //     try {
-  //       await this.DBAdapter().run(`
-  //         BEGIN TRANSACTION
-  //       `);
-
-  //       await this.DBAdapter().run(
-  //         `
-  //         UPDATE posts SET title = ?, content = ?, draft = ?, modified_at = strftime("%s","now") published_at = ${
-  //           postObject.draft ? 'NULL' : 'strftime("%s","now")'
-  //         } WHERE id = ?
-  //       `,
-  //         [
-  //           postObject.title,
-  //           postObject.content,
-  //           postObject.draft,
-  //           postObject.id,
-  //         ]
-  //       );
-
-  //       await this.DBAdapter().run(
-  //         `
-  //       UPDATE slugs SET is_active = 0 WHERE post_id = ? AND id = ?
-  //     `,
-  //         [postObject.id, oldSlug.id]
-  //       );
-
-  //       await this.DBAdapter().run(
-  //         `
-  //         INSERT INTO slugs(slug_value, post_id, is_active) VALUES(?, ?, ?)
-  //       `,
-  //         [postObject.slug, postObject.id, 1]
-  //       );
-  //     } catch (err) {
-  //       await this.DBAdapter().run(`
-  //         ROLLBACK TRANSACTION
-  //       `);
-  //       console.error(err);
-  //     }
-  //     await this.DBAdapter().run('COMMIT TRANSACTION');
-
-  //     const updatedPostData = await this.getPostById(postObject.id);
-
-  //     return new BlogPost(
-  //       updatedPostData.id,
-  //       updatedPostData.title,
-  //       updatedPostData.author,
-  //       updatedPostData.content,
-  //       updatedPostData.created_at,
-  //       undefined,
-  //       undefined,
-  //       undefined,
-  //       undefined
-  //     );
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // }
-
   async modifyPost(postObject) {
     try {
       postObject.draft = await this.DBAdapter().formatDBBoolSpecifics(

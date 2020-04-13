@@ -7,7 +7,7 @@
 {{/if}}
 <div class="container-fluid p-5 d-flex flex-column align-items-center new-post-site">
   <h1 class="pb-3">{{submenuTitle}}</h1>
-  <form method="POST" action="/admin/list/{{blogPost.id}}" class="new-post-form">
+  <form method="POST" action="/admin/list/{{blogPost.id}}" class="edit-post-form needs-validation">
     <div class="form-group row">
       <label for="post_title" class="col-sm-2 col-form-label">Title</label>
       <div class="col-sm-10">
@@ -35,6 +35,7 @@
       <button type="submit" class="btn btn-primary mb-2 save-draft">Save as draft</button>
       <button type="submit" class="btn btn-primary mb-2 modify">Modify</button>
     </div>
+    <div class="alert alert-danger mt-2 missing-fields-alert" role="alert"></div>
   </form>
 </div>
 
@@ -57,7 +58,39 @@
       document.querySelector('.set-draft').value = false;
       document.querySelector('.set-draft').disabled = false;
     })
+    const form = document.querySelector('.edit-post-form');
 
+    function displayErrorMessage(message) {
+      const errorTextDisplay = document.createTextNode(message);
+      document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+      document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+      document.querySelector('.missing-fields-alert').style.display = 'block';
+      return;
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      if (!document.querySelector('#post_title').value && !document.querySelector('#post_content').value) {
+        displayErrorMessage('Title and Content are Mandatory!');
+      }
+
+      if (!document.querySelector('#post_title').value) {
+        displayErrorMessage('Title is Mandatory!');
+      }
+
+      if (!document.querySelector('#post_content').value) {
+        displayErrorMessage('Content is Mandatory!');
+      }
+
+      if (document.querySelector('#post_title').value && document.querySelector('#post_content').value) {
+        document.querySelector('#post_slug').value = document.querySelector('#post_slug').placeholder;
+        form.submit();
+      }
+
+      form.classList.add('was-validated');
+
+    }, false);
     const toolbarOptions = [
       ['bold', 'italic', 'underline', 'strike'],
       ['blockquote', 'code-block'],
