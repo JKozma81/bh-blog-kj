@@ -233,18 +233,6 @@ class AdminController {
 
     return async (req, res) => {
       try {
-        const user = req.user;
-        if (!configurations['db-file']) {
-          res.render('newAccount', {
-            siteTitle: 'Bishops First Blog',
-            submenuTitle: 'New Account',
-            error:
-              'No Database file provided. Please provide a valid file to continue...',
-            username: user.username,
-          });
-          return;
-        }
-
         const { user_name, user_password, user_email } = req.body;
 
         const newAccount = await accountService.addNewAccount({

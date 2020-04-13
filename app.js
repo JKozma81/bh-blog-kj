@@ -90,7 +90,7 @@ app.get(
 
 app.post(
   '/login',
-  userAuthentication.login({ users }),
+  userAuthentication.login({ users, accountService, configurations }),
   LoginController.login({
     authCookie: AUTH_COOKIE,
     sessionService,

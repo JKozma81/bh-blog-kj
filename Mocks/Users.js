@@ -1,6 +1,6 @@
 module.exports = users = [
-	{
-		username: 'admin',
-		password: 'admin'
-	}
+  {
+    username: 'admin',
+    password: 'admin',
+  },
 ];

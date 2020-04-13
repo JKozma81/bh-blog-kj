@@ -1,8 +1,12 @@
 class UserAuthentication {
   login(options) {
     const users = options.users;
-    return (req, res, next) => {
+    const accountService = options.accountService;
+    const configurations = options.configurations;
+
+    return async (req, res, next) => {
       const { username, password } = req.body;
+      let user;
 
       if (!username && !password) {
         res.redirect('/login?error=missingcredentials');
@@ -19,9 +23,18 @@ class UserAuthentication {
         return;
       }
 
-      const user = users.find(
-        user => user.username === username && user.password === password
-      );
+      if (!configurations['db-file']) {
+        user = users.find(
+          (u) => u.username === username && u.password === password
+        );
+      }
+
+      if (configurations['db-file']) {
+        user = await accountService.getAccountByData({
+          username,
+          password,
+        });
+      }
 
       if (!user) {
         res.redirect('/login?error=credentials');

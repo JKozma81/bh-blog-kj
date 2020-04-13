@@ -78,6 +78,23 @@ class AccountRepository {
 
   async getAccountByData(dataObj) {
     try {
+      const account = await await this.DBAdapter().get(
+        `
+        SELECT
+          id,
+          user_name,
+          user_password,
+          user_email
+        FROM
+          accounts
+        WHERE
+          user_name = ?
+        AND
+          user_password = ? 
+      `,
+        [dataObj.username, dataObj.password]
+      );
+
       const result = new Account(
         account.id,
         account.user_name,
