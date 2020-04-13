@@ -25,6 +25,11 @@
             window.location = 'http://localhost:3000/admin/list';
             return
         }
+
+        if (window.location.href.includes('edit')) {
+            window.location = 'http://localhost:3000/admin/accounts';
+            return
+        }
         window.location = 'http://localhost:3000/admin';
     }
     function closeModal() {

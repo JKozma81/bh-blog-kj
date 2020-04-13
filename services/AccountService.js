@@ -20,6 +20,10 @@ class AccountService {
   async getAccountById(id) {
     return await this.AccountRepository.getAccountById(id);
   }
+
+  async editAccount(editedAccount) {
+    return await this.AccountRepository.editAccount(editedAccount);
+  }
 }
 
 module.exports = AccountService;

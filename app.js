@@ -207,6 +207,24 @@ app.get(
 );
 
 app.get(
+  '/admin/accounts/edit/:id',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE,
+  }),
+  AdminController.showEditAccount({ configurations, accountService })
+);
+
+app.post(
+  '/admin/accounts/edit/:id',
+  userAuthentication.authenticate({
+    sessionService,
+    authCookie: AUTH_COOKIE,
+  }),
+  AdminController.editAccount({ accountService })
+);
+
+app.get(
   '/posts',
   userAuthentication.authenticate({
     sessionService,

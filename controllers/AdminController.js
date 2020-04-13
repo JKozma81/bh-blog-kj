@@ -229,7 +229,6 @@ class AdminController {
 
   static addNewAccount(options) {
     const accountService = options.accountService;
-    const configurations = options.configurations;
 
     return async (req, res) => {
       try {
@@ -243,6 +242,66 @@ class AdminController {
 
         if (!newAccount) {
           throw new Error("Can't create new Account!");
+        }
+
+        res.redirect('/admin/accounts');
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  static showEditAccount(options) {
+    const configurations = options.configurations;
+    const accountService = options.accountService;
+
+    return async (req, res) => {
+      try {
+        const user = req.user;
+        if (!configurations['db-file']) {
+          res.render('editAccount', {
+            siteTitle: 'Bishops First Blog',
+            submenuTitle: 'Edit Account',
+            error:
+              'No Database file provided. Please provide a valid file to continue...',
+            username: user.username,
+          });
+          return;
+        }
+
+        const accountId = Number(req.params.id);
+
+        const editedUser = await accountService.getAccountById(accountId);
+
+        res.render('editAccount', {
+          siteTitle: 'Bishops First Blog',
+          submenuTitle: 'Edit Account',
+          username: user.username,
+          editedUser,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  static editAccount(options) {
+    const accountService = options.accountService;
+
+    return async (req, res) => {
+      try {
+        const { user_name, user_password, user_email } = req.body;
+        const accountId = Number(req.params.id);
+
+        const editedAccount = await accountService.editAccount({
+          id: accountId,
+          user_name,
+          user_password,
+          user_email,
+        });
+
+        if (!editedAccount) {
+          throw new Error("Can't modify Account!");
         }
 
         res.redirect('/admin/accounts');

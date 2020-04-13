@@ -110,6 +110,68 @@ class AccountRepository {
 
   async getAccountById(id) {
     try {
+      const account = await await this.DBAdapter().get(
+        `
+        SELECT
+          id,
+          user_name,
+          user_password,
+          user_email
+        FROM
+          accounts
+        WHERE
+          id = ?
+      `,
+        [id]
+      );
+
+      const result = new Account(
+        account.id,
+        account.user_name,
+        account.user_password,
+        account.user_email
+      );
+
+      return result;
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async editAccount(editedAccount) {
+    try {
+      await await this.DBAdapter().runAsync(
+        `
+        UPDATE
+          accounts
+        SET
+          user_name = ?,
+          user_email = ?,
+          user_password = ?
+        WHERE
+          id = ?
+      `,
+        editedAccount.user_name,
+        editedAccount.user_email,
+        editedAccount.user_password,
+        editedAccount.id
+      );
+
+      const account = await this.DBAdapter().get(
+        `
+        SELECT
+          id,
+          user_name,
+          user_password,
+          user_email
+        FROM
+          accounts
+        WHERE
+          id = ?
+      `,
+        [editedAccount.id]
+      );
+
       const result = new Account(
         account.id,
         account.user_name,

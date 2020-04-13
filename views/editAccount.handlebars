@@ -1,0 +1,102 @@
+{{> adminHeader }}
+{{> confirmationModal }}
+{{#if error}}
+<div class="alert alert-danger text-center" role="alert">
+  {{error}}
+</div>
+{{/if}}
+<div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-50">
+  <h1 class="pb-3">{{submenuTitle}}</h1>
+  <form method="POST" action="/admin/accounts/edit/{{editedUser.id}}" class="edit-account-form w-50 needs-validation">
+    <div class="form-group row">
+      <label for="user_name" class="col-sm-2 col-form-label">Username</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control" id="user_name" name="user_name" value="{{editedUser.username}}"
+          placeholder="Enter username" required>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="user_email" class="col-sm-2 col-form-label">Email</label>
+      <div class="col-sm-10">
+        <input type="email" class="form-control" id="user_email" name="user_email" value="{{editedUser.email}}"
+          placeholder="Enter email" required>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="user_password" class="col-sm-2 col-form-label">Password</label>
+      <div class="col-sm-10">
+        <input type="password" class="form-control" id="user_password" name="user_password"
+          value="{{editedUser.password}}" placeholder="" required>
+      </div>
+    </div>
+    <div class="form-group row d-flex justify-content-between">
+      <button type="button" class="btn btn-primary mb-2" onclick="showModal()">Discard</button>
+      <button type="submit" class="btn btn-primary mb-2 add-user">Save</button>
+    </div>
+
+    <div class="alert alert-danger mt-2 missing-fields-alert" role="alert">
+
+    </div>
+
+  </form>
+</div>
+
+<script>
+
+  (function () {
+
+    window.addEventListener('load', function () {
+      const form = document.querySelector('.edit-account-form');
+
+      function displayErrorMessage(message) {
+        const errorTextDisplay = document.createTextNode(message);
+        document.querySelector('.missing-fields-alert').firstChild.textContent = '';
+        document.querySelector('.missing-fields-alert').prepend(errorTextDisplay);
+        document.querySelector('.missing-fields-alert').style.display = 'block';
+        return;
+      }
+
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (!document.querySelector('#user_name').value && !document.querySelector('#user_email').value && !document.querySelector('#user_password').value) {
+          displayErrorMessage('Username, email and password are mandatory!');
+        }
+
+        if (!document.querySelector('#user_name').value && !document.querySelector('#user_email').value) {
+          displayErrorMessage('Username and email are mandatory!');
+        }
+
+        if (!document.querySelector('#user_name').value && !document.querySelector('#user_password').value) {
+          displayErrorMessage('Email and password are mandatory!');
+        }
+
+        if (!document.querySelector('#user_email').value && !document.querySelector('#user_password').value) {
+          displayErrorMessage('Email and password are mandatory!');
+        }
+
+        if (!document.querySelector('#user_name').value) {
+          displayErrorMessage('Username is mandatory!');
+        }
+        if (!document.querySelector('#user_email').value) {
+          displayErrorMessage('Email is mandatory!');
+        }
+        if (!document.querySelector('#user_password').value) {
+          displayErrorMessage('Password is mandatory!');
+        }
+
+
+        if (document.querySelector('#user_name').value && document.querySelector('#user_email').value && document.querySelector('#user_password').value) {
+          form.submit();
+        }
+
+        form.classList.add('was-validated');
+
+      }, false);
+
+    }, false);
+  })();
+  function showModal() {
+    $('.confirm-modal').modal('show');
+  }
+</script>
