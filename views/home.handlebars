@@ -23,7 +23,7 @@
 <div class="container-fluid row">
     <div class="container col-4 archive-container">
         {{#if tree}}
-        <ul>
+        <ul class="border p-3">
             Archive
             {{#each formatedBlogPostData}}
             <li>{{@key}}
@@ -43,10 +43,10 @@
         </ul>
         {{/if}}
         {{#if flat}}
-        <ul class="list-group">
+        <ul class="border p-3">
             Archive:
             {{#each postList}}
-            <li class="list-group-item"><a href="/posts/{{this.id}}">{{this.published_at}} {{this.title}}</a></li>
+            <li><a href="/posts/{{this.id}}">{{this.published_at}} {{this.title}}</a></li>
             {{/each}}
         </ul>
         {{/if}}

@@ -25,27 +25,30 @@ class ArchiveConfigRepository {
 
   async modifyLayout(layout) {
     try {
-      await this.DBAdapter().run(`
-        UPDATE 
-          archive_layouts
-        SET
-          is_active = 0
-        WHERE
-          is_active = 1
-  
-      `);
-
-      await this.DBAdapter().run(
-        `
-        UPDATE
-          archive_layouts
-        SET
-          is_active = 1
-        WHERE
-          layout = ?
-      `,
-        [layout]
-      );
+      await this.DBAdapter().runBatchAsync([
+        [
+          `
+          UPDATE 
+            archive_layouts
+          SET
+            is_active = 0
+          WHERE
+            is_active = 1
+    
+        `,
+        ],
+        [
+          `
+          UPDATE
+            archive_layouts
+          SET
+            is_active = 1
+          WHERE
+            layout = ?
+        `,
+          layout,
+        ],
+      ]);
     } catch (err) {
       console.error(err);
     }
