@@ -18,7 +18,7 @@ The master branch will be allways the up to date version with the solved HW task
 |               BLOG-009: Keresés                | :heavy_check_mark: |          BLOGHW-011: Tag felhő          | :x:                |
 |  BLOG-010: Konfigurálható adatbázis kapcsolat  | :heavy_check_mark: |   BLOGHW-012: installálható CSS témák   | :x:                |
 |                BLOG-011: Tagek                 |        :x:         |        BLOGHW-013: Edit Account         | :heavy_check_mark: |
-|       BLOG-012: Konfigurálható CSS témák       |        :x:         |    BLOGHW-014: szuperadmin és admin     | :x:                |
+|       BLOG-012: Konfigurálható CSS témák       | :heavy_check_mark: |    BLOGHW-014: szuperadmin és admin     | :x:                |
 |             BLOG-013: New Account              | :heavy_check_mark: |                                         |                    |
 | BLOG-014: Jogosultság kezelés, admin és szerző |        :x:         |                                         |                    |
 |   BLOG-015: Elfelejtett jelszó, email küldés   |        :x:         |                                         |                    |
