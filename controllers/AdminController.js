@@ -127,12 +127,21 @@ class AdminController {
   static showConfigurations(options) {
     const archiveConfigService = options.archiveConfigService;
     const configurations = options.configurations;
+    const themeService = options.themeService;
     return async (req, res) => {
       let layouts;
       if (configurations['db-file']) {
         layouts = await archiveConfigService.getAllLayouts();
       }
       const user = req.user;
+
+      const themes = themeService.getAllThemes().map((theme) => {
+        const tempObj = {};
+        tempObj.name = theme;
+        tempObj.default = configurations.theme === theme ? true : false;
+        return tempObj;
+      });
+
       res.render('configurations', {
         siteTitle: 'Bishops First Blog',
         submenuTitle: 'Admin Configurations',
@@ -140,6 +149,7 @@ class AdminController {
         layouts,
         dateFormat: configurations.dateFormat,
         dbFile: configurations['db-file'],
+        themes,
       });
     };
   }
@@ -147,8 +157,14 @@ class AdminController {
   static saveConfigurations(options) {
     const configurations = options.configurations;
     const archiveConfigService = options.archiveConfigService;
+    const themeService = options.themeService;
     return async (req, res) => {
-      const { archive_layout, date_format, database_file } = req.body;
+      const {
+        archive_layout,
+        date_format,
+        database_file,
+        theme_name,
+      } = req.body;
 
       configurations.dateFormat = date_format
         ? date_format
@@ -161,6 +177,9 @@ class AdminController {
       if (archive_layout) {
         await archiveConfigService.modifyLayout(archive_layout);
       }
+
+      themeService.applyTheme(theme_name);
+      configurations.theme = theme_name;
 
       res.redirect('/admin');
     };

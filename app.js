@@ -21,6 +21,7 @@ const ArchiveConfigService = require('./services/ArchiveConfigService');
 const ArchiveConfigRepository = require('./repositories/ArchiveRepository');
 const AccountService = require('./services/AccountService');
 const AccountRepository = require('./repositories/AccountRepository');
+const ThemeService = require('./services/ThemeService');
 
 const { AUTH_COOKIE } = require('./configs/config.json');
 const users = require('./mocks/Users');
@@ -32,6 +33,7 @@ const configurations = {
     const conn = initDBConnection(this['db-file']);
     return conn;
   },
+  theme: 'default',
 };
 
 const archiveRepository = new ArchiveConfigRepository(
@@ -44,6 +46,8 @@ const postRepository = new PostRepository(
 const accountRepository = new AccountRepository(
   configurations.dbAdapter.bind(configurations)
 );
+
+const themeService = new ThemeService(configurations);
 const accountService = new AccountService(accountRepository);
 
 let blogPostService = new BlogPostServive(postRepository);
@@ -53,6 +57,7 @@ const messageProviderService = new MessageProviderService(messages);
 
 const app = express();
 const port = 3000;
+themeService.applyTheme(configurations.theme);
 
 app.engine('handlebars', hbs());
 app.set('view engine', 'handlebars');
@@ -163,6 +168,7 @@ app.get(
     archiveConfigService,
     formatDate,
     configurations,
+    themeService,
   })
 );
 
@@ -176,6 +182,7 @@ app.post(
     archiveConfigService,
     formatDate,
     configurations,
+    themeService,
   })
 );
 
