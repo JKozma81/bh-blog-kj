@@ -29,6 +29,13 @@
           value="{{editedUser.password}}" placeholder="" required>
       </div>
     </div>
+    <div class="form-group row">
+      <label for="user_password_confirm" class="col-sm-2 col-form-label">Password</label>
+      <div class="col-sm-10">
+        <input type="password" class="form-control" id="user_password_confirm" name="user_password_confirm"
+          value="{{editedUser.password}}" placeholder="" required>
+      </div>
+    </div>
     <div class="form-group row d-flex justify-content-between">
       <button type="button" class="btn btn-primary mb-2" onclick="showModal()">Discard</button>
       <button type="submit" class="btn btn-primary mb-2 add-user">Save</button>
@@ -59,8 +66,12 @@
       form.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        if (!document.querySelector('#user_name').value && !document.querySelector('#user_email').value && !document.querySelector('#user_password').value) {
+        if (!document.querySelector('#user_name').value && !document.querySelector('#user_email').value && !document.querySelector('#user_password').value && !document.querySelector('#user_password').value) {
           displayErrorMessage('Username, email and password are mandatory!');
+        }
+
+        if (document.querySelector('#user_password').value !== document.querySelector('#user_password_confirm').value) {
+          displayErrorMessage('Password and confirmation password does not match!');
         }
 
         if (!document.querySelector('#user_name').value && !document.querySelector('#user_email').value) {
@@ -78,6 +89,9 @@
         if (!document.querySelector('#user_name').value) {
           displayErrorMessage('Username is mandatory!');
         }
+        if (!document.querySelector('#user_password_confirm').value) {
+          displayErrorMessage('You must confirm your password!');
+        }
         if (!document.querySelector('#user_email').value) {
           displayErrorMessage('Email is mandatory!');
         }
@@ -86,7 +100,7 @@
         }
 
 
-        if (document.querySelector('#user_name').value && document.querySelector('#user_email').value && document.querySelector('#user_password').value) {
+        if (document.querySelector('#user_name').value && document.querySelector('#user_email').value && document.querySelector('#user_password').value && document.querySelector('#user_password_confirm').value) {
           form.submit();
         }
 
