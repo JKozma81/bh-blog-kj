@@ -11,8 +11,8 @@ const { formatDate } = require('./utils/dateFormating');
 
 const LoginController = require('./controllers/LoginController');
 const {
-  MessageProviderService,
-  messages,
+	MessageProviderService,
+	messages,
 } = require('./services/MessageProviderService');
 const { SessionServices, sessions } = require('./services/SessionServices');
 const AdminController = require('./controllers/AdminController');
@@ -27,24 +27,24 @@ const { AUTH_COOKIE } = require('./configs/config.json');
 const users = require('./mocks/Users');
 
 const configurations = {
-  dateFormat: 'YYYY-MM-DD HH:mm:ss',
-  'db-file': '',
-  dbAdapter: function () {
-    const conn = initDBConnection(this['db-file']);
-    return conn;
-  },
-  theme: 'default',
+	dateFormat: 'YYYY-MM-DD HH:mm:ss',
+	'db-file': '',
+	dbAdapter: function () {
+		const conn = initDBConnection(this['db-file']);
+		return conn;
+	},
+	theme: 'default',
 };
 
 const archiveRepository = new ArchiveConfigRepository(
-  configurations.dbAdapter.bind(configurations)
+	configurations.dbAdapter.bind(configurations)
 );
 const archiveConfigService = new ArchiveConfigService(archiveRepository);
 const postRepository = new PostRepository(
-  configurations.dbAdapter.bind(configurations)
+	configurations.dbAdapter.bind(configurations)
 );
 const accountRepository = new AccountRepository(
-  configurations.dbAdapter.bind(configurations)
+	configurations.dbAdapter.bind(configurations)
 );
 
 const themeService = new ThemeService(configurations);
@@ -59,7 +59,12 @@ const app = express();
 const port = 3000;
 themeService.applyTheme(configurations.theme);
 
-app.engine('handlebars', hbs());
+app.engine(
+	'handlebars',
+	hbs({
+		helpers: require('./configs/handlebarsHelper'),
+	})
+);
 app.set('view engine', 'handlebars');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -67,199 +72,199 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
 app.get(
-  '/',
-  PostController.showHome({
-    blogPostService,
-    archiveConfigService,
-    formatDate,
-    configurations,
-  })
+	'/',
+	PostController.showHome({
+		blogPostService,
+		archiveConfigService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.post(
-  '/search',
-  PostController.getSearched({
-    blogPostService,
-    archiveConfigService,
-    formatDate,
-    configurations,
-  })
+	'/search',
+	PostController.getSearched({
+		blogPostService,
+		archiveConfigService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.get(
-  '/login',
-  LoginController.showLogin({
-    messageProviderService,
-  })
+	'/login',
+	LoginController.showLogin({
+		messageProviderService,
+	})
 );
 
 app.post(
-  '/login',
-  userAuthentication.login({ users, accountService, configurations }),
-  LoginController.login({
-    authCookie: AUTH_COOKIE,
-    sessionService,
-  })
+	'/login',
+	userAuthentication.login({ users, accountService, configurations }),
+	LoginController.login({
+		authCookie: AUTH_COOKIE,
+		sessionService,
+	})
 );
 
 app.get(
-  '/logout',
-  LoginController.logout({
-    authCookie: AUTH_COOKIE,
-    sessionService,
-  })
+	'/logout',
+	LoginController.logout({
+		authCookie: AUTH_COOKIE,
+		sessionService,
+	})
 );
 
 app.get(
-  '/admin',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showDashboard
+	'/admin',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showDashboard
 );
 
 app.get(
-  '/admin/list',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showAdminBlogPostList({
-    blogPostService,
-    formatDate,
-    configurations,
-  })
+	'/admin/list',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showAdminBlogPostList({
+		blogPostService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.get(
-  '/admin/list/:id',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showEditBlogPost({
-    blogPostService,
-    formatDate,
-    configurations,
-  })
+	'/admin/list/:id',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showEditBlogPost({
+		blogPostService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.post(
-  '/admin/list/:id',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.modifyBlogPost({
-    blogPostService,
-    formatDate,
-    configurations,
-  })
+	'/admin/list/:id',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.modifyBlogPost({
+		blogPostService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.get(
-  '/admin/config',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showConfigurations({
-    archiveConfigService,
-    formatDate,
-    configurations,
-    themeService,
-  })
+	'/admin/config',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showConfigurations({
+		archiveConfigService,
+		formatDate,
+		configurations,
+		themeService,
+	})
 );
 
 app.post(
-  '/admin/config',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.saveConfigurations({
-    archiveConfigService,
-    formatDate,
-    configurations,
-    themeService,
-  })
+	'/admin/config',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.saveConfigurations({
+		archiveConfigService,
+		formatDate,
+		configurations,
+		themeService,
+	})
 );
 
 app.get(
-  '/admin/accounts',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showAccountList({ accountService, configurations })
+	'/admin/accounts',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showAccountList({ accountService, configurations })
 );
 
 app.post(
-  '/admin/accounts',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.addNewAccount({ accountService, configurations })
+	'/admin/accounts',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.addNewAccount({ accountService, configurations })
 );
 
 app.get(
-  '/admin/accounts/new',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showNewAccount({ configurations })
+	'/admin/accounts/new',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showNewAccount({ accountService, configurations })
 );
 
 app.get(
-  '/admin/accounts/edit/:id',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.showEditAccount({ configurations, accountService })
+	'/admin/accounts/edit/:id',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.showEditAccount({ configurations, accountService })
 );
 
 app.post(
-  '/admin/accounts/edit/:id',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  AdminController.editAccount({ accountService })
+	'/admin/accounts/edit/:id',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	AdminController.editAccount({ accountService })
 );
 
 app.get(
-  '/posts',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  PostController.showNewPost({ messageProviderService, configurations })
+	'/posts',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	PostController.showNewPost({ messageProviderService, configurations })
 );
 
 app.get(
-  '/posts/:idOrSlug',
-  PostController.showBlogPost({
-    blogPostService,
-    formatDate,
-    configurations,
-  })
+	'/posts/:idOrSlug',
+	PostController.showBlogPost({
+		blogPostService,
+		formatDate,
+		configurations,
+	})
 );
 
 app.post(
-  '/posts',
-  userAuthentication.authenticate({
-    sessionService,
-    authCookie: AUTH_COOKIE,
-  }),
-  PostController.receiveBlogPostDataAndSave({
-    authCookie: AUTH_COOKIE,
-    sessionService,
-    blogPostService,
-  })
+	'/posts',
+	userAuthentication.authenticate({
+		sessionService,
+		authCookie: AUTH_COOKIE,
+	}),
+	PostController.receiveBlogPostDataAndSave({
+		authCookie: AUTH_COOKIE,
+		sessionService,
+		blogPostService,
+	})
 );
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

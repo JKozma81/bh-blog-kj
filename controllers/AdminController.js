@@ -2,333 +2,357 @@ const fs = require('fs');
 const { DBPath } = require('../configs/config.json');
 
 class AdminController {
-  static showDashboard(req, res) {
-    const user = req.user;
-    res.render('dashboard', {
-      siteTitle: 'Bishops First Blog',
-      submenuTitle: 'Admin Dashboard',
-      username: user.username,
-    });
-  }
+	static showDashboard(req, res) {
+		const user = req.user;
+		res.render('dashboard', {
+			siteTitle: 'Bishops First Blog',
+			submenuTitle: 'Admin Dashboard',
+			username: user.username,
+		});
+	}
 
-  static showAdminBlogPostList(options) {
-    const blogPostService = options.blogPostService;
-    const configurations = options.configurations;
-    const formatDate = options.formatDate;
+	static showAdminBlogPostList(options) {
+		const blogPostService = options.blogPostService;
+		const configurations = options.configurations;
+		const formatDate = options.formatDate;
 
-    return async (req, res) => {
-      try {
-        const user = req.user;
-        if (!configurations['db-file']) {
-          res.render('postList', {
-            siteTitle: 'Bishops First Blog',
-            submenuTitle: 'Admin Post List',
-            error:
-              'No Database file provided. Please provide a valid file to continue...',
-            username: user.username,
-            blogPosts: '',
-          });
-          return;
-        }
+		return async (req, res) => {
+			try {
+				const user = req.user;
+				if (!configurations['db-file']) {
+					res.render('postList', {
+						siteTitle: 'Bishops First Blog',
+						submenuTitle: 'Admin Post List',
+						error:
+							'No Database file provided. Please provide a valid file to continue...',
+						username: user.username,
+						blogPosts: '',
+					});
+					return;
+				}
 
-        const blogPosts = await blogPostService.getAllBlogPosts();
+				const blogPosts = await blogPostService.getAllBlogPosts();
 
-        blogPosts.forEach((post) => {
-          post.published_at =
-            post.published_at === 'N/A'
-              ? post.published_at
-              : formatDate(post.published_at, configurations.dateFormat);
-          post.modified_at = formatDate(
-            post.modified_at,
-            configurations.dateFormat
-          );
-          post.created_at = formatDate(
-            post.created_at,
-            configurations.dateFormat
-          );
-        });
+				blogPosts.forEach((post) => {
+					post.published_at =
+						post.published_at === 'N/A'
+							? post.published_at
+							: formatDate(
+									post.published_at,
+									configurations.dateFormat
+							  );
+					post.modified_at = formatDate(
+						post.modified_at,
+						configurations.dateFormat
+					);
+					post.created_at = formatDate(
+						post.created_at,
+						configurations.dateFormat
+					);
+				});
 
-        res.render('postList', {
-          siteTitle: 'Bishops First Blog',
-          submenuTitle: 'Admin Post List',
-          username: user.username,
-          blogPosts,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				res.render('postList', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'Admin Post List',
+					username: user.username,
+					blogPosts,
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 
-  static showEditBlogPost(options) {
-    const blogPostService = options.blogPostService;
-    const configurations = options.configurations;
-    const formatDate = options.formatDate;
+	static showEditBlogPost(options) {
+		const blogPostService = options.blogPostService;
+		const configurations = options.configurations;
+		const formatDate = options.formatDate;
 
-    return async (req, res) => {
-      const user = req.user;
-      const blogPostID = Number(req.params.id);
+		return async (req, res) => {
+			const user = req.user;
+			const blogPostID = Number(req.params.id);
 
-      if (!configurations['db-file']) {
-        res.render('editPost', {
-          siteTitle: 'Bishops First Blog',
-          submenuTitle: 'Edit Post',
-          error:
-            'No Database file provided. Please provide a valid file to continue...',
-          username: user.username,
-          blogPosts: '',
-        });
-        return;
-      }
+			if (!configurations['db-file']) {
+				res.render('editPost', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'Edit Post',
+					error:
+						'No Database file provided. Please provide a valid file to continue...',
+					username: user.username,
+					blogPosts: '',
+				});
+				return;
+			}
 
-      const blogPost = await blogPostService.getBlogPostById(blogPostID);
+			const blogPost = await blogPostService.getBlogPostById(blogPostID);
 
-      blogPost.published_at = formatDate(
-        blogPost.published_at,
-        configurations.dateFormat
-      );
-      blogPost.modified_at = formatDate(
-        blogPost.modified_at,
-        configurations.dateFormat
-      );
-      blogPost.created_at = formatDate(
-        blogPost.created_at,
-        configurations.dateFormat
-      );
+			blogPost.published_at = formatDate(
+				blogPost.published_at,
+				configurations.dateFormat
+			);
+			blogPost.modified_at = formatDate(
+				blogPost.modified_at,
+				configurations.dateFormat
+			);
+			blogPost.created_at = formatDate(
+				blogPost.created_at,
+				configurations.dateFormat
+			);
 
-      res.render('editPost', {
-        siteTitle: 'Bishops First Blog',
-        submenuTitle: 'Edit Post',
-        username: user.username,
-        blogPost,
-      });
-    };
-  }
+			res.render('editPost', {
+				siteTitle: 'Bishops First Blog',
+				submenuTitle: 'Edit Post',
+				username: user.username,
+				blogPost,
+			});
+		};
+	}
 
-  static modifyBlogPost(options) {
-    const blogPostService = options.blogPostService;
-    return async (req, res) => {
-      const blogPostID = Number(req.params.id);
-      const modifiedBlogPostData = {};
-      ({
-        title: modifiedBlogPostData.title,
-        content: modifiedBlogPostData.content,
-        slug: modifiedBlogPostData.slug,
-        draft: modifiedBlogPostData.draft,
-      } = req.body);
-      modifiedBlogPostData.id = blogPostID;
+	static modifyBlogPost(options) {
+		const blogPostService = options.blogPostService;
+		return async (req, res) => {
+			const blogPostID = Number(req.params.id);
+			const modifiedBlogPostData = {};
+			({
+				title: modifiedBlogPostData.title,
+				content: modifiedBlogPostData.content,
+				slug: modifiedBlogPostData.slug,
+				draft: modifiedBlogPostData.draft,
+			} = req.body);
+			modifiedBlogPostData.id = blogPostID;
 
-      await blogPostService.modifyPost(modifiedBlogPostData);
+			await blogPostService.modifyPost(modifiedBlogPostData);
 
-      res.redirect('/admin/list');
-    };
-  }
+			res.redirect('/admin/list');
+		};
+	}
 
-  static showConfigurations(options) {
-    const archiveConfigService = options.archiveConfigService;
-    const configurations = options.configurations;
-    const themeService = options.themeService;
-    return async (req, res) => {
-      let layouts;
-      if (configurations['db-file']) {
-        layouts = await archiveConfigService.getAllLayouts();
-      }
-      const user = req.user;
+	static showConfigurations(options) {
+		const archiveConfigService = options.archiveConfigService;
+		const configurations = options.configurations;
+		const themeService = options.themeService;
+		return async (req, res) => {
+			let layouts;
+			if (configurations['db-file']) {
+				layouts = await archiveConfigService.getAllLayouts();
+			}
+			const user = req.user;
 
-      const themes = themeService.getAllThemes().map((theme) => {
-        const tempObj = {};
-        tempObj.name = theme;
-        tempObj.default = configurations.theme === theme ? true : false;
-        return tempObj;
-      });
+			const themes = themeService.getAllThemes().map((theme) => {
+				const tempObj = {};
+				tempObj.name = theme;
+				tempObj.default = configurations.theme === theme ? true : false;
+				return tempObj;
+			});
 
-      res.render('configurations', {
-        siteTitle: 'Bishops First Blog',
-        submenuTitle: 'Admin Configurations',
-        username: user.username,
-        layouts,
-        dateFormat: configurations.dateFormat,
-        dbFile: configurations['db-file'],
-        themes,
-      });
-    };
-  }
+			res.render('configurations', {
+				siteTitle: 'Bishops First Blog',
+				submenuTitle: 'Admin Configurations',
+				username: user.username,
+				layouts,
+				dateFormat: configurations.dateFormat,
+				dbFile: configurations['db-file'],
+				themes,
+			});
+		};
+	}
 
-  static saveConfigurations(options) {
-    const configurations = options.configurations;
-    const archiveConfigService = options.archiveConfigService;
-    const themeService = options.themeService;
-    return async (req, res) => {
-      const {
-        archive_layout,
-        date_format,
-        database_file,
-        theme_name,
-      } = req.body;
+	static saveConfigurations(options) {
+		const configurations = options.configurations;
+		const archiveConfigService = options.archiveConfigService;
+		const themeService = options.themeService;
+		return async (req, res) => {
+			const {
+				archive_layout,
+				date_format,
+				database_file,
+				theme_name,
+			} = req.body;
 
-      configurations.dateFormat = date_format
-        ? date_format
-        : configurations.dateFormat;
+			configurations.dateFormat = date_format
+				? date_format
+				: configurations.dateFormat;
 
-      configurations['db-file'] = fs.existsSync(DBPath + database_file)
-        ? database_file
-        : '';
+			configurations['db-file'] = fs.existsSync(DBPath + database_file)
+				? database_file
+				: '';
 
-      if (archive_layout) {
-        await archiveConfigService.modifyLayout(archive_layout);
-      }
+			if (archive_layout) {
+				await archiveConfigService.modifyLayout(archive_layout);
+			}
 
-      themeService.applyTheme(theme_name);
-      configurations.theme = theme_name;
+			themeService.applyTheme(theme_name);
+			configurations.theme = theme_name;
 
-      res.redirect('/admin');
-    };
-  }
+			res.redirect('/admin');
+		};
+	}
 
-  static showAccountList(options) {
-    const accountService = options.accountService;
-    const configurations = options.configurations;
+	static showAccountList(options) {
+		const accountService = options.accountService;
+		const configurations = options.configurations;
 
-    return async (req, res) => {
-      try {
-        const user = req.user;
-        if (!configurations['db-file']) {
-          res.render('accountList', {
-            siteTitle: 'Bishops First Blog',
-            submenuTitle: 'Admin Account List',
-            error:
-              'No Database file provided. Please provide a valid file to continue...',
-            username: user.username,
-            accounts: '',
-          });
-          return;
-        }
+		return async (req, res) => {
+			try {
+				const user = req.user;
+				if (!configurations['db-file']) {
+					res.render('accountList', {
+						siteTitle: 'Bishops First Blog',
+						submenuTitle: 'Admin Account List',
+						error:
+							'No Database file provided. Please provide a valid file to continue...',
+						username: user.username,
+						accounts: '',
+					});
+					return;
+				}
 
-        const accounts = await accountService.getAllAccounts();
+				const accounts = await accountService.getAllAccounts();
 
-        res.render('accountList', {
-          siteTitle: 'Bishops First Blog',
-          submenuTitle: 'Admin Account List',
-          username: user.username,
-          accounts,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				res.render('accountList', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'Admin Account List',
+					username: user.username,
+					accounts,
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 
-  static showNewAccount(options) {
-    const configurations = options.configurations;
+	static showNewAccount(options) {
+		const configurations = options.configurations;
+		const accountService = options.accountService;
 
-    return async (req, res) => {
-      try {
-        const user = req.user;
-        if (!configurations['db-file']) {
-          res.render('newAccount', {
-            siteTitle: 'Bishops First Blog',
-            submenuTitle: 'New Account',
-            error:
-              'No Database file provided. Please provide a valid file to continue...',
-            username: user.username,
-          });
-          return;
-        }
+		return async (req, res) => {
+			try {
+				const user = req.user;
+				if (!configurations['db-file']) {
+					res.render('newAccount', {
+						siteTitle: 'Bishops First Blog',
+						submenuTitle: 'New Account',
+						error:
+							'No Database file provided. Please provide a valid file to continue...',
+						username: user.username,
+					});
+					return;
+				}
 
-        res.render('newAccount', {
-          siteTitle: 'Bishops First Blog',
-          submenuTitle: 'New Account',
-          username: user.username,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				const roles = await accountService.getAllRoles();
 
-  static addNewAccount(options) {
-    const accountService = options.accountService;
+				res.render('newAccount', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'New Account',
+					username: user.username,
+					roles,
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 
-    return async (req, res) => {
-      try {
-        const { user_name, user_password, user_email } = req.body;
+	static addNewAccount(options) {
+		const accountService = options.accountService;
 
-        const newAccount = await accountService.addNewAccount({
-          user_name,
-          user_password,
-          user_email,
-        });
+		return async (req, res) => {
+			try {
+				const {
+					user_name,
+					user_password,
+					user_email,
+					roles,
+				} = req.body;
 
-        if (!newAccount) {
-          throw new Error("Can't create new Account!");
-        }
+				const newAccount = await accountService.addNewAccount({
+					user_name,
+					user_password,
+					user_email,
+					roles,
+				});
 
-        res.redirect('/admin/accounts');
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				if (!newAccount) {
+					throw new Error("Can't create new Account!");
+				}
 
-  static showEditAccount(options) {
-    const configurations = options.configurations;
-    const accountService = options.accountService;
+				res.redirect('/admin/accounts');
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 
-    return async (req, res) => {
-      try {
-        const user = req.user;
-        if (!configurations['db-file']) {
-          res.render('editAccount', {
-            siteTitle: 'Bishops First Blog',
-            submenuTitle: 'Edit Account',
-            error:
-              'No Database file provided. Please provide a valid file to continue...',
-            username: user.username,
-          });
-          return;
-        }
+	static showEditAccount(options) {
+		const configurations = options.configurations;
+		const accountService = options.accountService;
 
-        const accountId = Number(req.params.id);
+		return async (req, res) => {
+			try {
+				const user = req.user;
+				if (!configurations['db-file']) {
+					res.render('editAccount', {
+						siteTitle: 'Bishops First Blog',
+						submenuTitle: 'Edit Account',
+						error:
+							'No Database file provided. Please provide a valid file to continue...',
+						username: user.username,
+					});
+					return;
+				}
 
-        const editedUser = await accountService.getAccountById(accountId);
+				const accountId = Number(req.params.id);
 
-        res.render('editAccount', {
-          siteTitle: 'Bishops First Blog',
-          submenuTitle: 'Edit Account',
-          username: user.username,
-          editedUser,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				const editedUser = await accountService.getAccountById(
+					accountId
+				);
 
-  static editAccount(options) {
-    const accountService = options.accountService;
+				const roles = await accountService.getAllRoles();
 
-    return async (req, res) => {
-      try {
-        const { user_name, user_password, user_email } = req.body;
-        const accountId = Number(req.params.id);
+				res.render('editAccount', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'Edit Account',
+					username: user.username,
+					editedUser,
+					roles,
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 
-        const editedAccount = await accountService.editAccount({
-          id: accountId,
-          user_name,
-          user_password,
-          user_email,
-        });
+	static editAccount(options) {
+		const accountService = options.accountService;
 
-        if (!editedAccount) {
-          throw new Error("Can't modify Account!");
-        }
+		return async (req, res) => {
+			try {
+				const {
+					user_name,
+					user_password,
+					user_email,
+					roles,
+				} = req.body;
+				const accountId = Number(req.params.id);
 
-        res.redirect('/admin/accounts');
-      } catch (err) {
-        console.error(err);
-      }
-    };
-  }
+				const editedAccount = await accountService.editAccount({
+					id: accountId,
+					user_name,
+					user_password,
+					user_email,
+					roles,
+				});
+
+				if (!editedAccount) {
+					throw new Error("Can't modify Account!");
+				}
+
+				res.redirect('/admin/accounts');
+			} catch (err) {
+				console.error(err);
+			}
+		};
+	}
 }
 
 module.exports = AdminController;

@@ -5,9 +5,9 @@
   {{error}}
 </div>
 {{/if}}
-<div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-50">
+<div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-75">
   <h1 class="pb-3">{{submenuTitle}}</h1>
-  <form method="POST" action="/admin/accounts" class="new-account-form w-50 needs-validation">
+  <form method="POST" action="/admin/accounts" class="new-account-form w-100 needs-validation">
     <div class="form-group row">
       <label for="user_name" class="col-sm-2 col-form-label">Username</label>
       <div class="col-sm-10">
@@ -30,10 +30,22 @@
       </div>
     </div>
     <div class="form-group row">
-      <label for="user_password_confirm" class="col-sm-2 col-form-label">Password</label>
+      <label for="user_password_confirm" class="col-sm-2 col-form-label">Confirm Password</label>
       <div class="col-sm-10">
         <input type="password" class="form-control" id="user_password_confirm" name="user_password_confirm"
           {{#if user_password}}value="{{user_password}}" {{/if}} placeholder="" required>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="roles" class="col-sm-2 col-form-label">Roles</label>
+      <div class="col-sm-10">
+        <select class="custom-select my-1 mr-sm-2" id="roles" name="roles" required>
+          {{#each roles}}
+          <option value="{{role_name}}">
+            {{role_name}}
+          </option>
+          {{/each}}
+        </select>
       </div>
     </div>
     <div class="form-group row d-flex justify-content-between">

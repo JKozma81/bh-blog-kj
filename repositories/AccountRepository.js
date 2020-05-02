@@ -1,189 +1,249 @@
 const Account = require('../domains/Account');
 
 class AccountRepository {
-  constructor(DBAdapter) {
-    this.DBAdapter = DBAdapter;
-  }
+	constructor(DBAdapter) {
+		this.DBAdapter = DBAdapter;
+	}
 
-  async getAllAccounts() {
-    try {
-      const accounts = await this.DBAdapter().getAll(
-        `
+	async getAllAccounts() {
+		try {
+			const accounts = await this.DBAdapter().getAll(
+				`
           SELECT
-            id,
-            user_name,
-            user_email,
-            user_password
+            accounts.id,
+            accounts.user_name,
+            accounts.user_email,
+            accounts.user_password,
+            roles.role_name
           FROM
             accounts
+          JOIN 
+            roles
+          ON
+            accounts.role_id = roles.id
         `
-      );
+			);
 
-      const results = accounts.map(
-        (account) =>
-          new Account(
-            account.id,
-            account.user_name,
-            account.user_password,
-            account.user_email
-          )
-      );
+			const results = accounts.map(
+				(account) =>
+					new Account(
+						account.id,
+						account.user_name,
+						account.user_password,
+						account.user_email,
+						account.role_name
+					)
+			);
 
-      return results;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			return results;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  async addNewAccount(newAccountObj) {
-    try {
-      await this.DBAdapter().runAsync(
-        `
-        INSERT INTO accounts(user_name, user_password, user_email) VALUES(?,?,?)
+	async addNewAccount(newAccountObj) {
+		try {
+			const roleId = await this.DBAdapter().get(
+				'SELECT id FROM roles WHERE role_name = ?',
+				[newAccountObj.roles]
+			);
+
+			await this.DBAdapter().runAsync(
+				`
+        INSERT INTO accounts(user_name, user_password, user_email, role_id) VALUES(?,?,?,?)
       `,
-        newAccountObj.user_name,
-        newAccountObj.user_password,
-        newAccountObj.user_email
-      );
+				newAccountObj.user_name,
+				newAccountObj.user_password,
+				newAccountObj.user_email,
+				roleId.id
+			);
 
-      const account = await this.DBAdapter().get(
-        `
+			const account = await this.DBAdapter().get(
+				`
         SELECT
-          id,
-          user_name,
-          user_password,
-          user_email
+          accounts.id,
+          accounts.user_name,
+          accounts.user_password,
+          accounts.user_email,
+          roles.role_name
         FROM
           accounts
+        JOIN
+          roles
+        ON
+          accounts.role_id = roles.id
         WHERE
           user_name = ?
         AND
           user_password = ? 
       `,
-        [newAccountObj.user_name, newAccountObj.user_password]
-      );
+				[newAccountObj.user_name, newAccountObj.user_password]
+			);
 
-      const result = new Account(
-        account.id,
-        account.user_name,
-        account.user_password,
-        account.user_email
-      );
+			const result = new Account(
+				account.id,
+				account.user_name,
+				account.user_password,
+				account.user_email,
+				account.role_name
+			);
 
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			return result;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  async getAccountByData(dataObj) {
-    try {
-      const account = await await this.DBAdapter().get(
-        `
+	async getAccountByData(dataObj) {
+		try {
+			const account = await await this.DBAdapter().get(
+				`
         SELECT
-          id,
-          user_name,
-          user_password,
-          user_email
+          accounts.id,
+          accounts.user_name,
+          accounts.user_password,
+          accounts.user_email,
+          roles.role_name
         FROM
           accounts
+        JOIN
+          roles
+        ON
+          accounts.role_id = roles.id
         WHERE
-          user_name = ?
+          accounts.user_name = ?
         AND
-          user_password = ? 
+          accounts.user_password = ? 
       `,
-        [dataObj.username, dataObj.password]
-      );
+				[dataObj.username, dataObj.password]
+			);
 
-      const result = new Account(
-        account.id,
-        account.user_name,
-        account.user_password,
-        account.user_email
-      );
+			const result = new Account(
+				account.id,
+				account.user_name,
+				account.user_password,
+				account.user_email,
+				account.role_name
+			);
 
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			return result;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  async getAccountById(id) {
-    try {
-      const account = await await this.DBAdapter().get(
-        `
+	async getAccountById(id) {
+		try {
+			const account = await await this.DBAdapter().get(
+				`
         SELECT
-          id,
-          user_name,
-          user_password,
-          user_email
+          accounts.id,
+          accounts.user_name,
+          accounts.user_password,
+          accounts.user_email,
+          roles.role_name
         FROM
           accounts
+        JOIN
+          roles
+        ON
+          accounts.role_id = roles.id
         WHERE
-          id = ?
+          accounts.id = ?
       `,
-        [id]
-      );
+				[id]
+			);
 
-      const result = new Account(
-        account.id,
-        account.user_name,
-        account.user_password,
-        account.user_email
-      );
+			const result = new Account(
+				account.id,
+				account.user_name,
+				account.user_password,
+				account.user_email,
+				account.role_name
+			);
 
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			return result;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 
-  async editAccount(editedAccount) {
-    try {
-      await await this.DBAdapter().runAsync(
-        `
+	async editAccount(editedAccount) {
+		try {
+			const roleId = await this.DBAdapter().get(
+				'SELECT id FROM roles WHERE role_name = ?',
+				[editedAccount.roles]
+			);
+
+			await await this.DBAdapter().runAsync(
+				`
         UPDATE
           accounts
         SET
           user_name = ?,
           user_email = ?,
-          user_password = ?
+          user_password = ?,
+          role_id = ?
         WHERE
           id = ?
       `,
-        editedAccount.user_name,
-        editedAccount.user_email,
-        editedAccount.user_password,
-        editedAccount.id
-      );
+				editedAccount.user_name,
+				editedAccount.user_email,
+				editedAccount.user_password,
+				roleId.id,
+				editedAccount.id
+			);
 
-      const account = await this.DBAdapter().get(
-        `
+			const account = await this.DBAdapter().get(
+				`
         SELECT
-          id,
-          user_name,
-          user_password,
-          user_email
+          accounts.id,
+          accounts.user_name,
+          accounts.user_password,
+          accounts.user_email,
+          roles.role_name
         FROM
           accounts
+        JOIN
+          roles
+        ON
+          accounts.role_id = roles.id
         WHERE
-          id = ?
+          accounts.id = ?
       `,
-        [editedAccount.id]
-      );
+				[editedAccount.id]
+			);
 
-      const result = new Account(
-        account.id,
-        account.user_name,
-        account.user_password,
-        account.user_email
-      );
+			const result = new Account(
+				account.id,
+				account.user_name,
+				account.user_password,
+				account.user_email,
+				account.role_name
+			);
 
-      return result;
-    } catch (err) {
-      console.error(err);
-    }
-  }
+			return result;
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	async getAllRoles() {
+		try {
+			const roles = await this.DBAdapter().getAll(
+				`
+          SELECT
+            id,
+            role_name
+          FROM
+            roles
+        `
+			);
+			return roles;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 }
 
 module.exports = AccountRepository;

@@ -5,9 +5,9 @@
   {{error}}
 </div>
 {{/if}}
-<div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-50">
+<div class="container-fluid p-5 d-flex flex-column align-items-center new-account-site w-75">
   <h1 class="pb-3">{{submenuTitle}}</h1>
-  <form method="POST" action="/admin/accounts/edit/{{editedUser.id}}" class="edit-account-form w-50 needs-validation">
+  <form method="POST" action="/admin/accounts/edit/{{editedUser.id}}" class="edit-account-form w-100 needs-validation">
     <div class="form-group row">
       <label for="user_name" class="col-sm-2 col-form-label">Username</label>
       <div class="col-sm-10">
@@ -34,6 +34,19 @@
       <div class="col-sm-10">
         <input type="password" class="form-control" id="user_password_confirm" name="user_password_confirm"
           value="{{editedUser.password}}" placeholder="" required>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="roles" class="col-sm-2 col-form-label">Roles</label>
+      <div class="col-sm-10">
+        <select class="custom-select my-1 mr-sm-2" id="roles" name="roles"
+          {{#if editedUser.role}}value="{{editedUser.role}}" {{/if}} required>
+          {{#each roles}}
+          <option value="{{role_name}}" {{#ifeq role_name ../editedUser.role}}selected{{/ifeq}}>
+            {{role_name}}
+          </option>
+          {{/each}}
+        </select>
       </div>
     </div>
     <div class="form-group row d-flex justify-content-between">
