@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const hbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
+const fileupload = require('express-fileupload');
 
 const PostController = require('./controllers/PostController');
 const BlogPostServive = require('./services/BlogPostService');
@@ -70,6 +71,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+app.use(fileupload());
 
 app.get(
 	'/',

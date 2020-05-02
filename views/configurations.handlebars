@@ -2,9 +2,15 @@
 
 <div class="container-fluid configuration-site">
   <div class="container d-flex flex-column align-items-center">
+    {{#if error}}
+    <div class="container alert alert-danger text-center" role="alert">
+      {{error}}
+    </div>
+    {{/if}}
+
     <h1 class="pb-3">{{submenuTitle}}</h1>
 
-    <form action="/admin/config" method="POST" class="w-75">
+    <form encType="multipart/form-data" action="/admin/config" method="POST" class="w-75">
 
       <fieldset class="border p-3 mb-3">
         <legend class="scheduler-border">Archive layout and Date format</legend>
@@ -63,6 +69,15 @@
               {{/each}}
             </select>
           </div>
+        </div>
+        <div class="form-row align-items-center">
+          <div class="form-group col-md-6">
+            <label for="upload_theme" class="col-form-label">Upload theme</label>
+          </div>
+          <div class="form-group col-md-6">
+            <input type="file" name="theme_zip" id="upload_theme" accept=".zip">
+          </div>
+        </div>
       </fieldset>
 
 

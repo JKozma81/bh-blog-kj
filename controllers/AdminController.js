@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+const AdmZip = require('adm-zip');
 const { DBPath } = require('../configs/config.json');
 
 class AdminController {
@@ -133,10 +135,11 @@ class AdminController {
 		const themeService = options.themeService;
 		return async (req, res) => {
 			let layouts;
+			const user = req.user;
+
 			if (configurations['db-file']) {
 				layouts = await archiveConfigService.getAllLayouts();
 			}
-			const user = req.user;
 
 			if (user.role === 'author') {
 				res.redirect('/admin');
@@ -149,6 +152,21 @@ class AdminController {
 				tempObj.default = configurations.theme === theme ? true : false;
 				return tempObj;
 			});
+
+			if (req.query.error === 'invalid-file') {
+				const error = 'Invalid file uploaded!';
+				res.render('configurations', {
+					siteTitle: 'Bishops First Blog',
+					submenuTitle: 'Admin Configurations',
+					user,
+					layouts,
+					dateFormat: configurations.dateFormat,
+					dbFile: configurations['db-file'],
+					themes,
+					error,
+				});
+				return;
+			}
 
 			res.render('configurations', {
 				siteTitle: 'Bishops First Blog',
@@ -188,6 +206,55 @@ class AdminController {
 
 			themeService.applyTheme(theme_name);
 			configurations.theme = theme_name;
+
+			if (req.files) {
+				await req.files.theme_zip.mv(
+					path.join(
+						__dirname,
+						'..',
+						'themes',
+						req.files.theme_zip.name
+					)
+				);
+
+				const zip = new AdmZip(
+					path.join(
+						__dirname,
+						'..',
+						'themes',
+						req.files.theme_zip.name
+					)
+				);
+
+				if (
+					req.files.theme_zip.mimetype !==
+						'application/x-zip-compressed' ||
+					!zip.getEntries()[0].isDirectory ||
+					zip.getEntries()[1].name !== 'bootstrap.css' ||
+					zip.getEntries().length !== 2
+				) {
+					fs.unlinkSync(
+						path.join(
+							__dirname,
+							'..',
+							'themes',
+							req.files.theme_zip.name
+						)
+					);
+					res.redirect('/admin/config?error=invalid-file');
+					return;
+				}
+
+				zip.extractAllTo(path.join(__dirname, '..', 'themes'));
+				fs.unlinkSync(
+					path.join(
+						__dirname,
+						'..',
+						'themes',
+						req.files.theme_zip.name
+					)
+				);
+			}
 
 			res.redirect('/admin');
 		};
