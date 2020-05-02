@@ -30,7 +30,8 @@
           <td>{{this.published_at}}</td>
           <td>{{this.modified_at}}</td>
           <td>
-            <a class="btn btn-primary w-100 btn-sm" href="/admin/list/{{this.id}}" role="button">Edit</a>
+            <a class="btn btn-primary w-100 btn-sm {{#ifeq ../user.role 'author'}}{{#ifNoteq this.author ../user.username}}disabled{{/ifNoteq}}{{/ifeq}}"
+              href="/admin/list/{{this.id}}" role="button">Edit</a>
           </td>
         </tr>
         {{/each}}

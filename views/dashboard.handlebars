@@ -15,6 +15,7 @@
             </div>
         </div>
 
+        {{#ifeq user.role 'admin'}}
         <div class="card text-center m-3 border border-primary rounded p-2" style="width: 18rem;">
             <img class="card-img-top" src="/img/options.png" alt="Write new post image">
 
@@ -30,6 +31,7 @@
                 <a class="btn btn-primary m-1" href="/admin/accounts" role="button">Accounts</a>
             </div>
         </div>
+        {{/ifeq}}
     </div>
 
 </div>

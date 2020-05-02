@@ -7,7 +7,7 @@ class AdminController {
 		res.render('dashboard', {
 			siteTitle: 'Bishops First Blog',
 			submenuTitle: 'Admin Dashboard',
-			username: user.username,
+			user,
 		});
 	}
 
@@ -25,7 +25,7 @@ class AdminController {
 						submenuTitle: 'Admin Post List',
 						error:
 							'No Database file provided. Please provide a valid file to continue...',
-						username: user.username,
+						user,
 						blogPosts: '',
 					});
 					return;
@@ -54,7 +54,7 @@ class AdminController {
 				res.render('postList', {
 					siteTitle: 'Bishops First Blog',
 					submenuTitle: 'Admin Post List',
-					username: user.username,
+					user,
 					blogPosts,
 				});
 			} catch (err) {
@@ -78,7 +78,7 @@ class AdminController {
 					submenuTitle: 'Edit Post',
 					error:
 						'No Database file provided. Please provide a valid file to continue...',
-					username: user.username,
+					user,
 					blogPosts: '',
 				});
 				return;
@@ -102,7 +102,7 @@ class AdminController {
 			res.render('editPost', {
 				siteTitle: 'Bishops First Blog',
 				submenuTitle: 'Edit Post',
-				username: user.username,
+				user,
 				blogPost,
 			});
 		};
@@ -138,6 +138,11 @@ class AdminController {
 			}
 			const user = req.user;
 
+			if (user.role === 'author') {
+				res.redirect('/admin');
+				return;
+			}
+
 			const themes = themeService.getAllThemes().map((theme) => {
 				const tempObj = {};
 				tempObj.name = theme;
@@ -148,7 +153,7 @@ class AdminController {
 			res.render('configurations', {
 				siteTitle: 'Bishops First Blog',
 				submenuTitle: 'Admin Configurations',
-				username: user.username,
+				user,
 				layouts,
 				dateFormat: configurations.dateFormat,
 				dbFile: configurations['db-file'],
@@ -201,18 +206,21 @@ class AdminController {
 						submenuTitle: 'Admin Account List',
 						error:
 							'No Database file provided. Please provide a valid file to continue...',
-						username: user.username,
+						user,
 						accounts: '',
 					});
 					return;
 				}
-
+				if (user.role === 'author') {
+					res.redirect('/admin');
+					return;
+				}
 				const accounts = await accountService.getAllAccounts();
 
 				res.render('accountList', {
 					siteTitle: 'Bishops First Blog',
 					submenuTitle: 'Admin Account List',
-					username: user.username,
+					user,
 					accounts,
 				});
 			} catch (err) {
@@ -234,17 +242,20 @@ class AdminController {
 						submenuTitle: 'New Account',
 						error:
 							'No Database file provided. Please provide a valid file to continue...',
-						username: user.username,
+						user,
 					});
 					return;
 				}
-
+				if (user.role === 'author') {
+					res.redirect('/admin');
+					return;
+				}
 				const roles = await accountService.getAllRoles();
 
 				res.render('newAccount', {
 					siteTitle: 'Bishops First Blog',
 					submenuTitle: 'New Account',
-					username: user.username,
+					user,
 					roles,
 				});
 			} catch (err) {
@@ -300,7 +311,10 @@ class AdminController {
 					});
 					return;
 				}
-
+				if (user.role === 'author') {
+					res.redirect('/admin');
+					return;
+				}
 				const accountId = Number(req.params.id);
 
 				const editedUser = await accountService.getAccountById(
@@ -312,7 +326,7 @@ class AdminController {
 				res.render('editAccount', {
 					siteTitle: 'Bishops First Blog',
 					submenuTitle: 'Edit Account',
-					username: user.username,
+					user,
 					editedUser,
 					roles,
 				});
