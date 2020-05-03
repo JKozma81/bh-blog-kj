@@ -191,13 +191,18 @@ class PostRepository {
           posts.draft,
           posts.published_at,
           posts.modified_at,
-          slugs.slug_value
+          slugs.slug_value,
+          GROUP_CONCAT(tags.tag_name, ',') AS tags
         FROM
           posts
         JOIN
           slugs
         ON
           slugs.post_id = posts.id
+        JOIN
+          tags
+        ON
+          posts.id = tags.post_id
         WHERE
           posts.id = ?
         AND
@@ -219,7 +224,8 @@ class PostRepository {
 				postData.slug_value,
 				undefined,
 				undefined,
-				postData.modified_at
+				postData.modified_at,
+				postData.tags
 			);
 		} catch (err) {
 			console.error(err);
