@@ -10,7 +10,7 @@ function initDBConnection(dbFile) {
 			dataBase.serialize(() => {
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-            posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
                    author VARCHAR(100) NOT NULL,
                    title VARCHAR(100) NOT NULL,
                    content TEXT NOT NULL,
@@ -22,7 +22,7 @@ function initDBConnection(dbFile) {
 
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-            slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
                    slug_value VARCHAR(100) NOT NULL,
                    post_id INTEGER NOT NULL,
                    is_active INTEGER NOT NULL,
@@ -32,7 +32,16 @@ function initDBConnection(dbFile) {
 
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-            archive_layouts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+            	   tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   tag_name VARCHAR(100) NOT NULL,
+                   post_id INTEGER NOT NULL,
+                   FOREIGN KEY (post_id) REFERENCES posts (id)
+                  )`
+				);
+
+				dataBase.run(
+					`CREATE TABLE IF NOT EXISTS
+                 archive_layouts (id INTEGER PRIMARY KEY AUTOINCREMENT,
                  layout VARCHAR(100) NOT NULL,
                  is_active INTEGER NOT NULL
                 )`

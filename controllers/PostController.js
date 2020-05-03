@@ -316,7 +316,7 @@ class PostController {
 		const sessionService = options.sessionService;
 		const blogPostService = options.blogPostService;
 		return async (req, res) => {
-			let { title, content, slug, draft } = req.body;
+			let { title, content, slug, tags, draft } = req.body;
 
 			if (!title && !content && !slug) {
 				res.redirect('/posts?error=title-content-slug');
@@ -352,11 +352,14 @@ class PostController {
 			const SID = Number(req.cookies[authCookie]);
 			const user = sessionService.getSession(SID).user;
 
+			const postTags = tags.includes(',') ? tags.split(',') : [tags];
+
 			const newPostData = {
 				title,
 				author: user.username,
 				content,
 				slug,
+				postTags,
 				draft,
 			};
 			const newBlogPost = await blogPostService.saveBlogpost(newPostData);
