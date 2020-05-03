@@ -50,7 +50,8 @@ class BlogPostService {
 			blogpostData.slug,
 			blogpostData.draft,
 			undefined,
-			undefined
+			undefined,
+			blogpostData.postTags
 		);
 
 		const savedPost = await this.PostRepository.modifyPost(newPostData);

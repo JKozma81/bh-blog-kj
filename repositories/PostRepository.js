@@ -346,6 +346,18 @@ class PostRepository {
 						1,
 					],
 				]);
+
+				await this.DBAdapter().run(
+					'DELETE FROM tags WHERE post_id = ?',
+					[postObject.id]
+				);
+
+				for (const tag of postObject.tags) {
+					await this.DBAdapter().run(
+						'INSERT INTO tags(tag_name, post_id) VALUES(?,?)',
+						[tag, postObject.id]
+					);
+				}
 			} catch (err) {
 				console.error(err);
 			}
@@ -361,7 +373,8 @@ class PostRepository {
 				undefined,
 				undefined,
 				undefined,
-				undefined
+				undefined,
+				updatedPostData.tags
 			);
 		} catch (err) {
 			console.error(err);

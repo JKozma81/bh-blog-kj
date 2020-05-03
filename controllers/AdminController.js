@@ -122,6 +122,9 @@ class AdminController {
 				draft: modifiedBlogPostData.draft,
 			} = req.body);
 			modifiedBlogPostData.id = blogPostID;
+			modifiedBlogPostData.postTags = req.body.tags.includes(',')
+				? req.body.tags.split(',')
+				: [req.body.tags];
 
 			await blogPostService.modifyPost(modifiedBlogPostData);
 
