@@ -1,0 +1,48 @@
+<div class="container-fluid d-flex justify-content-center align-items-center flex-column reset-container">
+    {{#if error}}
+    <div class="alert alert-danger text-center" role="alert">
+        {{error}}
+    </div>
+    {{/if}}
+    <form class="p-3 border reset-form needs-validation" action="/reset" method="POST">
+        <div class="form-group row">
+            <label for="user_email" class="col-sm-3 col-form-label">Your email address: </label>
+            <div class="col-sm-9">
+                <input type="email" class="form-control" id="user_email" placeholder="Email" name="user_email" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="container-fluid d-flex justify-content-end col-sm-12">
+                <div class="col-sm-12 p-1">
+                    <button type="submit" class="btn btn-primary col-sm-12">Send reset email</button>
+                    {{#if emailMsg}}
+                    <div class="alert alert-success mt-2" role="alert">
+                        {{emailMsg}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    (function () {
+        window.addEventListener('load', function () {
+            const forms = document.getElementsByClassName('needs-validation');
+            const validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>

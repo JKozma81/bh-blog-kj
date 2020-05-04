@@ -1,87 +1,92 @@
 html,
 body {
-  width: 100%;
-  height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 div.login-container,
 .error404-content,
-.admin-post-list {
-  min-width: 1280px;
-  min-height: 720px;
+.admin-post-list,
+.reset-container {
+	min-width: 1280px;
+	min-height: 720px;
 }
 
 .login-form {
-  width: 500px;
+	width: 500px;
+}
+
+.reset-form {
+	width: 700px;
 }
 
 .icon {
-  width: 100%;
+	width: 100%;
 }
 
 .logout-btn {
-  width: 50px;
+	width: 50px;
 }
 
 .dashboard-menu {
-  min-height: 120px;
+	min-height: 120px;
 }
 
 .dashboard-content {
-  min-height: 600px;
+	min-height: 600px;
 }
 
 .new-post-site,
 .configuration-site {
-  min-height: 720px;
+	min-height: 720px;
 }
 
 .new-post-form {
-  width: 75%;
-  min-height: 700px;
+	width: 75%;
+	min-height: 700px;
 }
 
 .missing-fields-alert {
-  display: none;
+	display: none;
 }
 
 #post_content {
-  height: 400px;
+	height: 400px;
 }
 
 .read-post-header {
-  min-height: 150px;
+	min-height: 150px;
 }
 
 .post-info {
-  min-height: 150px;
+	min-height: 150px;
 }
 
 .post-content {
-  min-height: 370px;
+	min-height: 370px;
 }
 
 .error404-img {
-  width: 50%;
+	width: 50%;
 }
 
 .archive-container ul {
-  list-style: none;
-  padding-left: 20px;
+	list-style: none;
+	padding-left: 20px;
 }
 
 #editor,
 .ql-editor {
-  width: 100%;
-  min-height: 500px;
+	width: 100%;
+	min-height: 500px;
 }
 
 .ql-toolbar {
-  width: 100%;
+	width: 100%;
 }
 
 legend.scheduler-border {
-  width: inherit;
-  padding: 0 10px;
-  border-bottom: none;
+	width: inherit;
+	padding: 0 10px;
+	border-bottom: none;
 }

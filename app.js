@@ -15,6 +15,7 @@ const {
 	MessageProviderService,
 	messages,
 } = require('./services/MessageProviderService');
+const PasswordResetController = require('./controllers/PasswordResetController');
 const { SessionServices, sessions } = require('./services/SessionServices');
 const AdminController = require('./controllers/AdminController');
 const UserAuthentication = require('./middlewares/Authentication');
@@ -89,6 +90,14 @@ app.get(
 		blogPostService,
 		archiveConfigService,
 		formatDate,
+		configurations,
+	})
+);
+
+app.get(
+	'/reset',
+	PasswordResetController.showReset({
+		messageProviderService,
 		configurations,
 	})
 );
