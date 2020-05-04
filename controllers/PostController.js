@@ -51,6 +51,7 @@ class PostController {
 
 				const publishedPosts = await blogPostService.getPublishedBlogposts();
 				const defaultLayout = await archiveConfigService.getDefaultLayout();
+				const tags = await blogPostService.getTaglist();
 
 				if (defaultLayout.name === 'tree') {
 					if (configurations.dateFormat !== 'YYYY-MM-DD HH:mm:ss') {
@@ -100,6 +101,7 @@ class PostController {
 								defaultLayout.name === 'tree'
 									? defaultLayout.default
 									: false,
+							tags,
 						});
 						return;
 					}
@@ -131,6 +133,7 @@ class PostController {
 							defaultLayout.name === 'tree'
 								? defaultLayout.default
 								: false,
+						tags,
 					});
 					return;
 				}
@@ -164,6 +167,7 @@ class PostController {
 						defaultLayout.name === 'tree'
 							? defaultLayout.default
 							: false,
+					tags,
 				});
 			} catch (err) {
 				console.error(err);
@@ -196,6 +200,7 @@ class PostController {
 				const defaultLayout = await archiveConfigService.getDefaultLayout();
 				let archiveMap;
 
+				const tags = await blogPostService.getTaglist();
 				const publishedPosts = await blogPostService.getPublishedBlogposts();
 
 				if (
@@ -268,6 +273,7 @@ class PostController {
 						defaultLayout.name === 'tree'
 							? defaultLayout.default
 							: false,
+					tags,
 				});
 			} catch (err) {
 				console.error(err);
@@ -436,6 +442,180 @@ class PostController {
 				siteTitle: 'Bishops First Blog',
 				post: blogPost,
 			});
+		};
+	}
+
+	static showTags(options) {
+		const blogPostService = options.blogPostService;
+		const archiveConfigService = options.archiveConfigService;
+		const formatDate = options.formatDate;
+		const configurations = options.configurations;
+
+		return async (req, res) => {
+			let archiveMap;
+			try {
+				if (!configurations['db-file']) {
+					res.render('home', {
+						siteTitle: 'Bishops First Blog',
+						postList: '',
+						formatedBlogPostData: '',
+						error:
+							'No Database file provided. Please provide a valid file to continue...',
+						flat: false,
+						tree: true,
+					});
+					return;
+				}
+
+				const postTag = req.params.tag;
+
+				if (!(await blogPostService.getTag(postTag))) {
+					res.redirect('/');
+					return;
+				}
+
+				const publishedPosts = await blogPostService.getPublishedBlogposts();
+				const postsByTag = await blogPostService.getPublishedBlogpostsByTag(
+					postTag
+				);
+
+				const defaultLayout = await archiveConfigService.getDefaultLayout();
+				const tags = await blogPostService.getTaglist();
+
+				if (defaultLayout.name === 'tree') {
+					if (configurations.dateFormat !== 'YYYY-MM-DD HH:mm:ss') {
+						const archiveData = publishedPosts.map((post) => {
+							const tempObject = {
+								...post,
+							};
+							tempObject.published_at = formatDate(
+								post.published_at,
+								'YYYY-MM-DD HH:mm:ss'
+							);
+							tempObject.modified_at = formatDate(
+								post.modified_at,
+								'YYYY-MM-DD HH:mm:ss'
+							);
+							tempObject.created_at = formatDate(
+								post.created_at,
+								'YYYY-MM-DD HH:mm:ss'
+							);
+							return tempObject;
+						});
+						archiveMap = createArchiveMap(archiveData);
+
+						postsByTag.forEach((post) => {
+							post.published_at = formatDate(
+								post.published_at,
+								configurations.dateFormat
+							);
+							post.modified_at = formatDate(
+								post.modified_at,
+								configurations.dateFormat
+							);
+							post.created_at = formatDate(
+								post.created_at,
+								configurations.dateFormat
+							);
+						});
+						res.render('home', {
+							siteTitle: 'Bishops First Blog',
+							postList: postsByTag,
+							formatedBlogPostData: archiveMap,
+							flat:
+								defaultLayout.name === 'flat'
+									? defaultLayout.default
+									: false,
+							tree:
+								defaultLayout.name === 'tree'
+									? defaultLayout.default
+									: false,
+							tags,
+						});
+						return;
+					}
+
+					publishedPosts.forEach((post) => {
+						post.published_at = formatDate(
+							post.published_at,
+							configurations.dateFormat
+						);
+						post.modified_at = formatDate(
+							post.modified_at,
+							configurations.dateFormat
+						);
+						post.created_at = formatDate(
+							post.created_at,
+							configurations.dateFormat
+						);
+					});
+					archiveMap = createArchiveMap(publishedPosts);
+
+					postsByTag.forEach((post) => {
+						post.published_at = formatDate(
+							post.published_at,
+							configurations.dateFormat
+						);
+						post.modified_at = formatDate(
+							post.modified_at,
+							configurations.dateFormat
+						);
+						post.created_at = formatDate(
+							post.created_at,
+							configurations.dateFormat
+						);
+					});
+					res.render('home', {
+						siteTitle: 'Bishops First Blog',
+						postList: postsByTag,
+						formatedBlogPostData: archiveMap,
+						flat:
+							defaultLayout.name === 'flat'
+								? defaultLayout.default
+								: false,
+						tree:
+							defaultLayout.name === 'tree'
+								? defaultLayout.default
+								: false,
+						tags,
+					});
+					return;
+				}
+
+				postsByTag.forEach((post) => {
+					post.published_at = formatDate(
+						post.published_at,
+						configurations.dateFormat
+					);
+					post.modified_at = formatDate(
+						post.modified_at,
+						configurations.dateFormat
+					);
+					post.created_at = formatDate(
+						post.created_at,
+						configurations.dateFormat
+					);
+				});
+
+				archiveMap = '';
+
+				res.render('home', {
+					siteTitle: 'Bishops First Blog',
+					postList: postsByTag,
+					formatedBlogPostData: archiveMap,
+					flat:
+						defaultLayout.name === 'flat'
+							? defaultLayout.default
+							: false,
+					tree:
+						defaultLayout.name === 'tree'
+							? defaultLayout.default
+							: false,
+					tags,
+				});
+			} catch (err) {
+				console.error(err);
+			}
 		};
 	}
 }

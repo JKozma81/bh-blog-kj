@@ -69,6 +69,18 @@ class BlogPostService {
 	async getActiveSlug(postId) {
 		return await this.PostRepository.getActiveSlug(postId);
 	}
+
+	async getTaglist() {
+		return await this.PostRepository.getAllTags();
+	}
+
+	async getTag(tagName) {
+		return await this.PostRepository.getTag(tagName);
+	}
+
+	async getPublishedBlogpostsByTag(postTag) {
+		return await this.PostRepository.getAllPublishedPostsByTag(postTag);
+	}
 }
 
 module.exports = BlogPostService;

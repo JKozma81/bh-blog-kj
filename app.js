@@ -83,6 +83,16 @@ app.get(
 	})
 );
 
+app.get(
+	'/tags/:tag',
+	PostController.showTags({
+		blogPostService,
+		archiveConfigService,
+		formatDate,
+		configurations,
+	})
+);
+
 app.post(
 	'/search',
 	PostController.getSearched({
@@ -268,5 +278,17 @@ app.post(
 		blogPostService,
 	})
 );
+
+app.all('*', (req, res) => {
+	throw new Error('Bad request');
+});
+
+app.use((e, req, res, next) => {
+	if (e.message === 'Bad request') {
+		res.render('custom404', {
+			siteTitle: 'Bishops First Blog',
+		});
+	}
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

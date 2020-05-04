@@ -10,105 +10,101 @@ function initDBConnection(dbFile) {
 			dataBase.serialize(() => {
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-                   posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   author VARCHAR(100) NOT NULL,
-                   title VARCHAR(100) NOT NULL,
-                   content TEXT NOT NULL,
-                   created_at INTEGER NOT NULL,
-                   published_at INTEGER,
-                   modified_at INTEGER,
-                   draft INTEGER NOT NULL)`
+                   		posts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   		author VARCHAR(100) NOT NULL,
+                   		title VARCHAR(100) NOT NULL,
+                   		content TEXT NOT NULL,
+                   		created_at INTEGER NOT NULL,
+                   		published_at INTEGER,
+                   		modified_at INTEGER,
+                   		draft INTEGER NOT NULL)`
 				);
 
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-                   slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   slug_value VARCHAR(100) NOT NULL,
-                   post_id INTEGER NOT NULL,
-                   is_active INTEGER NOT NULL,
-                   FOREIGN KEY (post_id) REFERENCES posts (id)
-                  )`
+                   		slugs (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   		slug_value VARCHAR(100) NOT NULL,
+                   		post_id INTEGER NOT NULL,
+                   		is_active INTEGER NOT NULL,
+                    FOREIGN KEY (post_id) REFERENCES posts (id)
+                  	)`
 				);
 
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-            	   tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   tag_name VARCHAR(100) NOT NULL,
-                   post_id INTEGER NOT NULL,
-                   FOREIGN KEY (post_id) REFERENCES posts (id)
-                  )`
+            	   		tags (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   		tag_name VARCHAR(100) NOT NULL,
+                   		post_id INTEGER NOT NULL,
+                   	FOREIGN KEY (post_id) REFERENCES posts (id)
+                  	)`
 				);
 
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
-                 archive_layouts (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 layout VARCHAR(100) NOT NULL,
-                 is_active INTEGER NOT NULL
-                )`
+                 		archive_layouts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                 		layout VARCHAR(100) NOT NULL,
+                 		is_active INTEGER NOT NULL
+                	)`
 				);
 
-				dataBase.all(
-					`SELECT layout FROM archive_layouts`,
-					(err, results) => {
-						const layouts = results;
-						if (layouts.length === 0) {
-							dataBase.run(`
-                INSERT INTO 
-                  archive_layouts(layout, is_active)
-                VALUES("flat", 0)
-              `);
-							dataBase.run(`
-                INSERT INTO 
-                  archive_layouts(layout, is_active)
-                VALUES("tree", 1)
-              `);
+				dataBase.run(`
+					INSERT INTO 
+						archive_layouts(layout, is_active)
+					VALUES("flat", 0)
+				`);
+
+				dataBase.run(`
+					INSERT INTO 
+						archive_layouts(layout, is_active)
+					VALUES("tree", 1)
+				`);
+
+				dataBase.run(
+					`CREATE TABLE IF NOT EXISTS
+            	   		accounts (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   		user_name VARCHAR(100) NOT NULL,
+                   		user_email VARCHAR(100) NOT NULL,
+                   		user_password VARCHAR(100) NOT NULL,
+                   		role_id INTEGER NOT NULL,
+                   	FOREIGN KEY (role_id) REFERENCES roles (id)
+                  	)`
+				);
+
+				dataBase.run(
+					`CREATE TABLE IF NOT EXISTS
+						roles (id INTEGER PRIMARY KEY AUTOINCREMENT,
+						role_name VARCHAR(100) NOT NULL
+						)`
+				);
+
+				dataBase.run(`
+					INSERT INTO
+						roles(role_name)
+					VALUES("admin")
+				`);
+
+				dataBase.run(`
+					INSERT INTO
+						roles(role_name)
+					VALUES("author")
+				`);
+
+				dataBase.serialize(() => {
+					dataBase.get(
+						'SELECT id FROM roles WHERE role_name = ?',
+						['admin'],
+						(err, roleResult) => {
+							const adminId = roleResult.id;
+							dataBase.run(
+								`
+								INSERT INTO
+									accounts(user_name, user_email, user_password, role_id)
+								VALUES("admin", "admin@example.com", "admin", ?)
+								`,
+								adminId
+							);
 						}
-					}
-				);
-
-				dataBase.run(
-					`CREATE TABLE IF NOT EXISTS
-            	   accounts (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   user_name VARCHAR(100) NOT NULL,
-                   user_email VARCHAR(100) NOT NULL,
-                   user_password VARCHAR(100) NOT NULL,
-                   role_id INTEGER NOT NULL,
-                   FOREIGN KEY (role_id) REFERENCES roles (id)
-                  )`
-				);
-				dataBase.get(
-					'SELECT user_name FROM accounts',
-					(err, result) => {
-						if (!result) {
-							dataBase.run(`
-              INSERT INTO
-                accounts(user_name, user_email, user_password, role_id)
-              VALUES("admin", "admin@example.com", "admin", 1)
-            `);
-						}
-					}
-				);
-
-				dataBase.run(
-					`CREATE TABLE IF NOT EXISTS
-            roles (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                   role_name VARCHAR(100) NOT NULL
-                  )`
-				);
-
-				dataBase.get('SELECT role_name FROM roles', (err, result) => {
-					if (!result) {
-						dataBase.run(`
-              INSERT INTO
-                roles(role_name)
-              VALUES("admin")
-            `);
-						dataBase.run(`
-              INSERT INTO
-                roles(role_name)
-              VALUES("author")
-          `);
-					}
+					);
 				});
 			});
 		} catch (err) {

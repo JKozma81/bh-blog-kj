@@ -50,6 +50,13 @@
             {{/each}}
         </ul>
         {{/if}}
+
+        <div class="container-fluid border p-2">
+            <p>Tags</p>
+            {{#each tags}}
+            <a href="/tags/{{this}}">{{this}}</a>
+            {{/each}}
+        </div>
     </div>
 
 

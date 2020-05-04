@@ -426,6 +426,95 @@ class PostRepository {
 			console.error(err);
 		}
 	}
+
+	async getAllTags() {
+		try {
+			const tags = await this.DBAdapter().getAll(
+				`
+        SELECT DISTINCT tag_name FROM tags
+      `
+			);
+
+			const results = tags.map((tag) => tag.tag_name);
+
+			return results;
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	async getTag(tagName) {
+		try {
+			const tag = await this.DBAdapter().get(
+				`
+        SELECT DISTINCT tag_name FROM tags WHERE tag_name = ?
+      `,
+				[tagName]
+			);
+
+			const result = tag ? tag.tag_name : undefined;
+
+			return result;
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	async getAllPublishedPostsByTag(postTag) {
+		try {
+			const blogPostsData = await this.DBAdapter().getAll(
+				`SELECT
+          posts.id,
+          posts.title,
+          posts.author,
+          posts.content,
+          posts.created_at,
+          posts.draft,
+          posts.published_at,
+          posts.modified_at,
+          slugs.slug_value
+				FROM
+          posts
+        JOIN
+          slugs
+        ON
+          slugs.post_id = posts.id
+        JOIN
+          tags
+        ON
+          tags.post_id = posts.id
+        WHERE
+          slugs.is_active = 1
+        AND
+          posts.published_at IS NOT NULL
+        AND
+          tags.tag_name = ?
+				ORDER BY posts.published_at DESC
+      `,
+				[postTag]
+			);
+
+			const results = blogPostsData.map(
+				(postData) =>
+					new BlogPost(
+						postData.id,
+						postData.title,
+						postData.author,
+						postData.content,
+						postData.created_at,
+						postData.slug_value,
+						postData.draft === 1 ? true : false,
+						postData.published_at,
+						postData.modified_at,
+						postData.tags
+					)
+			);
+
+			return results;
+		} catch (err) {
+			console.error(err);
+		}
+	}
 }
 
 module.exports = PostRepository;
