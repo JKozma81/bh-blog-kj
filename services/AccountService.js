@@ -17,6 +17,10 @@ class AccountService {
 		return await this.AccountRepository.getAccountByData(dataObj);
 	}
 
+	async getUnicId(userEmail) {
+		return await this.AccountRepository.getUnicId(userEmail);
+	}
+
 	async getAccountById(id) {
 		return await this.AccountRepository.getAccountById(id);
 	}

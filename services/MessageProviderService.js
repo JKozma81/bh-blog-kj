@@ -13,6 +13,7 @@ const messages = {
 	login: 'Login required!',
 	success: `Logout success!`,
 	emailSent: 'Password reset email was sent!',
+	notRegistered: 'The email you provided is not registered!',
 };
 
 class MessageProviderService {

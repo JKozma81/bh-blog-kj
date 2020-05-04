@@ -106,6 +106,15 @@ function initDBConnection(dbFile) {
 						}
 					);
 				});
+
+				dataBase.run(
+					`CREATE TABLE IF NOT EXISTS
+                   		pass_resets (id INTEGER PRIMARY KEY NOT NULL,
+                   		account_id INTEGER NOT NULL,
+                   		is_active INTEGER NOT NULL,
+                    FOREIGN KEY (account_id) REFERENCES accounts (id)
+                  	)`
+				);
 			});
 		} catch (err) {
 			console.error(err);

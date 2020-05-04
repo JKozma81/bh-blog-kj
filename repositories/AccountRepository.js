@@ -244,6 +244,59 @@ class AccountRepository {
 			console.error(err);
 		}
 	}
+
+	async getUnicId(userEmail) {
+		try {
+			const account = await this.DBAdapter().get(
+				`
+				SELECT
+					accounts.id,
+					accounts.user_name,
+					accounts.user_password,
+					accounts.user_email,
+					roles.role_name
+				FROM
+					accounts
+				JOIN
+					roles
+				ON
+					accounts.role_id = roles.id
+				WHERE
+					accounts.user_email = ?
+      		`,
+				[userEmail]
+			);
+
+			if (!account) {
+				return undefined;
+			}
+
+			await this.DBAdapter().run(
+				'iNSERT INTO pass_resets(id, account_id, is_active) VALUES(?,?,?)',
+				[Date.now(), account.id, 1]
+			);
+
+			const unicId = await this.DBAdapter().get(
+				'SELECT id FROM pass_resets WHERE account_id = ? AND is_active = 1',
+				[account.id]
+			);
+
+			const accountResult = new Account(
+				account.id,
+				account.user_name,
+				account.user_password,
+				account.user_email,
+				account.role_name
+			);
+
+			return {
+				account: accountResult,
+				unicId: unicId.id,
+			};
+		} catch (err) {
+			console.error(err);
+		}
+	}
 }
 
 module.exports = AccountRepository;

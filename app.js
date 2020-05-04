@@ -103,6 +103,14 @@ app.get(
 );
 
 app.post(
+	'/reset',
+	PasswordResetController.sendPassReset({
+		configurations,
+		accountService,
+	})
+);
+
+app.post(
 	'/search',
 	PostController.getSearched({
 		blogPostService,
