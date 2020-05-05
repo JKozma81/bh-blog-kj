@@ -17,8 +17,8 @@ class AccountService {
 		return await this.AccountRepository.getAccountByData(dataObj);
 	}
 
-	async getUnicId(userEmail) {
-		return await this.AccountRepository.getUnicId(userEmail);
+	async getAccountInfo(userEmail) {
+		return await this.AccountRepository.getAccountInfo(userEmail);
 	}
 
 	async getAccountById(id) {
@@ -31,6 +31,14 @@ class AccountService {
 
 	async getAllRoles() {
 		return await this.AccountRepository.getAllRoles();
+	}
+
+	async getResetInfo(resetId) {
+		return await this.AccountRepository.getResetInfo(resetId);
+	}
+
+	async resetPassword(resetInfoObject) {
+		return await this.AccountRepository.resetPassword(resetInfoObject);
 	}
 }
 

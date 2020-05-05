@@ -47,18 +47,6 @@ function initDBConnection(dbFile) {
                 	)`
 				);
 
-				dataBase.run(`
-					INSERT INTO 
-						archive_layouts(layout, is_active)
-					VALUES("flat", 0)
-				`);
-
-				dataBase.run(`
-					INSERT INTO 
-						archive_layouts(layout, is_active)
-					VALUES("tree", 1)
-				`);
-
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
             	   		accounts (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -77,36 +65,6 @@ function initDBConnection(dbFile) {
 						)`
 				);
 
-				dataBase.run(`
-					INSERT INTO
-						roles(role_name)
-					VALUES("admin")
-				`);
-
-				dataBase.run(`
-					INSERT INTO
-						roles(role_name)
-					VALUES("author")
-				`);
-
-				dataBase.serialize(() => {
-					dataBase.get(
-						'SELECT id FROM roles WHERE role_name = ?',
-						['admin'],
-						(err, roleResult) => {
-							const adminId = roleResult.id;
-							dataBase.run(
-								`
-								INSERT INTO
-									accounts(user_name, user_email, user_password, role_id)
-								VALUES("admin", "admin@example.com", "admin", ?)
-								`,
-								adminId
-							);
-						}
-					);
-				});
-
 				dataBase.run(
 					`CREATE TABLE IF NOT EXISTS
                    		pass_resets (id INTEGER PRIMARY KEY NOT NULL,
@@ -115,6 +73,66 @@ function initDBConnection(dbFile) {
                     FOREIGN KEY (account_id) REFERENCES accounts (id)
                   	)`
 				);
+
+				dataBase.serialize(() => {
+					dataBase.get(
+						'SELECT id FROM archive_layouts',
+						(err, archiveResult) => {
+							if (!archiveResult) {
+								dataBase.run(`
+									INSERT INTO 
+										archive_layouts(layout, is_active)
+									VALUES("flat", 0)
+								`);
+
+								dataBase.run(`
+									INSERT INTO 
+										archive_layouts(layout, is_active)
+									VALUES("tree", 1)
+								`);
+							}
+						}
+					);
+
+					dataBase.get('SELECT id FROM roles', (err, roleResult) => {
+						if (!roleResult) {
+							dataBase.run(`
+								INSERT INTO
+									roles(role_name)
+								VALUES("admin")
+							`);
+
+							dataBase.run(`
+								INSERT INTO
+									roles(role_name)
+								VALUES("author")
+							`);
+						}
+					});
+
+					dataBase.get(
+						'SELECT id FROM accounts',
+						(err, accountResult) => {
+							if (!accountResult) {
+								dataBase.get(
+									'SELECT id FROM roles WHERE role_name = ?',
+									['admin'],
+									(err, roleResult) => {
+										const adminId = roleResult.id;
+										dataBase.run(
+											`
+										INSERT INTO
+											accounts(user_name, user_email, user_password, role_id)
+										VALUES("admin", "admin@example.com", "admin", ?)
+										`,
+											adminId
+										);
+									}
+								);
+							}
+						}
+					);
+				});
 			});
 		} catch (err) {
 			console.error(err);

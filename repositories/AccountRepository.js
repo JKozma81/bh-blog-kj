@@ -96,27 +96,31 @@ class AccountRepository {
 
 	async getAccountByData(dataObj) {
 		try {
-			const account = await await this.DBAdapter().get(
+			const account = await this.DBAdapter().get(
 				`
-        SELECT
-          accounts.id,
-          accounts.user_name,
-          accounts.user_password,
-          accounts.user_email,
-          roles.role_name
-        FROM
-          accounts
-        JOIN
-          roles
-        ON
-          accounts.role_id = roles.id
-        WHERE
-          accounts.user_name = ?
-        AND
-          accounts.user_password = ? 
-      `,
+				SELECT
+					accounts.id,
+					accounts.user_name,
+					accounts.user_password,
+					accounts.user_email,
+					roles.role_name
+				FROM
+					accounts
+				JOIN
+					roles
+				ON
+					accounts.role_id = roles.id
+				WHERE
+					accounts.user_name = ?
+				AND
+					accounts.user_password = ? 
+				`,
 				[dataObj.username, dataObj.password]
 			);
+
+			if (!account) {
+				return undefined;
+			}
 
 			const result = new Account(
 				account.id,
@@ -134,25 +138,29 @@ class AccountRepository {
 
 	async getAccountById(id) {
 		try {
-			const account = await await this.DBAdapter().get(
+			const account = await this.DBAdapter().get(
 				`
-        SELECT
-          accounts.id,
-          accounts.user_name,
-          accounts.user_password,
-          accounts.user_email,
-          roles.role_name
-        FROM
-          accounts
-        JOIN
-          roles
-        ON
-          accounts.role_id = roles.id
-        WHERE
-          accounts.id = ?
-      `,
+				SELECT
+					accounts.id,
+					accounts.user_name,
+					accounts.user_password,
+					accounts.user_email,
+					roles.role_name
+				FROM
+					accounts
+				JOIN
+					roles
+				ON
+					accounts.role_id = roles.id
+				WHERE
+					accounts.id = ?
+				`,
 				[id]
 			);
+
+			if (!account) {
+				return undefined;
+			}
 
 			const result = new Account(
 				account.id,
@@ -175,18 +183,18 @@ class AccountRepository {
 				[editedAccount.roles]
 			);
 
-			await await this.DBAdapter().runAsync(
+			await this.DBAdapter().runAsync(
 				`
-        UPDATE
-          accounts
-        SET
-          user_name = ?,
-          user_email = ?,
-          user_password = ?,
-          role_id = ?
-        WHERE
-          id = ?
-      `,
+				UPDATE
+					accounts
+				SET
+					user_name = ?,
+					user_email = ?,
+					user_password = ?,
+					role_id = ?
+				WHERE
+					id = ?
+      			`,
 				editedAccount.user_name,
 				editedAccount.user_email,
 				editedAccount.user_password,
@@ -196,21 +204,21 @@ class AccountRepository {
 
 			const account = await this.DBAdapter().get(
 				`
-        SELECT
-          accounts.id,
-          accounts.user_name,
-          accounts.user_password,
-          accounts.user_email,
-          roles.role_name
-        FROM
-          accounts
-        JOIN
-          roles
-        ON
-          accounts.role_id = roles.id
-        WHERE
-          accounts.id = ?
-      `,
+			SELECT
+				accounts.id,
+				accounts.user_name,
+				accounts.user_password,
+				accounts.user_email,
+				roles.role_name
+			FROM
+				accounts
+			JOIN
+				roles
+			ON
+				accounts.role_id = roles.id
+			WHERE
+				accounts.id = ?
+			`,
 				[editedAccount.id]
 			);
 
@@ -232,12 +240,12 @@ class AccountRepository {
 		try {
 			const roles = await this.DBAdapter().getAll(
 				`
-          SELECT
-            id,
-            role_name
-          FROM
-            roles
-        `
+				SELECT
+					id,
+					role_name
+				FROM
+					roles
+				`
 			);
 			return roles;
 		} catch (err) {
@@ -245,7 +253,7 @@ class AccountRepository {
 		}
 	}
 
-	async getUnicId(userEmail) {
+	async getAccountInfo(userEmail) {
 		try {
 			const account = await this.DBAdapter().get(
 				`
@@ -271,9 +279,11 @@ class AccountRepository {
 				return undefined;
 			}
 
-			await this.DBAdapter().run(
+			await this.DBAdapter().runAsync(
 				'iNSERT INTO pass_resets(id, account_id, is_active) VALUES(?,?,?)',
-				[Date.now(), account.id, 1]
+				Date.now(),
+				account.id,
+				1
 			);
 
 			const unicId = await this.DBAdapter().get(
@@ -293,6 +303,54 @@ class AccountRepository {
 				account: accountResult,
 				unicId: unicId.id,
 			};
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	async getResetInfo(id) {
+		try {
+			const accountId = await this.DBAdapter().get(
+				`
+				SELECT
+					id,
+					account_id
+				FROM
+					pass_resets
+				WHERE
+					id = ?
+				AND
+					is_active = 1
+				`,
+				[id]
+			);
+
+			if (!accountId) {
+				return undefined;
+			}
+
+			return accountId;
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	async resetPassword(resetInfoObject) {
+		try {
+			this.DBAdapter().run(
+				'UPDATE accounts SET user_password = ? WHERE id = ?',
+				[resetInfoObject.password, resetInfoObject.account_id]
+			);
+
+			this.DBAdapter().run(
+				'UPDATE pass_resets SET is_active = 0 WHERE id = ? AND account_id = ?',
+				[
+					Number(resetInfoObject.reset_id),
+					Number(resetInfoObject.account_id),
+				]
+			);
+
+			return resetInfoObject.account_id;
 		} catch (err) {
 			console.error(err);
 		}

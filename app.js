@@ -96,7 +96,7 @@ app.get(
 
 app.get(
 	'/reset',
-	PasswordResetController.showReset({
+	PasswordResetController.showForgotPassword({
 		messageProviderService,
 		configurations,
 	})
@@ -105,6 +105,22 @@ app.get(
 app.post(
 	'/reset',
 	PasswordResetController.sendPassReset({
+		configurations,
+		accountService,
+	})
+);
+
+app.get(
+	'/reset/:id',
+	PasswordResetController.showPasswordReset({
+		configurations,
+		accountService,
+	})
+);
+
+app.post(
+	'/passwordreset',
+	PasswordResetController.resetPassword({
 		configurations,
 		accountService,
 	})
