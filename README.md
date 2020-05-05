@@ -21,4 +21,4 @@ The master branch will be allways the up to date version with the solved HW task
 |       BLOG-012: Konfigurálható CSS témák       | :heavy_check_mark: |    BLOGHW-014: szuperadmin és admin     | :x:                |
 |             BLOG-013: New Account              | :heavy_check_mark: |                                         |                    |
 | BLOG-014: Jogosultság kezelés, admin és szerző | :heavy_check_mark: |                                         |                    |
-|   BLOG-015: Elfelejtett jelszó, email küldés   |        :x:         |                                         |                    |
+|   BLOG-015: Elfelejtett jelszó, email küldés   | :heavy_check_mark: |                                         |                    |
