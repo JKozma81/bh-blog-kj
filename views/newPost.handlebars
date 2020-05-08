@@ -148,7 +148,9 @@
         }
 
         if (document.querySelector('#post_title').value && document.querySelector('#post_content').value && document.querySelector('#post_tags').value) {
-          document.querySelector('#post_slug').value = document.querySelector('#post_slug').placeholder;
+          if (!document.querySelector('#post_slug').value) {
+            document.querySelector('#post_slug').value = document.querySelector('#post_slug').placeholder;
+          }
           form.submit();
         }
 
