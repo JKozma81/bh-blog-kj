@@ -53,13 +53,15 @@ class PasswordResetController {
 			// 		pass: 'Rg2HCJep9bFScmkbqd',
 			// 	},
 			// });
+
+			// When you want to test the email feature you need to provide some account info down below
 			let transporter = nodemailer.createTransport({
 				host: 'smtp.gmail.com',
 				port: 465,
 				secure: true,
 				auth: {
-					user: 'jkozma81@gmail.com',
-					pass: 'Snoopy8119',
+					user: 'your_gmail_account_here',
+					pass: 'Your_gmail_password_here',
 				},
 			});
 
