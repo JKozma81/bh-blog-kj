@@ -1,24 +1,32 @@
-# bh-blog-kj
+# BH Blog project
 
 This is my solution for the Blog project we are working on.
 
 The master branch will be allways the up to date version with the solved HW task merged to it.
 
-|                  Normal Task                   |     Condition      |                 HW task                 | Condition          |
-| :--------------------------------------------: | :----------------: | :-------------------------------------: | ------------------ |
-|  BLOG-000: Main Layout és Post List Component  | :heavy_check_mark: |        BLOGHW-001: Logout üzenet        | :heavy_check_mark: |
-|     BLOG-001: Login View és Dashboard View     | :heavy_check_mark: |    BLOGHW-002 Login űrlap validáció     | :heavy_check_mark: |
-|    BLOG-002: Süti alapú munkamenet kezelés     | :heavy_check_mark: |     BLOGHW-003: Discard megerősítés     | :heavy_check_mark: |
-|        BLOG-003: Új bejegyzés felvitele        | :heavy_check_mark: |     BLOGHW-004: WYSIWYG szerkesztő      | :heavy_check_mark: |
-|        BLOG-004: Post List és Post View        | :heavy_check_mark: |       BLOGHW-005: Slug generálás        | :heavy_check_mark: |
-|               BLOG-005: URL slug               | :heavy_check_mark: | BLOGHW-007: Utolsó frissítés időpontja  | :heavy_check_mark: |
-|   BLOG-006: Dashboard Post List és Edit Post   | :heavy_check_mark: |   BLOGHW-008: Régi slug átirányítása    | :heavy_check_mark: |
-|            BLOG-007: Save as draft             | :heavy_check_mark: |   BLOGHW-009: konfigurálható archívum   | :heavy_check_mark: |
-|               BLOG-008: Archívum               | :heavy_check_mark: | BLOGHW-010: kicserélhető adatbázismotor | :x:                |
-|               BLOG-009: Keresés                | :heavy_check_mark: |          BLOGHW-011: Tag felhő          | :x:                |
-|  BLOG-010: Konfigurálható adatbázis kapcsolat  | :heavy_check_mark: |   BLOGHW-012: installálható CSS témák   | :heavy_check_mark: |
-|                BLOG-011: Tagek                 | :heavy_check_mark: |        BLOGHW-013: Edit Account         | :heavy_check_mark: |
-|       BLOG-012: Konfigurálható CSS témák       | :heavy_check_mark: |    BLOGHW-014: szuperadmin és admin     | :x:                |
-|             BLOG-013: New Account              | :heavy_check_mark: |                                         |                    |
-| BLOG-014: Jogosultság kezelés, admin és szerző | :heavy_check_mark: |                                         |                    |
-|   BLOG-015: Elfelejtett jelszó, email küldés   | :heavy_check_mark: |                                         |                    |
+## Description
+
+This was our second project in the bootcamp. It is basic blog app with admin and public interface. Its able to perform basic CRUD operations. The required task are listed below with the status of them.
+
+|                  Normal Task                  |     Condition      |                HW task                | Condition          |
+| :-------------------------------------------: | :----------------: | :-----------------------------------: | ------------------ |
+| BLOG-000: Main Layout and Post List Component | :heavy_check_mark: |      BLOGHW-001: Logout message       | :heavy_check_mark: |
+|    BLOG-001: Login View and Dashboard View    | :heavy_check_mark: |      BLOGHW-002 Login validation      | :heavy_check_mark: |
+|   BLOG-002: Cookie-based session management   | :heavy_check_mark: |   BLOGHW-003: Discard confirmation    | :heavy_check_mark: |
+|              BLOG-003: New post               | :heavy_check_mark: |      BLOGHW-004: WYSIWYG editor       | :heavy_check_mark: |
+|       BLOG-004: Post List and Post View       | :heavy_check_mark: |       BLOGHW-005: Generate slug       | :heavy_check_mark: |
+|              BLOG-005: URL slug               | :heavy_check_mark: |    BLOGHW-007: Last modified date     | :heavy_check_mark: |
+|  BLOG-006: Dashboard Post List and Edit Post  | :heavy_check_mark: |   BLOGHW-008: Old slug redirection    | :heavy_check_mark: |
+|            BLOG-007: Save as draft            | :heavy_check_mark: |    BLOGHW-009: Confirable archive     | :heavy_check_mark: |
+|               BLOG-008: Archive               | :heavy_check_mark: | BLOGHW-010: Removable database engine | :x:                |
+|               BLOG-009: Search                | :heavy_check_mark: |         BLOGHW-011: Tag cloud         | :x:                |
+|   BLOG-010: Confirable database connection    | :heavy_check_mark: |  BLOGHW-012: Installable CSS themes   | :heavy_check_mark: |
+|                BLOG-011: Tags                 | :heavy_check_mark: |       BLOGHW-013: Edit Account        | :heavy_check_mark: |
+|        BLOG-012: Confurable CSS themes        | :heavy_check_mark: |   BLOGHW-014: Superadmin and admin    | :x:                |
+|             BLOG-013: New Account             | :heavy_check_mark: |                                       |                    |
+| BLOG-014: User authorization admin and author | :heavy_check_mark: |                                       |                    |
+|       BLOG-015: Forgott password email        | :heavy_check_mark: |                                       |                    |
+
+## Technologies
+
+Node js / Express js / Handlebars / Bootstrap 4 / SQLite
