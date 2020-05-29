@@ -6,7 +6,7 @@ The master branch will be allways the up to date version with the solved HW task
 
 ## Description
 
-This was our second project in the bootcamp. It is basic blog app with admin and public interface. Its able to perform basic CRUD operations. The required task are listed below with the status of them.
+This was our second project in the bootcamp. It is a basic blog app with admin and public interface. Its able to perform basic CRUD operations. The required task are listed below with the status of them.
 
 |                  Normal Task                  |     Condition      |                HW task                | Condition          |
 | :-------------------------------------------: | :----------------: | :-----------------------------------: | ------------------ |
