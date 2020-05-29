@@ -20,7 +20,7 @@ This was our second project in the bootcamp. It is a basic blog app with admin a
 |            BLOG-007: Save as draft            | :heavy_check_mark: |    BLOGHW-009: Confirable archive     | :heavy_check_mark: |
 |               BLOG-008: Archive               | :heavy_check_mark: | BLOGHW-010: Removable database engine | :x:                |
 |               BLOG-009: Search                | :heavy_check_mark: |         BLOGHW-011: Tag cloud         | :x:                |
-|   BLOG-010: Confirable database connection    | :heavy_check_mark: |  BLOGHW-012: Installable CSS themes   | :heavy_check_mark: |
+|  BLOG-010: Configurable database connection   | :heavy_check_mark: |  BLOGHW-012: Installable CSS themes   | :heavy_check_mark: |
 |                BLOG-011: Tags                 | :heavy_check_mark: |       BLOGHW-013: Edit Account        | :heavy_check_mark: |
 |        BLOG-012: Confurable CSS themes        | :heavy_check_mark: |   BLOGHW-014: Superadmin and admin    | :x:                |
 |             BLOG-013: New Account             | :heavy_check_mark: |                                       |                    |
