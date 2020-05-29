@@ -17,7 +17,7 @@ This was our second project in the bootcamp. It is a basic blog app with admin a
 |       BLOG-004: Post List and Post View       | :heavy_check_mark: |       BLOGHW-005: Generate slug       | :heavy_check_mark: |
 |              BLOG-005: URL slug               | :heavy_check_mark: |    BLOGHW-007: Last modified date     | :heavy_check_mark: |
 |  BLOG-006: Dashboard Post List and Edit Post  | :heavy_check_mark: |   BLOGHW-008: Old slug redirection    | :heavy_check_mark: |
-|            BLOG-007: Save as draft            | :heavy_check_mark: |    BLOGHW-009: Confirable archive     | :heavy_check_mark: |
+|            BLOG-007: Save as draft            | :heavy_check_mark: |   BLOGHW-009: Configurable archive    | :heavy_check_mark: |
 |               BLOG-008: Archive               | :heavy_check_mark: | BLOGHW-010: Removable database engine | :x:                |
 |               BLOG-009: Search                | :heavy_check_mark: |         BLOGHW-011: Tag cloud         | :x:                |
 |  BLOG-010: Configurable database connection   | :heavy_check_mark: |  BLOGHW-012: Installable CSS themes   | :heavy_check_mark: |
